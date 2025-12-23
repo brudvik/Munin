@@ -64,18 +64,28 @@ public partial class MainViewModel : ObservableObject
     private readonly HashSet<string> _loadedHistoryChannels = new();
     private RawIrcLogWindow? _rawIrcLogWindow;
 
-    partial void OnSelectedChannelChanged(ChannelViewModel? value)
+    partial void OnSelectedChannelChanged(ChannelViewModel? oldValue, ChannelViewModel? newValue)
     {
-        _logger.Information("OnSelectedChannelChanged: value={Name}", value?.Channel?.Name ?? "null");
-        if (value != null && SelectedServer != null)
+        _logger.Information("OnSelectedChannelChanged: value={Name}", newValue?.Channel?.Name ?? "null");
+        
+        // Deselect old channel
+        if (oldValue != null)
         {
+            oldValue.IsSelected = false;
+        }
+        
+        if (newValue != null && SelectedServer != null)
+        {
+            // Mark new channel as selected
+            newValue.IsSelected = true;
+            
             // Clear unread when selecting a channel
-            value.UnreadCount = 0;
-            value.HasMention = false;
+            newValue.UnreadCount = 0;
+            newValue.HasMention = false;
             
             _logger.Information("OnSelectedChannelChanged: About to load channel history");
             // Load history if not already loaded
-            LoadChannelHistory(value);
+            LoadChannelHistory(newValue);
             _logger.Information("OnSelectedChannelChanged: Channel history loaded");
         }
     }
@@ -402,6 +412,19 @@ public partial class MainViewModel : ObservableObject
                 var server = Servers.FirstOrDefault(sv => sv.Server.Id == e.Server.Id);
                 if (server != null)
                 {
+                    // Remove channel from UI
+                    var channelVm = server.Channels.FirstOrDefault(c => c.Channel?.Name == e.Channel.Name);
+                    if (channelVm != null)
+                    {
+                        server.Channels.Remove(channelVm);
+                        
+                        // If we were viewing this channel, switch to another
+                        if (SelectedChannel == channelVm)
+                        {
+                            SelectedChannel = server.Channels.FirstOrDefault();
+                        }
+                    }
+                    
                     // Remove channel from auto-join list
                     _configService.RemoveChannelFromServer(e.Server.Id, e.Channel.Name);
                     _ = SaveConfigurationAsync();
@@ -807,6 +830,13 @@ public partial class MainViewModel : ObservableObject
             Content = message
         };
         SelectedChannel.Messages.Add(new MessageViewModel(ircMessage));
+
+        // Log our own message
+        var serverName = SelectedChannel.ServerViewModel.Server.Name;
+        var logTarget = SelectedChannel.IsPrivateMessage 
+            ? $"PM-{SelectedChannel.PrivateMessageTarget}" 
+            : target;
+        LoggingService.Instance.LogMessage(serverName, logTarget, ircMessage);
     }
 
     private async Task HandleCommandAsync(string input, IrcConnection connection)
@@ -866,6 +896,7 @@ public partial class MainViewModel : ObservableObject
                                 Content = msgContent
                             };
                             dmChannel.Messages.Add(new MessageViewModel(ircMessage));
+                            LoggingService.Instance.LogMessage(server.Server.Name, $"PM-{targetNick}", ircMessage);
                             SelectedChannel = dmChannel;
                         }
                     }
@@ -897,6 +928,7 @@ public partial class MainViewModel : ObservableObject
                                 Content = queryMsg
                             };
                             dmChannel.Messages.Add(new MessageViewModel(ircMessage));
+                            LoggingService.Instance.LogMessage(server.Server.Name, $"PM-{targetUser}", ircMessage);
                         }
                     }
                 }
@@ -911,6 +943,13 @@ public partial class MainViewModel : ObservableObject
                     await connection.SendActionAsync(meTarget, args);
                     var actionMsg = IrcMessage.CreateAction(connection.CurrentNickname, args);
                     SelectedChannel.Messages.Add(new MessageViewModel(actionMsg));
+                    
+                    // Log the action
+                    var serverName = SelectedChannel.ServerViewModel.Server.Name;
+                    var logTarget = SelectedChannel.IsPrivateMessage 
+                        ? $"PM-{SelectedChannel.PrivateMessageTarget}" 
+                        : meTarget;
+                    LoggingService.Instance.LogMessage(serverName, logTarget, actionMsg);
                 }
                 break;
 

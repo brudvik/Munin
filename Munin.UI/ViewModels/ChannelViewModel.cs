@@ -74,6 +74,12 @@ public partial class ChannelViewModel : ObservableObject
     private string _privateMessageTarget = string.Empty;
     
     /// <summary>
+    /// Whether this channel is currently selected/active.
+    /// </summary>
+    [ObservableProperty]
+    private bool _isSelected;
+    
+    /// <summary>
     /// Message count per user (nickname -> count).
     /// </summary>
     private readonly ConcurrentDictionary<string, int> _userMessageCounts = new(StringComparer.OrdinalIgnoreCase);

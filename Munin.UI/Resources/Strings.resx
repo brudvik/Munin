@@ -236,6 +236,12 @@ Are you absolutely sure?</value>
   <data name="MainWindow_Search" xml:space="preserve">
     <value>Search...</value>
   </data>
+  <data name="MainWindow_LeaveChannel" xml:space="preserve">
+    <value>Leave channel</value>
+  </data>
+  <data name="MainWindow_CloseConversation" xml:space="preserve">
+    <value>Close conversation</value>
+  </data>
   
   <!-- Add Server Dialog -->
   <data name="AddServer_Title" xml:space="preserve">
@@ -369,6 +375,337 @@ Are you absolutely sure?</value>
   </data>
   <data name="ContextMenu_DeVoice" xml:space="preserve">
     <value>Remove Voice</value>
+  </data>
+  
+  <!-- Main Window Additional -->
+  <data name="MainWindow_Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="MainWindow_RawLog" xml:space="preserve">
+    <value>Raw IRC Log (Debug)</value>
+  </data>
+  <data name="MainWindow_Connecting" xml:space="preserve">
+    <value>Connecting...</value>
+  </data>
+  <data name="MainWindow_EditServer" xml:space="preserve">
+    <value>Edit server</value>
+  </data>
+  <data name="MainWindow_RemoveServer" xml:space="preserve">
+    <value>Remove server</value>
+  </data>
+  <data name="MainWindow_CloseSearch" xml:space="preserve">
+    <value>Close search (Esc)</value>
+  </data>
+  <data name="MainWindow_Send" xml:space="preserve">
+    <value>Send</value>
+  </data>
+  <data name="MainWindow_DoubleClickPM" xml:space="preserve">
+    <value>Double-click to send private message</value>
+  </data>
+  <data name="MainWindow_SendPrivateMessage" xml:space="preserve">
+    <value>Send Message</value>
+  </data>
+  <data name="MainWindow_Whois" xml:space="preserve">
+    <value>Whois</value>
+  </data>
+  <data name="MainWindow_IgnoreUser" xml:space="preserve">
+    <value>Ignore User</value>
+  </data>
+  <data name="MainWindow_UnignoreUser" xml:space="preserve">
+    <value>Unignore User</value>
+  </data>
+  
+  <!-- Add Server Dialog Additional -->
+  <data name="AddServer_Header" xml:space="preserve">
+    <value>Add IRC Server</value>
+  </data>
+  <data name="AddServer_Description" xml:space="preserve">
+    <value>Configure your IRC server connection</value>
+  </data>
+  <data name="AddServer_Hostname" xml:space="preserve">
+    <value>Hostname</value>
+  </data>
+  <data name="AddServer_Security" xml:space="preserve">
+    <value>Security</value>
+  </data>
+  <data name="AddServer_AcceptInvalidCerts" xml:space="preserve">
+    <value>Accept invalid certificates</value>
+  </data>
+  <data name="AddServer_AcceptInvalidCertsTooltip" xml:space="preserve">
+    <value>Enable this for self-signed certificates</value>
+  </data>
+  <data name="AddServer_SaslHeader" xml:space="preserve">
+    <value>SASL Authentication (IRCv3)</value>
+  </data>
+  <data name="AddServer_SaslUsername" xml:space="preserve">
+    <value>SASL Username (account name)</value>
+  </data>
+  <data name="AddServer_SaslPassword" xml:space="preserve">
+    <value>SASL Password</value>
+  </data>
+  <data name="AddServer_ServerPasswordOptional" xml:space="preserve">
+    <value>Server Password (optional)</value>
+  </data>
+  
+  <!-- Edit Server Dialog -->
+  <data name="EditServer_Title" xml:space="preserve">
+    <value>Edit Server</value>
+  </data>
+  <data name="EditServer_Header" xml:space="preserve">
+    <value>Edit Server</value>
+  </data>
+  <data name="EditServer_Description" xml:space="preserve">
+    <value>Modify your IRC server settings</value>
+  </data>
+  <data name="EditServer_NickServPassword" xml:space="preserve">
+    <value>NickServ Password (optional)</value>
+  </data>
+  
+  <!-- Settings Window Additional -->
+  <data name="Settings_Description" xml:space="preserve">
+    <value>Configure notifications, highlighting and more</value>
+  </data>
+  <data name="Settings_NotificationsHeader" xml:space="preserve">
+    <value>NOTIFICATIONS</value>
+  </data>
+  <data name="Settings_EnableSound" xml:space="preserve">
+    <value>Enable sound notifications</value>
+  </data>
+  <data name="Settings_FlashTaskbar" xml:space="preserve">
+    <value>Flash taskbar on new messages</value>
+  </data>
+  <data name="Settings_NotifyInactive" xml:space="preserve">
+    <value>Only notify when window is inactive</value>
+  </data>
+  <data name="Settings_HighlightingHeader" xml:space="preserve">
+    <value>HIGHLIGHTING</value>
+  </data>
+  <data name="Settings_HighlightWords" xml:space="preserve">
+    <value>Highlight Words (one per line)</value>
+  </data>
+  <data name="Settings_IgnoredUsersHeader" xml:space="preserve">
+    <value>IGNORED USERS</value>
+  </data>
+  <data name="Settings_IgnoredUsers" xml:space="preserve">
+    <value>Ignored Users (one per line)</value>
+  </data>
+  <data name="Settings_SecurityHeader" xml:space="preserve">
+    <value>SECURITY</value>
+  </data>
+  <data name="Settings_Encryption" xml:space="preserve">
+    <value>Encryption: </value>
+  </data>
+  <data name="Settings_EncryptionEnabled" xml:space="preserve">
+    <value>Enabled 🔒</value>
+  </data>
+  <data name="Settings_ChangeMasterPassword" xml:space="preserve">
+    <value>Change master password</value>
+  </data>
+  <data name="Settings_DisableEncryption" xml:space="preserve">
+    <value>Disable encryption</value>
+  </data>
+  <data name="Settings_EnableEncryption" xml:space="preserve">
+    <value>Enable encryption</value>
+  </data>
+  <data name="Settings_AutoLockHeader" xml:space="preserve">
+    <value>AUTO-LOCK</value>
+  </data>
+  <data name="Settings_AutoLockAfterInactivity" xml:space="preserve">
+    <value>Lock automatically after inactivity</value>
+  </data>
+  <data name="Settings_MinutesBeforeLock" xml:space="preserve">
+    <value>Minutes before lock:</value>
+  </data>
+  <data name="Settings_LogCleanupHeader" xml:space="preserve">
+    <value>LOG CLEANUP</value>
+  </data>
+  <data name="Settings_HistoryLinesToLoad" xml:space="preserve">
+    <value>History lines to load:</value>
+  </data>
+  <data name="Settings_DeleteOldLogs" xml:space="preserve">
+    <value>Delete old logs automatically</value>
+  </data>
+  <data name="Settings_KeepLogsFor" xml:space="preserve">
+    <value>Keep logs for:</value>
+  </data>
+  <data name="Settings_Days" xml:space="preserve">
+    <value>days (7-365)</value>
+  </data>
+  <data name="Settings_UseSecureDelete" xml:space="preserve">
+    <value>Use secure deletion (overwrites data before deleting)</value>
+  </data>
+  <data name="Settings_DeleteOldLogsNow" xml:space="preserve">
+    <value>Delete old logs now...</value>
+  </data>
+  <data name="Settings_SecurityLogHeader" xml:space="preserve">
+    <value>SECURITY LOG</value>
+  </data>
+  <data name="Settings_ShowSecurityLog" xml:space="preserve">
+    <value>Show security log...</value>
+  </data>
+  <data name="Settings_PortableModeHeader" xml:space="preserve">
+    <value>PORTABLE MODE</value>
+  </data>
+  <data name="Settings_Mode" xml:space="preserve">
+    <value>Mode: </value>
+  </data>
+  <data name="Settings_ModeNormal" xml:space="preserve">
+    <value>Normal</value>
+  </data>
+  <data name="Settings_ModePortable" xml:space="preserve">
+    <value>Portable</value>
+  </data>
+  <data name="Settings_DataStoredIn" xml:space="preserve">
+    <value>Data stored in: </value>
+  </data>
+  <data name="Settings_EnablePortableMode" xml:space="preserve">
+    <value>Enable portable mode</value>
+  </data>
+  <data name="Settings_OpenDataFolder" xml:space="preserve">
+    <value>Open data folder</value>
+  </data>
+  <data name="Settings_PortableModeDescription" xml:space="preserve">
+    <value>In portable mode, all data is stored in the same folder as the program.
+Perfect for USB drives.</value>
+  </data>
+  
+  <!-- Channel List Window -->
+  <data name="ChannelList_Title" xml:space="preserve">
+    <value>Channel List</value>
+  </data>
+  <data name="ChannelList_Loading" xml:space="preserve">
+    <value>Loading channels...</value>
+  </data>
+  <data name="ChannelList_Channel" xml:space="preserve">
+    <value>Channel</value>
+  </data>
+  <data name="ChannelList_Users" xml:space="preserve">
+    <value>Users</value>
+  </data>
+  <data name="ChannelList_Topic" xml:space="preserve">
+    <value>Topic</value>
+  </data>
+  <data name="ChannelList_Refresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="ChannelList_Join" xml:space="preserve">
+    <value>Join</value>
+  </data>
+  
+  <!-- Channel Stats Window -->
+  <data name="ChannelStats_Title" xml:space="preserve">
+    <value>Channel Statistics</value>
+  </data>
+  <data name="ChannelStats_Messages" xml:space="preserve">
+    <value>Messages</value>
+  </data>
+  <data name="ChannelStats_Chatters" xml:space="preserve">
+    <value>Chatters</value>
+  </data>
+  <data name="ChannelStats_MsgsPerMin" xml:space="preserve">
+    <value>Msgs/min</value>
+  </data>
+  <data name="ChannelStats_TopChatters" xml:space="preserve">
+    <value>Top Chatters 🏆</value>
+  </data>
+  
+  <!-- User Info Window -->
+  <data name="UserInfo_Title" xml:space="preserve">
+    <value>User Information</value>
+  </data>
+  <data name="UserInfo_Nickname" xml:space="preserve">
+    <value>Nickname</value>
+  </data>
+  
+  <!-- User Profile Window -->
+  <data name="UserProfile_Title" xml:space="preserve">
+    <value>User Profile</value>
+  </data>
+  <data name="UserProfile_RealName" xml:space="preserve">
+    <value>Real Name:</value>
+  </data>
+  <data name="UserProfile_Server" xml:space="preserve">
+    <value>Server:</value>
+  </data>
+  <data name="UserProfile_Account" xml:space="preserve">
+    <value>Account:</value>
+  </data>
+  <data name="UserProfile_Status" xml:space="preserve">
+    <value>Status:</value>
+  </data>
+  <data name="UserProfile_Connected" xml:space="preserve">
+    <value>Connected:</value>
+  </data>
+  <data name="UserProfile_Away" xml:space="preserve">
+    <value>Away:</value>
+  </data>
+  <data name="UserProfile_Channels" xml:space="preserve">
+    <value>Channels:</value>
+  </data>
+  <data name="UserProfile_Loading" xml:space="preserve">
+    <value>Loading...</value>
+  </data>
+  
+  <!-- Security Log Window -->
+  <data name="SecurityLog_Title" xml:space="preserve">
+    <value>Security Log</value>
+  </data>
+  <data name="SecurityLog_Description" xml:space="preserve">
+    <value>Overview of unlock attempts and security events</value>
+  </data>
+  <data name="SecurityLog_Time" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="SecurityLog_Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="SecurityLog_Event" xml:space="preserve">
+    <value>Event</value>
+  </data>
+  <data name="SecurityLog_Machine" xml:space="preserve">
+    <value>Machine</value>
+  </data>
+  <data name="SecurityLog_User" xml:space="preserve">
+    <value>User</value>
+  </data>
+  <data name="SecurityLog_Refresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  
+  <!-- Change Password Dialog -->
+  <data name="ChangePassword_Title" xml:space="preserve">
+    <value>Change Master Password</value>
+  </data>
+  <data name="ChangePassword_CurrentPassword" xml:space="preserve">
+    <value>Current password:</value>
+  </data>
+  <data name="ChangePassword_NewPassword" xml:space="preserve">
+    <value>New password:</value>
+  </data>
+  <data name="ChangePassword_ConfirmNewPassword" xml:space="preserve">
+    <value>Confirm new password:</value>
+  </data>
+  <data name="ChangePassword_Button" xml:space="preserve">
+    <value>Change Password</value>
+  </data>
+  
+  <!-- Raw Log Window -->
+  <data name="RawLog_Title" xml:space="preserve">
+    <value>Raw IRC Log</value>
+  </data>
+  <data name="RawLog_Clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="RawLog_AutoScroll" xml:space="preserve">
+    <value>Auto-scroll</value>
+  </data>
+  
+  <!-- Common Strings -->
+  <data name="Common_Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Common_Loading" xml:space="preserve">
+    <value>Loading...</value>
   </data>
   
 </root>

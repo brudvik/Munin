@@ -37,15 +37,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configurable history line count (10-1000 lines)
 - History timestamp separator showing date range of loaded messages
 - Copilot instructions file for development guidelines
+- Close button (X) on sidebar channels and DMs for easy leave/close
+- Full localization support for all UI windows and dialogs
+
+### Fixed
+- User's own messages are now properly logged to chat history
 
 ### Changed
 - PrivacyService now loads mappings asynchronously during startup
 - LoggingService initialization is now async to prevent UI deadlock
 - History loading now uses configurable line count from settings
+- All UI strings now use localization system for multi-language support
 
 ### Fixed
 - Fixed UI thread blocking when loading privacy mappings
 - Fixed potential deadlock during application startup with encrypted storage
+- Fixed encrypted log buffers not flushing on application exit (storage was locked before flush)
+- Fixed active channel not highlighted in sidebar
+- Fixed user's own messages not being logged (only received messages were logged)
+- Fixed channels not being removed from sidebar when leaving with /part
+- Fixed hardcoded strings in Settings, Add Server, Change Password, Security Log, and Raw Log windows
 
 ### Security
 - AES-256-GCM authenticated encryption

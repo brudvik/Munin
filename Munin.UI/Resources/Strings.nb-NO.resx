@@ -236,6 +236,12 @@ Er du helt sikker?</value>
   <data name="MainWindow_Search" xml:space="preserve">
     <value>Søk...</value>
   </data>
+  <data name="MainWindow_LeaveChannel" xml:space="preserve">
+    <value>Forlat kanal</value>
+  </data>
+  <data name="MainWindow_CloseConversation" xml:space="preserve">
+    <value>Lukk samtale</value>
+  </data>
   
   <!-- Add Server Dialog -->
   <data name="AddServer_Title" xml:space="preserve">
@@ -369,6 +375,337 @@ Er du helt sikker?</value>
   </data>
   <data name="ContextMenu_DeVoice" xml:space="preserve">
     <value>Fjern Voice</value>
+  </data>
+  
+  <!-- Main Window Additional -->
+  <data name="MainWindow_Settings" xml:space="preserve">
+    <value>Innstillinger</value>
+  </data>
+  <data name="MainWindow_RawLog" xml:space="preserve">
+    <value>Rå IRC-logg (Debug)</value>
+  </data>
+  <data name="MainWindow_Connecting" xml:space="preserve">
+    <value>Kobler til...</value>
+  </data>
+  <data name="MainWindow_EditServer" xml:space="preserve">
+    <value>Rediger server</value>
+  </data>
+  <data name="MainWindow_RemoveServer" xml:space="preserve">
+    <value>Fjern server</value>
+  </data>
+  <data name="MainWindow_CloseSearch" xml:space="preserve">
+    <value>Lukk søk (Esc)</value>
+  </data>
+  <data name="MainWindow_Send" xml:space="preserve">
+    <value>Send</value>
+  </data>
+  <data name="MainWindow_DoubleClickPM" xml:space="preserve">
+    <value>Dobbeltklikk for å sende privat melding</value>
+  </data>
+  <data name="MainWindow_SendPrivateMessage" xml:space="preserve">
+    <value>Send melding</value>
+  </data>
+  <data name="MainWindow_Whois" xml:space="preserve">
+    <value>Whois</value>
+  </data>
+  <data name="MainWindow_IgnoreUser" xml:space="preserve">
+    <value>Ignorer bruker</value>
+  </data>
+  <data name="MainWindow_UnignoreUser" xml:space="preserve">
+    <value>Slutt å ignorere bruker</value>
+  </data>
+  
+  <!-- Add Server Dialog Additional -->
+  <data name="AddServer_Header" xml:space="preserve">
+    <value>Legg til IRC-server</value>
+  </data>
+  <data name="AddServer_Description" xml:space="preserve">
+    <value>Konfigurer din IRC-servertilkobling</value>
+  </data>
+  <data name="AddServer_Hostname" xml:space="preserve">
+    <value>Vertsnavn</value>
+  </data>
+  <data name="AddServer_Security" xml:space="preserve">
+    <value>Sikkerhet</value>
+  </data>
+  <data name="AddServer_AcceptInvalidCerts" xml:space="preserve">
+    <value>Godta ugyldige sertifikater</value>
+  </data>
+  <data name="AddServer_AcceptInvalidCertsTooltip" xml:space="preserve">
+    <value>Aktiver dette for selvsignerte sertifikater</value>
+  </data>
+  <data name="AddServer_SaslHeader" xml:space="preserve">
+    <value>SASL-autentisering (IRCv3)</value>
+  </data>
+  <data name="AddServer_SaslUsername" xml:space="preserve">
+    <value>SASL-brukernavn (kontonavn)</value>
+  </data>
+  <data name="AddServer_SaslPassword" xml:space="preserve">
+    <value>SASL-passord</value>
+  </data>
+  <data name="AddServer_ServerPasswordOptional" xml:space="preserve">
+    <value>Serverpassord (valgfritt)</value>
+  </data>
+  
+  <!-- Edit Server Dialog -->
+  <data name="EditServer_Title" xml:space="preserve">
+    <value>Rediger server</value>
+  </data>
+  <data name="EditServer_Header" xml:space="preserve">
+    <value>Rediger server</value>
+  </data>
+  <data name="EditServer_Description" xml:space="preserve">
+    <value>Endre dine IRC-serverinnstillinger</value>
+  </data>
+  <data name="EditServer_NickServPassword" xml:space="preserve">
+    <value>NickServ-passord (valgfritt)</value>
+  </data>
+  
+  <!-- Settings Window Additional -->
+  <data name="Settings_Description" xml:space="preserve">
+    <value>Konfigurer varsler, utheving og mer</value>
+  </data>
+  <data name="Settings_NotificationsHeader" xml:space="preserve">
+    <value>VARSLER</value>
+  </data>
+  <data name="Settings_EnableSound" xml:space="preserve">
+    <value>Aktiver lydvarsler</value>
+  </data>
+  <data name="Settings_FlashTaskbar" xml:space="preserve">
+    <value>Blink i oppgavelinjen ved nye meldinger</value>
+  </data>
+  <data name="Settings_NotifyInactive" xml:space="preserve">
+    <value>Varsle kun når vinduet er inaktivt</value>
+  </data>
+  <data name="Settings_HighlightingHeader" xml:space="preserve">
+    <value>UTHEVING</value>
+  </data>
+  <data name="Settings_HighlightWords" xml:space="preserve">
+    <value>Uthevingsord (ett per linje)</value>
+  </data>
+  <data name="Settings_IgnoredUsersHeader" xml:space="preserve">
+    <value>IGNORERTE BRUKERE</value>
+  </data>
+  <data name="Settings_IgnoredUsers" xml:space="preserve">
+    <value>Ignorerte brukere (én per linje)</value>
+  </data>
+  <data name="Settings_SecurityHeader" xml:space="preserve">
+    <value>SIKKERHET</value>
+  </data>
+  <data name="Settings_Encryption" xml:space="preserve">
+    <value>Kryptering: </value>
+  </data>
+  <data name="Settings_EncryptionEnabled" xml:space="preserve">
+    <value>Aktivert 🔒</value>
+  </data>
+  <data name="Settings_ChangeMasterPassword" xml:space="preserve">
+    <value>Endre master-passord</value>
+  </data>
+  <data name="Settings_DisableEncryption" xml:space="preserve">
+    <value>Deaktiver kryptering</value>
+  </data>
+  <data name="Settings_EnableEncryption" xml:space="preserve">
+    <value>Aktiver kryptering</value>
+  </data>
+  <data name="Settings_AutoLockHeader" xml:space="preserve">
+    <value>AUTO-LÅS</value>
+  </data>
+  <data name="Settings_AutoLockAfterInactivity" xml:space="preserve">
+    <value>Lås automatisk etter inaktivitet</value>
+  </data>
+  <data name="Settings_MinutesBeforeLock" xml:space="preserve">
+    <value>Minutter før låsing:</value>
+  </data>
+  <data name="Settings_LogCleanupHeader" xml:space="preserve">
+    <value>LOGG-RENGJØRING</value>
+  </data>
+  <data name="Settings_HistoryLinesToLoad" xml:space="preserve">
+    <value>Antall historikklinjer å laste:</value>
+  </data>
+  <data name="Settings_DeleteOldLogs" xml:space="preserve">
+    <value>Slett gamle logger automatisk</value>
+  </data>
+  <data name="Settings_KeepLogsFor" xml:space="preserve">
+    <value>Behold logger i:</value>
+  </data>
+  <data name="Settings_Days" xml:space="preserve">
+    <value>dager (7-365)</value>
+  </data>
+  <data name="Settings_UseSecureDelete" xml:space="preserve">
+    <value>Bruk sikker sletting (overskriver data før sletting)</value>
+  </data>
+  <data name="Settings_DeleteOldLogsNow" xml:space="preserve">
+    <value>Slett gamle logger nå...</value>
+  </data>
+  <data name="Settings_SecurityLogHeader" xml:space="preserve">
+    <value>SIKKERHETSLOGG</value>
+  </data>
+  <data name="Settings_ShowSecurityLog" xml:space="preserve">
+    <value>Vis sikkerhetslogg...</value>
+  </data>
+  <data name="Settings_PortableModeHeader" xml:space="preserve">
+    <value>PORTABEL MODUS</value>
+  </data>
+  <data name="Settings_Mode" xml:space="preserve">
+    <value>Modus: </value>
+  </data>
+  <data name="Settings_ModeNormal" xml:space="preserve">
+    <value>Normal</value>
+  </data>
+  <data name="Settings_ModePortable" xml:space="preserve">
+    <value>Portabel</value>
+  </data>
+  <data name="Settings_DataStoredIn" xml:space="preserve">
+    <value>Data lagres i: </value>
+  </data>
+  <data name="Settings_EnablePortableMode" xml:space="preserve">
+    <value>Aktiver portabel modus</value>
+  </data>
+  <data name="Settings_OpenDataFolder" xml:space="preserve">
+    <value>Åpne datamappe</value>
+  </data>
+  <data name="Settings_PortableModeDescription" xml:space="preserve">
+    <value>I portabel modus lagres all data i samme mappe som programmet.
+Perfekt for USB-minnepinne.</value>
+  </data>
+  
+  <!-- Channel List Window -->
+  <data name="ChannelList_Title" xml:space="preserve">
+    <value>Kanalliste</value>
+  </data>
+  <data name="ChannelList_Loading" xml:space="preserve">
+    <value>Laster kanaler...</value>
+  </data>
+  <data name="ChannelList_Channel" xml:space="preserve">
+    <value>Kanal</value>
+  </data>
+  <data name="ChannelList_Users" xml:space="preserve">
+    <value>Brukere</value>
+  </data>
+  <data name="ChannelList_Topic" xml:space="preserve">
+    <value>Emne</value>
+  </data>
+  <data name="ChannelList_Refresh" xml:space="preserve">
+    <value>Oppdater</value>
+  </data>
+  <data name="ChannelList_Join" xml:space="preserve">
+    <value>Bli med</value>
+  </data>
+  
+  <!-- Channel Stats Window -->
+  <data name="ChannelStats_Title" xml:space="preserve">
+    <value>Kanalstatistikk</value>
+  </data>
+  <data name="ChannelStats_Messages" xml:space="preserve">
+    <value>Meldinger</value>
+  </data>
+  <data name="ChannelStats_Chatters" xml:space="preserve">
+    <value>Pratefolk</value>
+  </data>
+  <data name="ChannelStats_MsgsPerMin" xml:space="preserve">
+    <value>Mld/min</value>
+  </data>
+  <data name="ChannelStats_TopChatters" xml:space="preserve">
+    <value>Topp-pratere 🏆</value>
+  </data>
+  
+  <!-- User Info Window -->
+  <data name="UserInfo_Title" xml:space="preserve">
+    <value>Brukerinformasjon</value>
+  </data>
+  <data name="UserInfo_Nickname" xml:space="preserve">
+    <value>Kallenavn</value>
+  </data>
+  
+  <!-- User Profile Window -->
+  <data name="UserProfile_Title" xml:space="preserve">
+    <value>Brukerprofil</value>
+  </data>
+  <data name="UserProfile_RealName" xml:space="preserve">
+    <value>Virkelig navn:</value>
+  </data>
+  <data name="UserProfile_Server" xml:space="preserve">
+    <value>Server:</value>
+  </data>
+  <data name="UserProfile_Account" xml:space="preserve">
+    <value>Konto:</value>
+  </data>
+  <data name="UserProfile_Status" xml:space="preserve">
+    <value>Status:</value>
+  </data>
+  <data name="UserProfile_Connected" xml:space="preserve">
+    <value>Tilkoblet:</value>
+  </data>
+  <data name="UserProfile_Away" xml:space="preserve">
+    <value>Borte:</value>
+  </data>
+  <data name="UserProfile_Channels" xml:space="preserve">
+    <value>Kanaler:</value>
+  </data>
+  <data name="UserProfile_Loading" xml:space="preserve">
+    <value>Laster...</value>
+  </data>
+  
+  <!-- Security Log Window -->
+  <data name="SecurityLog_Title" xml:space="preserve">
+    <value>Sikkerhetslogg</value>
+  </data>
+  <data name="SecurityLog_Description" xml:space="preserve">
+    <value>Oversikt over opplåsingsforsøk og sikkerhetshendelser</value>
+  </data>
+  <data name="SecurityLog_Time" xml:space="preserve">
+    <value>Tidspunkt</value>
+  </data>
+  <data name="SecurityLog_Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="SecurityLog_Event" xml:space="preserve">
+    <value>Hendelse</value>
+  </data>
+  <data name="SecurityLog_Machine" xml:space="preserve">
+    <value>Maskin</value>
+  </data>
+  <data name="SecurityLog_User" xml:space="preserve">
+    <value>Bruker</value>
+  </data>
+  <data name="SecurityLog_Refresh" xml:space="preserve">
+    <value>Oppdater</value>
+  </data>
+  
+  <!-- Change Password Dialog -->
+  <data name="ChangePassword_Title" xml:space="preserve">
+    <value>Endre master-passord</value>
+  </data>
+  <data name="ChangePassword_CurrentPassword" xml:space="preserve">
+    <value>Nåværende passord:</value>
+  </data>
+  <data name="ChangePassword_NewPassword" xml:space="preserve">
+    <value>Nytt passord:</value>
+  </data>
+  <data name="ChangePassword_ConfirmNewPassword" xml:space="preserve">
+    <value>Bekreft nytt passord:</value>
+  </data>
+  <data name="ChangePassword_Button" xml:space="preserve">
+    <value>Endre passord</value>
+  </data>
+  
+  <!-- Raw Log Window -->
+  <data name="RawLog_Title" xml:space="preserve">
+    <value>Rå IRC-logg</value>
+  </data>
+  <data name="RawLog_Clear" xml:space="preserve">
+    <value>Tøm</value>
+  </data>
+  <data name="RawLog_AutoScroll" xml:space="preserve">
+    <value>Auto-rull</value>
+  </data>
+  
+  <!-- Common Strings -->
+  <data name="Common_Close" xml:space="preserve">
+    <value>Lukk</value>
+  </data>
+  <data name="Common_Loading" xml:space="preserve">
+    <value>Laster...</value>
   </data>
   
 </root>

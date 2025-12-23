@@ -6,6 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Munin.UI.ViewModels"
         xmlns:controls="clr-namespace:Munin.UI.Controls"
+        xmlns:loc="clr-namespace:Munin.UI.Localization"
         mc:Ignorable="d"
         Title="IRC Client" 
         Height="700" 
@@ -78,13 +79,13 @@
                 <!-- Actions -->
                 <StackPanel Grid.Column="2" Orientation="Horizontal">
                     <Button Content="⚙" 
-                            ToolTip="Settings"
+                            ToolTip="{loc:Localize Key=MainWindow_Settings}"
                             Command="{Binding ShowSettingsCommand}"
                             Style="{StaticResource IconButtonStyle}"
                             FontSize="16"
                             Margin="0,0,4,0"/>
                     <Button Content="🔧" 
-                            ToolTip="Raw IRC Log (Debug)"
+                            ToolTip="{loc:Localize Key=MainWindow_RawLog}"
                             Command="{Binding ShowRawIrcLogCommand}"
                             Style="{StaticResource IconButtonStyle}"
                             FontSize="16"
@@ -119,7 +120,7 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0" 
-                               Text="SERVERS" 
+                               Text="{loc:Localize Key=MainWindow_Servers}" 
                                FontSize="11" 
                                FontWeight="SemiBold"
                                Foreground="{StaticResource TextMutedBrush}"
@@ -157,7 +158,7 @@
                                                        VerticalAlignment="Center"
                                                        Margin="4,0"
                                                        Visibility="{Binding IsConnecting, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                       ToolTip="Connecting...">
+                                                       ToolTip="{loc:Localize Key=MainWindow_Connecting}">
                                                 <TextBlock.RenderTransform>
                                                     <RotateTransform x:Name="SpinnerRotate" CenterX="6" CenterY="6"/>
                                                 </TextBlock.RenderTransform>
@@ -176,27 +177,27 @@
                                                 </TextBlock.Triggers>
                                             </TextBlock>
                                             <Button Content="⚡" 
-                                                    ToolTip="Connect"
+                                                    ToolTip="{loc:Localize Key=Connect}"
                                                     Style="{StaticResource IconButtonStyle}"
                                                     Command="{Binding DataContext.ConnectToServerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                     CommandParameter="{Binding}"
                                                     IsEnabled="{Binding IsConnecting, Converter={StaticResource InverseBoolConverter}}"
                                                     Visibility="{Binding IsConnected, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                                             <Button Content="⏹" 
-                                                    ToolTip="Disconnect"
+                                                    ToolTip="{loc:Localize Key=Disconnect}"
                                                     Style="{StaticResource IconButtonStyle}"
                                                     Command="{Binding DataContext.DisconnectFromServerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                     CommandParameter="{Binding}"
                                                     Visibility="{Binding IsConnected, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                             <Button Content="✏️" 
-                                                    ToolTip="Edit server"
+                                                    ToolTip="{loc:Localize Key=MainWindow_EditServer}"
                                                     Style="{StaticResource IconButtonStyle}"
                                                     Command="{Binding DataContext.EditServerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                     CommandParameter="{Binding}"
                                                     IsEnabled="{Binding IsConnecting, Converter={StaticResource InverseBoolConverter}}"
                                                     Visibility="{Binding IsConnected, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                                             <Button Content="✕" 
-                                                    ToolTip="Remove server"
+                                                    ToolTip="{loc:Localize Key=MainWindow_RemoveServer}"
                                                     Style="{StaticResource IconButtonStyle}"
                                                     Command="{Binding DataContext.RemoveServerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                     CommandParameter="{Binding}"
@@ -226,6 +227,7 @@
                                                             <ColumnDefinition Width="18"/>
                                                             <ColumnDefinition Width="*"/>
                                                             <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
                                                         </Grid.ColumnDefinitions>
                                                         
                                                         <TextBlock Grid.Column="0" 
@@ -246,9 +248,26 @@
                                                                        FontSize="10"
                                                                        Foreground="White"/>
                                                         </Border>
+                                                        
+                                                        <!-- Close/Leave Button (hidden for server console) -->
+                                                        <Button x:Name="closeButton"
+                                                                Grid.Column="3" 
+                                                                Content="✕" 
+                                                                ToolTip="{loc:Localize Key=MainWindow_LeaveChannel}"
+                                                                Style="{StaticResource IconButtonStyle}"
+                                                                FontSize="10"
+                                                                Padding="4,2"
+                                                                Margin="4,0,0,0"
+                                                                Visibility="Hidden"
+                                                                Command="{Binding DataContext.PartChannelCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                CommandParameter="{Binding}"/>
                                                     </Grid>
                                                 </Border>
                                                 <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                        <Setter TargetName="channelBorder" Property="Background" 
+                                                                Value="{StaticResource AccentDimBrush}"/>
+                                                    </DataTrigger>
                                                     <Trigger Property="IsMouseOver" Value="True">
                                                         <Setter TargetName="channelBorder" Property="Background" 
                                                                 Value="{StaticResource BackgroundHighlightBrush}"/>
@@ -257,6 +276,14 @@
                                                         <Setter TargetName="channelBorder" Property="Background" 
                                                                 Value="#1F2937"/>
                                                     </DataTrigger>
+                                                    <!-- Show close button on hover, but not for server console -->
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True"/>
+                                                            <Condition Binding="{Binding IsServerConsole}" Value="False"/>
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter TargetName="closeButton" Property="Visibility" Value="Visible"/>
+                                                    </MultiDataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
@@ -312,7 +339,7 @@
                         </TextBox>
                         
                         <Button Grid.Column="2" 
-                                Content="Search" 
+                                Content="{loc:Localize Key=MainWindow_Search}" 
                                 Command="{Binding SearchCommand}"
                                 Style="{StaticResource AccentButtonStyle}"
                                 Margin="8,0,0,0"/>
@@ -326,7 +353,7 @@
                         
                         <Button Grid.Column="4" 
                                 Content="✕" 
-                                ToolTip="Close search (Esc)"
+                                ToolTip="{loc:Localize Key=MainWindow_CloseSearch}"
                                 Command="{Binding CloseSearchCommand}"
                                 Style="{StaticResource IconButtonStyle}"
                                 Margin="8,0,0,0"/>
@@ -481,7 +508,7 @@
                         </controls:ChatInputTextBox>
 
                         <Button Grid.Column="1" 
-                                Content="Send" 
+                                Content="{loc:Localize Key=MainWindow_Send}" 
                                 Command="{Binding SendMessageCommand}"
                                 Style="{StaticResource AccentButtonStyle}"
                                 Margin="8,0,0,0"
@@ -506,7 +533,7 @@
                     </Grid.RowDefinitions>
 
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="16,16,16,8">
-                        <TextBlock Text="USERS" 
+                        <TextBlock Text="{loc:Localize Key=MainWindow_Users}" 
                                    FontSize="11" 
                                    FontWeight="SemiBold"
                                    Foreground="{StaticResource TextMutedBrush}"/>
@@ -546,17 +573,17 @@
                         </ListBox.ItemContainerStyle>
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Grid ToolTip="Double-click to send private message" Opacity="{Binding AwayOpacity}">
+                                <Grid ToolTip="{loc:Localize Key=MainWindow_DoubleClickPM}" Opacity="{Binding AwayOpacity}">
                                     <Grid.ContextMenu>
                                         <ContextMenu>
-                                            <MenuItem Header="Send Message" 
+                                            <MenuItem Header="{loc:Localize Key=MainWindow_SendPrivateMessage}" 
                                                       Command="{Binding DataContext.StartPrivateMessageCommand, Source={x:Reference Name=MainWindowRoot}}"
                                                       CommandParameter="{Binding}">
                                                 <MenuItem.Icon>
                                                     <TextBlock Text="💬" FontSize="12"/>
                                                 </MenuItem.Icon>
                                             </MenuItem>
-                                            <MenuItem Header="Whois" 
+                                            <MenuItem Header="{loc:Localize Key=MainWindow_Whois}" 
                                                       Command="{Binding DataContext.WhoisCommand, Source={x:Reference Name=MainWindowRoot}}"
                                                       CommandParameter="{Binding}">
                                                 <MenuItem.Icon>
@@ -564,14 +591,14 @@
                                                 </MenuItem.Icon>
                                             </MenuItem>
                                             <Separator/>
-                                            <MenuItem Header="Ignore User" 
+                                            <MenuItem Header="{loc:Localize Key=MainWindow_IgnoreUser}" 
                                                       Command="{Binding DataContext.IgnoreUserCommand, Source={x:Reference Name=MainWindowRoot}}"
                                                       CommandParameter="{Binding}">
                                                 <MenuItem.Icon>
                                                     <TextBlock Text="🚫" FontSize="12"/>
                                                 </MenuItem.Icon>
                                             </MenuItem>
-                                            <MenuItem Header="Unignore User" 
+                                            <MenuItem Header="{loc:Localize Key=MainWindow_UnignoreUser}" 
                                                       Command="{Binding DataContext.UnignoreUserCommand, Source={x:Reference Name=MainWindowRoot}}"
                                                       CommandParameter="{Binding}">
                                                 <MenuItem.Icon>

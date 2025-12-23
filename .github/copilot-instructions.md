@@ -44,9 +44,14 @@
 - Keep UI logic in ViewModels, not code-behind
 
 ### Localization
-- All user-facing strings should be in `Resources/Strings.resx`
-- Add translations to `Strings.nb-NO.resx` for Norwegian
-- Use `LocalizeExtension` in XAML for binding to localized strings
+- **All user-facing strings MUST be localized** - never hardcode text in XAML or code-behind
+- Add English strings to `Resources/Strings.resx`
+- Add Norwegian translations to `Strings.nb-NO.resx`
+- Use `LocalizeExtension` in XAML: `{loc:Localize Key=StringKeyName}`
+- For ToolTips: `ToolTip="{loc:Localize Key=MainWindow_LeaveChannel}"`
+- For Content/Text: `Content="{loc:Localize Key=ButtonText}"`
+- String keys should follow pattern: `ViewName_ElementDescription` (e.g., `MainWindow_LeaveChannel`)
+- Always add both English and Norwegian translations when adding new strings
 
 ## Testing Checklist
 Before committing changes:

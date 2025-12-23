@@ -1,7 +1,8 @@
 <Window x:Class="Munin.UI.Views.EditServerDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Edit Server" 
+        xmlns:loc="clr-namespace:Munin.UI.Localization"
+        Title="{loc:Localize Key=EditServer_Title}" 
         Height="660" 
         Width="450"
         WindowStartupLocation="CenterOwner"
@@ -20,10 +21,10 @@
 
         <!-- Header -->
         <StackPanel Grid.Row="0" Margin="0,0,0,24">
-            <TextBlock Text="Edit Server" 
+            <TextBlock Text="{loc:Localize Key=EditServer_Header}" 
                        FontSize="20" 
                        FontWeight="SemiBold"/>
-            <TextBlock Text="Modify your IRC server settings" 
+            <TextBlock Text="{loc:Localize Key=EditServer_Description}" 
                        Foreground="{StaticResource TextSecondaryBrush}"
                        Margin="0,4,0,0"/>
         </StackPanel>
@@ -32,7 +33,7 @@
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel>
                 <!-- Server Name -->
-                <TextBlock Text="Server Name" 
+                <TextBlock Text="{loc:Localize Key=AddServer_ServerName}" 
                            Foreground="{StaticResource TextSecondaryBrush}"
                            FontSize="12"
                            Margin="0,0,0,6"/>
@@ -40,7 +41,7 @@
                          Margin="0,0,0,16"/>
 
                 <!-- Hostname -->
-                <TextBlock Text="Hostname" 
+                <TextBlock Text="{loc:Localize Key=AddServer_Hostname}" 
                            Foreground="{StaticResource TextSecondaryBrush}"
                            FontSize="12"
                            Margin="0,0,0,6"/>
@@ -55,7 +56,7 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Grid.Column="0" Margin="0,0,8,0">
-                        <TextBlock Text="Port" 
+                        <TextBlock Text="{loc:Localize Key=AddServer_Port}" 
                                    Foreground="{StaticResource TextSecondaryBrush}"
                                    FontSize="12"
                                    Margin="0,0,0,6"/>
@@ -63,27 +64,27 @@
                     </StackPanel>
 
                     <StackPanel Grid.Column="1" Margin="8,0,0,0">
-                        <TextBlock Text="Security" 
+                        <TextBlock Text="{loc:Localize Key=AddServer_Security}" 
                                    Foreground="{StaticResource TextSecondaryBrush}"
                                    FontSize="12"
                                    Margin="0,0,0,6"/>
                         <CheckBox x:Name="UseSslCheckBox" 
-                                  Content="Use SSL/TLS" 
+                                  Content="{loc:Localize Key=AddServer_UseSSL}" 
                                   Foreground="{StaticResource TextPrimaryBrush}"
                                   VerticalAlignment="Center"
                                   Margin="0,8,0,0"/>
                         <CheckBox x:Name="AcceptInvalidCertsCheckBox" 
-                                  Content="Accept invalid certificates" 
+                                  Content="{loc:Localize Key=AddServer_AcceptInvalidCerts}" 
                                   Foreground="{StaticResource TextSecondaryBrush}"
                                   VerticalAlignment="Center"
-                                  ToolTip="Enable this for self-signed certificates"
+                                  ToolTip="{loc:Localize Key=AddServer_AcceptInvalidCertsTooltip}"
                                   Margin="0,6,0,0"
                                   IsEnabled="{Binding IsChecked, ElementName=UseSslCheckBox}"/>
                     </StackPanel>
                 </Grid>
 
                 <!-- Nickname -->
-                <TextBlock Text="Nickname" 
+                <TextBlock Text="{loc:Localize Key=AddServer_Nickname}" 
                            Foreground="{StaticResource TextSecondaryBrush}"
                            FontSize="12"
                            Margin="0,0,0,6"/>
@@ -91,7 +92,7 @@
                          Margin="0,0,0,16"/>
 
                 <!-- Username -->
-                <TextBlock Text="Username" 
+                <TextBlock Text="{loc:Localize Key=AddServer_Username}" 
                            Foreground="{StaticResource TextSecondaryBrush}"
                            FontSize="12"
                            Margin="0,0,0,6"/>
@@ -99,7 +100,7 @@
                          Margin="0,0,0,16"/>
 
                 <!-- Real Name -->
-                <TextBlock Text="Real Name" 
+                <TextBlock Text="{loc:Localize Key=AddServer_RealName}" 
                            Foreground="{StaticResource TextSecondaryBrush}"
                            FontSize="12"
                            Margin="0,0,0,6"/>
@@ -107,7 +108,7 @@
                          Margin="0,0,0,16"/>
 
                 <!-- Server Password -->
-                <TextBlock Text="Server Password (optional)" 
+                <TextBlock Text="{loc:Localize Key=AddServer_ServerPasswordOptional}" 
                            Foreground="{StaticResource TextSecondaryBrush}"
                            FontSize="12"
                            Margin="0,0,0,6"/>
@@ -115,7 +116,7 @@
                              Margin="0,0,0,16"/>
 
                 <!-- NickServ Password -->
-                <TextBlock Text="NickServ Password (optional)" 
+                <TextBlock Text="{loc:Localize Key=EditServer_NickServPassword}" 
                            Foreground="{StaticResource TextSecondaryBrush}"
                            FontSize="12"
                            Margin="0,0,0,6"/>
@@ -123,18 +124,18 @@
                              Margin="0,0,0,16"/>
 
                 <!-- SASL Authentication -->
-                <TextBlock Text="SASL Authentication (IRCv3)" 
+                <TextBlock Text="{loc:Localize Key=AddServer_SaslHeader}" 
                            FontWeight="SemiBold"
                            Margin="0,8,0,8"/>
                 
-                <TextBlock Text="SASL Username (account name)" 
+                <TextBlock Text="{loc:Localize Key=AddServer_SaslUsername}" 
                            Foreground="{StaticResource TextSecondaryBrush}"
                            FontSize="12"
                            Margin="0,0,0,6"/>
                 <TextBox x:Name="SaslUsernameTextBox" 
                          Margin="0,0,0,16"/>
 
-                <TextBlock Text="SASL Password" 
+                <TextBlock Text="{loc:Localize Key=AddServer_SaslPassword}" 
                            Foreground="{StaticResource TextSecondaryBrush}"
                            FontSize="12"
                            Margin="0,0,0,6"/>
@@ -143,7 +144,7 @@
 
                 <!-- Auto-connect -->
                 <CheckBox x:Name="AutoConnectCheckBox" 
-                          Content="Connect automatically on startup" 
+                          Content="{loc:Localize Key=AddServer_AutoConnect}" 
                           Foreground="{StaticResource TextSecondaryBrush}"
                           Margin="0,0,0,8"/>
             </StackPanel>
@@ -154,11 +155,11 @@
                     Orientation="Horizontal" 
                     HorizontalAlignment="Right"
                     Margin="0,24,0,0">
-            <Button Content="Cancel" 
+            <Button Content="{loc:Localize Key=Cancel}" 
                     Click="CancelButton_Click"
                     Width="100"
                     Margin="0,0,12,0"/>
-            <Button Content="Save" 
+            <Button Content="{loc:Localize Key=Save}" 
                     Click="SaveButton_Click"
                     Style="{StaticResource AccentButtonStyle}"
                     Width="120"/>
