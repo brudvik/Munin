@@ -1,0 +1,100 @@
+<Window x:Class="Munin.UI.Views.UserProfileWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="User Profile" 
+        Width="380" Height="400"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BackgroundDarkBrush}"
+        ResizeMode="NoResize">
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+        </Style>
+    </Window.Resources>
+    
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header with avatar and nickname -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
+            <Border Width="64" Height="64" CornerRadius="32" Margin="0,0,16,0">
+                <Border.Background>
+                    <ImageBrush x:Name="AvatarBrush" Stretch="UniformToFill"/>
+                </Border.Background>
+            </Border>
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock x:Name="NicknameText" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}"/>
+                <TextBlock x:Name="UserHostText" FontSize="12" Foreground="{DynamicResource TextMutedBrush}"/>
+                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                    <TextBlock x:Name="StatusBadge" Padding="6,2" FontSize="11"/>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+        
+        <!-- Info Grid -->
+        <Border Grid.Row="1" 
+                Background="{DynamicResource BackgroundMediumBrush}"
+                CornerRadius="8"
+                Padding="16">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Real Name -->
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Real Name:" Foreground="{DynamicResource TextMutedBrush}" Margin="0,4"/>
+                <TextBlock Grid.Row="0" Grid.Column="1" x:Name="RealNameText" Margin="0,4" TextWrapping="Wrap"/>
+                
+                <!-- Server -->
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Server:" Foreground="{DynamicResource TextMutedBrush}" Margin="0,4"/>
+                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="ServerText" Margin="0,4"/>
+                
+                <!-- Account -->
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Account:" Foreground="{DynamicResource TextMutedBrush}" Margin="0,4"/>
+                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="AccountText" Margin="0,4"/>
+                
+                <!-- Idle -->
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Status:" Foreground="{DynamicResource TextMutedBrush}" Margin="0,4"/>
+                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="IdleText" Margin="0,4"/>
+                
+                <!-- Signon -->
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Connected:" Foreground="{DynamicResource TextMutedBrush}" Margin="0,4"/>
+                <TextBlock Grid.Row="4" Grid.Column="1" x:Name="SignonText" Margin="0,4"/>
+                
+                <!-- Away -->
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="Away:" Foreground="{DynamicResource TextMutedBrush}" Margin="0,4"
+                           x:Name="AwayLabel" Visibility="Collapsed"/>
+                <TextBlock Grid.Row="5" Grid.Column="1" x:Name="AwayText" Margin="0,4" Visibility="Collapsed" 
+                           TextWrapping="Wrap" Foreground="Orange"/>
+                
+                <!-- Channels -->
+                <TextBlock Grid.Row="6" Grid.Column="0" Text="Channels:" Foreground="{DynamicResource TextMutedBrush}" Margin="0,8,0,4"/>
+                <TextBlock Grid.Row="6" Grid.Column="1" x:Name="ChannelsText" Margin="0,8,0,4" TextWrapping="Wrap" FontSize="12"/>
+            </Grid>
+        </Border>
+        
+        <!-- Loading / Buttons -->
+        <Grid Grid.Row="2" Margin="0,16,0,0">
+            <TextBlock x:Name="LoadingText" Text="Loading..." HorizontalAlignment="Center" Visibility="Collapsed"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" x:Name="ButtonsPanel">
+                <Button Content="Send Message" Margin="0,0,8,0" Padding="16,8" Click="SendMessage_Click"/>
+                <Button Content="Close" Padding="16,8" Click="Close_Click"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

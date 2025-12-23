@@ -1,6 +1,8 @@
-# IRC Client for Windows
+# Munin
 
-A modern, secure IRC client built with .NET 8 and WPF.
+**Munin** is a modern, secure IRC client for Windows, built with .NET 8 and WPF.
+
+*Named after Odin's raven who flies across the world to bring back news and information.*
 
 ![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4)
 ![Windows](https://img.shields.io/badge/Platform-Windows-0078D6)
@@ -47,23 +49,23 @@ A modern, secure IRC client built with .NET 8 and WPF.
 ### Build from Source
 
 ```bash
-git clone https://github.com/your-username/IrcClient.git
-cd IrcClient
+git clone https://github.com/your-username/Munin.git
+cd Munin
 dotnet build
-dotnet run --project IrcClient.UI
+dotnet run --project Munin.UI
 ```
 
 ### Publish as Standalone
 
 ```bash
-dotnet publish IrcClient.UI -c Release -r win-x64 --self-contained
+dotnet publish Munin.UI -c Release -r win-x64 --self-contained
 ```
 
 ## 📁 Project Structure
 
 ```
-IrcClient/
-├── IrcClient.Core/           # Core logic and services
+Munin/
+├── Munin.Core/               # Core logic and services
 │   ├── Models/               # Data models
 │   └── Services/             # Business logic
 │       ├── IrcConnection.cs      # IRC protocol
@@ -71,7 +73,7 @@ IrcClient/
 │       ├── SecureStorageService.cs
 │       ├── LoggingService.cs
 │       └── ...
-└── IrcClient.UI/             # WPF interface
+└── Munin.UI/                 # WPF interface
     ├── Views/                # XAML windows
     ├── ViewModels/           # MVVM ViewModels
     ├── Controls/             # Custom controls
@@ -82,10 +84,10 @@ IrcClient/
 ## ⚙️ Configuration
 
 ### Normal Mode
-Data is stored in: `%APPDATA%\IrcClient\`
+Data is stored in: `%APPDATA%\Munin\`
 
 ### Portable Mode
-1. Create an empty file `portable.txt` next to `IrcClient.exe`
+1. Create an empty file `portable.txt` next to `Munin.exe`
 2. Data will now be stored in `[exe-folder]\data\`
 
 ## 🔐 Security

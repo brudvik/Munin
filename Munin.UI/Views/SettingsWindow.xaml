@@ -1,0 +1,271 @@
+<Window x:Class="Munin.UI.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Settings"
+        Height="500"
+        Width="500"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="{StaticResource BackgroundDarkBrush}"
+        Foreground="{StaticResource TextPrimaryBrush}"
+        FontFamily="{StaticResource MonospaceFont}"
+        FontSize="13">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,24">
+            <TextBlock Text="⚙ Settings" 
+                       FontSize="20" 
+                       FontWeight="SemiBold"/>
+            <TextBlock Text="Configure notifications, highlighting and more" 
+                       Foreground="{StaticResource TextSecondaryBrush}"
+                       Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- Settings -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <!-- Notifications Section -->
+                <TextBlock Text="NOTIFICATIONS" 
+                           FontSize="11" 
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextMutedBrush}"
+                           Margin="0,0,0,12"/>
+
+                <CheckBox x:Name="EnableSoundCheckBox" 
+                          Content="Enable sound notifications" 
+                          Margin="0,0,0,8"/>
+                <CheckBox x:Name="EnableFlashCheckBox" 
+                          Content="Flash taskbar on new messages" 
+                          Margin="0,0,0,8"/>
+                <CheckBox x:Name="OnlyWhenInactiveCheckBox" 
+                          Content="Only notify when window is inactive" 
+                          Margin="0,0,0,24"/>
+
+                <!-- Highlighting Section -->
+                <TextBlock Text="HIGHLIGHTING" 
+                           FontSize="11" 
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextMutedBrush}"
+                           Margin="0,0,0,12"/>
+
+                <TextBlock Text="Highlight Words (one per line)" 
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           FontSize="12"
+                           Margin="0,0,0,6"/>
+                <TextBox x:Name="HighlightWordsTextBox" 
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"
+                         Height="80"
+                         VerticalScrollBarVisibility="Auto"
+                         Margin="0,0,0,24"/>
+
+                <!-- Ignored Users Section -->
+                <TextBlock Text="IGNORED USERS" 
+                           FontSize="11" 
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextMutedBrush}"
+                           Margin="0,0,0,12"/>
+
+                <TextBlock Text="Ignored Users (one per line)" 
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           FontSize="12"
+                           Margin="0,0,0,6"/>
+                <TextBox x:Name="IgnoredUsersTextBox" 
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"
+                         Height="80"
+                         VerticalScrollBarVisibility="Auto"
+                         Margin="0,0,0,24"/>
+
+                <!-- Security Section -->
+                <TextBlock Text="SIKKERHET" 
+                           FontSize="11" 
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextMutedBrush}"
+                           Margin="0,0,0,12"/>
+
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="Kryptering: " 
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               VerticalAlignment="Center"/>
+                    <TextBlock x:Name="EncryptionStatusText" 
+                               Text="Aktivert 🔒" 
+                               VerticalAlignment="Center"
+                               FontWeight="SemiBold"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <Button x:Name="ChangePasswordButton" 
+                            Content="Endre master-passord" 
+                            Click="ChangePasswordButton_Click"
+                            Margin="0,0,10,0"/>
+                    <Button x:Name="DisableEncryptionButton" 
+                            Content="Deaktiver kryptering" 
+                            Click="DisableEncryptionButton_Click"/>
+                </StackPanel>
+                
+                <StackPanel x:Name="EnableEncryptionPanel"
+                           Orientation="Horizontal"
+                           Visibility="Collapsed"
+                           Margin="0,0,0,8">
+                    <Button x:Name="EnableEncryptionButton" 
+                            Content="Aktiver kryptering" 
+                            Click="EnableEncryptionButton_Click"
+                            Style="{StaticResource AccentButtonStyle}"/>
+                    <TextBlock Text="  Krypterer all data med master-passord"
+                               Foreground="{StaticResource TextMutedBrush}"
+                               VerticalAlignment="Center"
+                               FontSize="11"/>
+                </StackPanel>
+                
+                <!-- Auto-lock Section -->
+                <TextBlock Text="AUTO-LÅS" 
+                           FontSize="11" 
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextMutedBrush}"
+                           Margin="0,16,0,12"/>
+                
+                <CheckBox x:Name="AutoLockEnabledCheckBox" 
+                          Content="Lås automatisk etter inaktivitet" 
+                          Checked="AutoLockEnabledCheckBox_Changed"
+                          Unchecked="AutoLockEnabledCheckBox_Changed"
+                          Margin="0,0,0,8"/>
+                
+                <StackPanel Orientation="Horizontal" Margin="20,0,0,16">
+                    <TextBlock Text="Minutter før låsing:" 
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,8,0"/>
+                    <TextBox x:Name="AutoLockMinutesTextBox" 
+                             Width="60"
+                             Text="5"/>
+                    <TextBlock Text="(1-60)" 
+                               Foreground="{StaticResource TextMutedBrush}"
+                               VerticalAlignment="Center"
+                               FontSize="11"
+                               Margin="8,0,0,0"/>
+                </StackPanel>
+                
+                <!-- Auto-delete logs Section -->
+                <TextBlock Text="LOGG-RENGJØRING" 
+                           FontSize="11" 
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextMutedBrush}"
+                           Margin="0,0,0,12"/>
+                
+                <CheckBox x:Name="AutoDeleteLogsEnabledCheckBox" 
+                          Content="Slett gamle logger automatisk" 
+                          Checked="AutoDeleteLogsEnabledCheckBox_Changed"
+                          Unchecked="AutoDeleteLogsEnabledCheckBox_Changed"
+                          Margin="0,0,0,8"/>
+                
+                <StackPanel Orientation="Horizontal" Margin="20,0,0,8">
+                    <TextBlock Text="Behold logger i:" 
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,8,0"/>
+                    <TextBox x:Name="AutoDeleteLogsDaysTextBox" 
+                             Width="60"
+                             Text="30"/>
+                    <TextBlock Text="dager (7-365)" 
+                               Foreground="{StaticResource TextMutedBrush}"
+                               VerticalAlignment="Center"
+                               FontSize="11"
+                               Margin="8,0,0,0"/>
+                </StackPanel>
+                
+                <CheckBox x:Name="SecureDeleteEnabledCheckBox" 
+                          Content="Bruk sikker sletting (overskriver data før sletting)" 
+                          Margin="20,0,0,8"/>
+                
+                <Button x:Name="DeleteOldLogsButton" 
+                        Content="Slett gamle logger nå..." 
+                        Click="DeleteOldLogsButton_Click"
+                        HorizontalAlignment="Left"
+                        Margin="20,8,0,16"/>
+                
+                <!-- Security Audit Section -->
+                <TextBlock Text="SIKKERHETSLOGG" 
+                           FontSize="11" 
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextMutedBrush}"
+                           Margin="0,0,0,12"/>
+                
+                <Button x:Name="ViewSecurityLogButton" 
+                        Content="Vis sikkerhetslogg..." 
+                        Click="ViewSecurityLogButton_Click"
+                        HorizontalAlignment="Left"
+                        Margin="0,0,0,8"/>
+                
+                <TextBlock x:Name="RecentUnlockAttemptsText"
+                           Text=""
+                           Foreground="{StaticResource TextMutedBrush}"
+                           FontSize="11"
+                           TextWrapping="Wrap"
+                           Margin="0,0,0,24"/>
+                
+                <!-- Portable Mode Section -->
+                <TextBlock Text="PORTABEL MODUS" 
+                           FontSize="11" 
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextMutedBrush}"
+                           Margin="0,0,0,12"/>
+                
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="Modus: " 
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               VerticalAlignment="Center"/>
+                    <TextBlock x:Name="PortableModeStatusText" 
+                               Text="Normal" 
+                               VerticalAlignment="Center"
+                               FontWeight="SemiBold"/>
+                </StackPanel>
+                
+                <TextBlock x:Name="DataLocationText"
+                           Text="Data lagres i: ..."
+                           Foreground="{StaticResource TextMutedBrush}"
+                           FontSize="11"
+                           TextWrapping="Wrap"
+                           Margin="0,0,0,8"/>
+                
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <Button x:Name="TogglePortableModeButton" 
+                            Content="Aktiver portabel modus" 
+                            Click="TogglePortableModeButton_Click"
+                            Margin="0,0,10,0"/>
+                    <Button x:Name="OpenDataFolderButton" 
+                            Content="Åpne datamappe" 
+                            Click="OpenDataFolderButton_Click"/>
+                </StackPanel>
+                
+                <TextBlock Text="I portabel modus lagres all data i samme mappe som programmet.&#x0a;Perfekt for USB-minnepinne."
+                           Foreground="{StaticResource TextMutedBrush}"
+                           FontSize="11"
+                           TextWrapping="Wrap"
+                           Margin="0,0,0,16"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="2" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right"
+                    Margin="0,24,0,0">
+            <Button Content="Cancel" 
+                    Click="CancelButton_Click"
+                    Width="100"
+                    Margin="0,0,12,0"/>
+            <Button Content="Save" 
+                    Click="SaveButton_Click"
+                    Style="{StaticResource AccentButtonStyle}"
+                    Width="100"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Initial release of IRC Client for Windows
+- Initial release of Munin IRC Client for Windows
 - Multi-server support with tabbed interface
 - SSL/TLS encrypted connections
 - SASL authentication (PLAIN and SCRAM-SHA-256)
