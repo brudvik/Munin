@@ -66,32 +66,43 @@ public partial class MainViewModel : ObservableObject
 
     partial void OnSelectedChannelChanged(ChannelViewModel? value)
     {
+        _logger.Information("OnSelectedChannelChanged: value={Name}", value?.Channel?.Name ?? "null");
         if (value != null && SelectedServer != null)
         {
             // Clear unread when selecting a channel
             value.UnreadCount = 0;
             value.HasMention = false;
             
+            _logger.Information("OnSelectedChannelChanged: About to load channel history");
             // Load history if not already loaded
             LoadChannelHistory(value);
+            _logger.Information("OnSelectedChannelChanged: Channel history loaded");
         }
     }
 
     private void LoadChannelHistory(ChannelViewModel channel)
     {
+        _logger.Information("LoadChannelHistory: Starting for {Name}", channel.Channel?.Name ?? "null");
         if (SelectedServer == null) return;
         
         var historyKey = $"{SelectedServer.Server.Name}|{channel.Channel.Name}";
-        if (_loadedHistoryChannels.Contains(historyKey)) return;
+        if (_loadedHistoryChannels.Contains(historyKey))
+        {
+            _logger.Information("LoadChannelHistory: Already loaded, skipping");
+            return;
+        }
         
         _loadedHistoryChannels.Add(historyKey);
         
-        // Load last 100 messages from log
+        _logger.Information("LoadChannelHistory: Reading last lines from log");
+        // Load messages from log based on configuration
+        var linesToLoad = _configService.Configuration.Settings.HistoryLinesToLoad;
         var historyLines = LoggingService.Instance.ReadLastLines(
             SelectedServer.Server.Name,
             channel.Channel.Name,
-            100);
+            linesToLoad);
 
+        _logger.Information("LoadChannelHistory: Got history lines, parsing");
         var historyMessages = new List<MessageViewModel>();
         foreach (var line in historyLines)
         {
@@ -102,14 +113,32 @@ public partial class MainViewModel : ObservableObject
             }
         }
 
+        _logger.Information("LoadChannelHistory: Parsed {Count} messages, inserting", historyMessages.Count);
         // Insert at the beginning
         if (historyMessages.Count > 0)
         {
+            // Find the oldest message's timestamp to show "last updated" info
+            var oldestMessage = historyMessages.FirstOrDefault();
+            var newestMessage = historyMessages.LastOrDefault();
+            
             for (int i = historyMessages.Count - 1; i >= 0; i--)
             {
                 channel.Messages.Insert(0, historyMessages[i]);
             }
+            
+            // Add a separator message showing when this history is from
+            if (oldestMessage?.Message?.Timestamp != null && newestMessage?.Message?.Timestamp != null)
+            {
+                var separatorMessage = new IrcMessage
+                {
+                    Type = MessageType.System,
+                    Content = $"--- History loaded: {historyMessages.Count} messages from {oldestMessage.Message.Timestamp:g} to {newestMessage.Message.Timestamp:g} ---",
+                    Timestamp = DateTime.Now
+                };
+                channel.Messages.Add(new MessageViewModel(separatorMessage));
+            }
         }
+        _logger.Information("LoadChannelHistory: Complete");
     }
 
     private IrcMessage? ParseLogLine(string line)
@@ -208,26 +237,43 @@ public partial class MainViewModel : ObservableObject
 
     private async Task LoadConfigurationAsync()
     {
+        _logger.Information("LoadConfigurationAsync: Starting");
         await _configService.LoadAsync();
+        _logger.Information("LoadConfigurationAsync: Configuration loaded");
         
-        foreach (var server in _configService.GetAllServers())
+        // Must run UI operations on the dispatcher thread
+        await App.Current.Dispatcher.InvokeAsync(() =>
         {
-            var serverVm = CreateServerViewModel(server);
-            Servers.Add(serverVm);
-            
-            // Auto-connect if configured
-            if (server.AutoConnect)
+            foreach (var server in _configService.GetAllServers())
             {
-                _ = ConnectToServerAsync(serverVm);
+                _logger.Information("LoadConfigurationAsync: Creating VM for {Name}", server.Name);
+                var serverVm = CreateServerViewModel(server);
+                _logger.Information("LoadConfigurationAsync: Adding server to collection");
+                Servers.Add(serverVm);
+                _logger.Information("LoadConfigurationAsync: Server added to Servers collection");
+                
+                // Auto-connect if configured
+                if (server.AutoConnect)
+                {
+                    _logger.Information("LoadConfigurationAsync: Auto-connecting to {Name}", server.Name);
+                    _ = ConnectToServerAsync(serverVm);
+                }
             }
-        }
-        
-        if (Servers.Count > 0)
-        {
-            SelectedServer = Servers[0];
-            SelectedChannel = SelectedServer.Channels.FirstOrDefault();
-            StatusText = $"Loaded {Servers.Count} server(s)";
-        }
+            
+            _logger.Information("LoadConfigurationAsync: Setting SelectedServer");
+            if (Servers.Count > 0)
+            {
+                SelectedServer = Servers[0];
+                _logger.Information("LoadConfigurationAsync: SelectedServer set, getting FirstOrDefault channel");
+                var firstChannel = SelectedServer.Channels.FirstOrDefault();
+                _logger.Information("LoadConfigurationAsync: Got first channel: {Name}, Count: {Count}", 
+                    firstChannel?.Channel?.Name ?? "null", SelectedServer.Channels.Count);
+                SelectedChannel = firstChannel;
+                _logger.Information("LoadConfigurationAsync: SelectedChannel set");
+                StatusText = $"Loaded {Servers.Count} server(s)";
+            }
+            _logger.Information("LoadConfigurationAsync: Complete");
+        });
     }
 
     private ServerViewModel CreateServerViewModel(IrcServer server)
@@ -657,6 +703,7 @@ public partial class MainViewModel : ObservableObject
         try
         {
             IsConnecting = true;
+            server.IsConnecting = true;
             StatusText = $"Connecting to {server.Server.Name}...";
             _logger.Information("Connecting to server {ServerName} ({Hostname}:{Port})", 
                 server.Server.Name, server.Server.Hostname, server.Server.Port);
@@ -670,6 +717,7 @@ public partial class MainViewModel : ObservableObject
         finally
         {
             IsConnecting = false;
+            server.IsConnecting = false;
         }
     }
 

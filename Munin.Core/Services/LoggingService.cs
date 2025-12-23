@@ -37,7 +37,7 @@ public class LoggingService : IDisposable
     /// Must be called before first access to Instance if encryption is desired.
     /// </summary>
     /// <param name="storage">The secure storage service to use for encrypted logs.</param>
-    public static void Initialize(SecureStorageService storage)
+    public static async Task InitializeAsync(SecureStorageService storage)
     {
         _storageService = storage;
         _privacyService = new PrivacyService(storage);
@@ -46,6 +46,9 @@ public class LoggingService : IDisposable
         if (_privacyService != null)
         {
             _privacyService.IsEnabled = storage.IsEncryptionEnabled;
+            
+            // Load privacy mappings asynchronously
+            await _privacyService.InitializeAsync();
         }
         
         _instance = new LoggingService();
@@ -176,15 +179,21 @@ public class LoggingService : IDisposable
     /// <param name="message">The message to log.</param>
     public void LogMessage(string serverName, string channelName, IrcMessage message)
     {
-        if (!EnableLogging) return;
+        if (!EnableLogging) 
+        {
+            _logger.Debug("LogMessage: Logging is disabled");
+            return;
+        }
 
         try
         {
             var line = FormatLogLine(message);
+            _logger.Debug("LogMessage: Logging to {Server}/{Channel}: {Line}", serverName, channelName, line);
             
             if (IsEncryptionEnabled)
             {
                 // Use encrypted logging
+                _logger.Debug("LogMessage: Using encrypted logging");
                 LogEncrypted(serverName, channelName, line);
             }
             else if (UseStructuredLogging)
@@ -217,12 +226,14 @@ public class LoggingService : IDisposable
     {
         if (_storageService == null || !_storageService.IsUnlocked)
         {
-            _logger.Warning("Cannot log encrypted: storage is locked");
+            _logger.Warning("Cannot log encrypted: storage is null={StorageNull}, unlocked={Unlocked}", 
+                _storageService == null, _storageService?.IsUnlocked);
             return;
         }
         
         var key = $"{serverName}|{channelName}|{DateTime.Today:yyyy-MM-dd}";
         var buffer = _encryptedLogBuffers.GetOrAdd(key, _ => new List<string>());
+        _logger.Debug("LogEncrypted: Adding to buffer for {Key}, buffer size: {Size}", key, buffer.Count);
         
         lock (buffer)
         {
@@ -231,6 +242,7 @@ public class LoggingService : IDisposable
             // Flush to disk every 10 messages or if buffer is getting large
             if (buffer.Count >= 10)
             {
+                _logger.Debug("LogEncrypted: Flushing buffer for {Key}", key);
                 FlushEncryptedBuffer(serverName, channelName, buffer);
             }
         }
@@ -248,16 +260,16 @@ public class LoggingService : IDisposable
         {
             var relativePath = GetEncryptedLogPath(serverName, channelName, DateTime.Today);
             
-            // Read existing content if file exists
+            // Read existing content if file exists (use sync to avoid deadlock)
             var existingContent = "";
             if (_storageService.FileExists(relativePath))
             {
-                existingContent = _storageService.ReadTextAsync(relativePath).GetAwaiter().GetResult() ?? "";
+                existingContent = _storageService.ReadTextSync(relativePath) ?? "";
             }
             
-            // Append new lines
+            // Append new lines (use sync to avoid deadlock)
             var newContent = existingContent + string.Join(Environment.NewLine, buffer) + Environment.NewLine;
-            _storageService.WriteTextAsync(relativePath, newContent).GetAwaiter().GetResult();
+            _storageService.WriteTextSync(relativePath, newContent);
             
             buffer.Clear();
         }
@@ -410,7 +422,8 @@ public class LoggingService : IDisposable
             if (!_storageService.FileExists(relativePath))
                 return Enumerable.Empty<string>();
             
-            var content = _storageService.ReadTextAsync(relativePath).GetAwaiter().GetResult();
+            // Use sync method to avoid deadlock on UI thread
+            var content = _storageService.ReadTextSync(relativePath);
             if (string.IsNullOrEmpty(content))
                 return Enumerable.Empty<string>();
             

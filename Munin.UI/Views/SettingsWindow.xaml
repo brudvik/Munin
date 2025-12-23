@@ -160,6 +160,21 @@
                            Foreground="{StaticResource TextMutedBrush}"
                            Margin="0,0,0,12"/>
                 
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBlock Text="Antall historikklinjer å laste:" 
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,8,0"/>
+                    <TextBox x:Name="HistoryLinesToLoadTextBox" 
+                             Width="60"
+                             Text="100"/>
+                    <TextBlock Text="(10-1000)" 
+                               Foreground="{StaticResource TextMutedBrush}"
+                               VerticalAlignment="Center"
+                               FontSize="11"
+                               Margin="8,0,0,0"/>
+                </StackPanel>
+                
                 <CheckBox x:Name="AutoDeleteLogsEnabledCheckBox" 
                           Content="Slett gamle logger automatisk" 
                           Checked="AutoDeleteLogsEnabledCheckBox_Changed"

@@ -31,6 +31,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Custom command aliases
 - Flood protection with token bucket algorithm
 - Sound and taskbar flash notifications
+- Multi-language support (English and Norwegian)
+- Automatic language detection based on system settings
+- Connection status spinner with button disable during connection
+- Configurable history line count (10-1000 lines)
+- History timestamp separator showing date range of loaded messages
+- Copilot instructions file for development guidelines
+
+### Changed
+- PrivacyService now loads mappings asynchronously during startup
+- LoggingService initialization is now async to prevent UI deadlock
+- History loading now uses configurable line count from settings
+
+### Fixed
+- Fixed UI thread blocking when loading privacy mappings
+- Fixed potential deadlock during application startup with encrypted storage
 
 ### Security
 - AES-256-GCM authenticated encryption

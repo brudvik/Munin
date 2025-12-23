@@ -1,4 +1,5 @@
 using System.Windows;
+using Munin.UI.Resources;
 
 namespace Munin.UI.Views;
 
@@ -29,26 +30,26 @@ public partial class EncryptionSetupDialog : Window
         // Validate password
         if (string.IsNullOrEmpty(PasswordBox.Password))
         {
-            ShowError("Passord kan ikke være tomt.");
+            ShowError(Strings.EncryptionSetup_PasswordEmpty);
             return;
         }
         
         if (PasswordBox.Password.Length < 8)
         {
-            ShowError("Passord må være minst 8 tegn.");
+            ShowError(Strings.EncryptionSetup_PasswordTooShort);
             return;
         }
         
         if (PasswordBox.Password != ConfirmPasswordBox.Password)
         {
-            ShowError("Passordene samsvarer ikke.");
+            ShowError(Strings.EncryptionSetup_PasswordMismatch);
             return;
         }
         
         // Check password strength
         if (!IsPasswordStrong(PasswordBox.Password))
         {
-            ShowError("Passordet er for svakt. Bruk store/små bokstaver, tall eller spesialtegn.");
+            ShowError(Strings.EncryptionSetup_PasswordWeak);
             return;
         }
         
@@ -61,9 +62,8 @@ public partial class EncryptionSetupDialog : Window
     private void SkipButton_Click(object sender, RoutedEventArgs e)
     {
         var result = MessageBox.Show(
-            "Er du sikker på at du vil fortsette uten kryptering?\n\n" +
-            "Dine serverpassord og chat-logger vil lagres ukryptert på disk.",
-            "Bekreft",
+            Strings.EncryptionSetup_SkipConfirmTitle + "\n\n" + Strings.EncryptionSetup_SkipConfirmMessage,
+            Strings.Confirm,
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
         

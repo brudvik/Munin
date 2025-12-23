@@ -503,4 +503,9 @@ public class GeneralSettings
     /// Enable secure deletion (overwrite files before deleting).
     /// </summary>
     public bool SecureDeleteEnabled { get; set; } = false;
+    
+    /// <summary>
+    /// Number of history lines to load when joining a channel or opening a DM.
+    /// </summary>
+    public int HistoryLinesToLoad { get; set; } = 100;
 }

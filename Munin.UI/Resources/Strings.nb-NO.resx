@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  
+  <!-- Application -->
+  <data name="AppName" xml:space="preserve">
+    <value>Munin IRC-klient</value>
+  </data>
+  <data name="AppTitle" xml:space="preserve">
+    <value>IRC-klient</value>
+  </data>
+  
+  <!-- Common -->
+  <data name="OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Avbryt</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Lagre</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Lukk</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Ja</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>Nei</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Feil</value>
+  </data>
+  <data name="Warning" xml:space="preserve">
+    <value>Advarsel</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Bekreft</value>
+  </data>
+  <data name="Connect" xml:space="preserve">
+    <value>Koble til</value>
+  </data>
+  <data name="Disconnect" xml:space="preserve">
+    <value>Koble fra</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Innstillinger</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Språk</value>
+  </data>
+  
+  <!-- Encryption Setup Dialog -->
+  <data name="EncryptionSetup_Title" xml:space="preserve">
+    <value>Sikkerhet - Kryptering</value>
+  </data>
+  <data name="EncryptionSetup_Header" xml:space="preserve">
+    <value>Aktiver kryptering</value>
+  </data>
+  <data name="EncryptionSetup_Description" xml:space="preserve">
+    <value>Beskytt dine data med et master-passord</value>
+  </data>
+  <data name="EncryptionSetup_WillBeEncrypted" xml:space="preserve">
+    <value>Dette vil krypteres:</value>
+  </data>
+  <data name="EncryptionSetup_ServerConfigs" xml:space="preserve">
+    <value>Serverkonfigurasjoner og passord</value>
+  </data>
+  <data name="EncryptionSetup_NickServSasl" xml:space="preserve">
+    <value>NickServ og SASL-legitimasjon</value>
+  </data>
+  <data name="EncryptionSetup_ChatHistory" xml:space="preserve">
+    <value>Chat-historikk og logger</value>
+  </data>
+  <data name="EncryptionSetup_AllSettings" xml:space="preserve">
+    <value>Alle innstillinger</value>
+  </data>
+  <data name="EncryptionSetup_CreatePassword" xml:space="preserve">
+    <value>Opprett master-passord:</value>
+  </data>
+  <data name="EncryptionSetup_ConfirmPassword" xml:space="preserve">
+    <value>Bekreft passord:</value>
+  </data>
+  <data name="EncryptionSetup_Warning" xml:space="preserve">
+    <value>Viktig: Hvis du glemmer passordet, er alle data utilgjengelige. Det finnes ingen gjenopprettingsmulighet.</value>
+  </data>
+  <data name="EncryptionSetup_Enable" xml:space="preserve">
+    <value>Aktiver kryptering</value>
+  </data>
+  <data name="EncryptionSetup_Skip" xml:space="preserve">
+    <value>Hopp over for nå</value>
+  </data>
+  <data name="EncryptionSetup_PasswordEmpty" xml:space="preserve">
+    <value>Passord kan ikke være tomt.</value>
+  </data>
+  <data name="EncryptionSetup_PasswordTooShort" xml:space="preserve">
+    <value>Passord må være minst 8 tegn.</value>
+  </data>
+  <data name="EncryptionSetup_PasswordMismatch" xml:space="preserve">
+    <value>Passordene samsvarer ikke.</value>
+  </data>
+  <data name="EncryptionSetup_PasswordWeak" xml:space="preserve">
+    <value>Passordet er for svakt. Bruk store/små bokstaver, tall eller spesialtegn.</value>
+  </data>
+  <data name="EncryptionSetup_SkipConfirmTitle" xml:space="preserve">
+    <value>Er du sikker på at du vil fortsette uten kryptering?</value>
+  </data>
+  <data name="EncryptionSetup_SkipConfirmMessage" xml:space="preserve">
+    <value>Dine serverpassord og chat-logger vil lagres ukryptert på disk.</value>
+  </data>
+  <data name="EncryptionSetup_Failed" xml:space="preserve">
+    <value>Kunne ikke aktivere kryptering.</value>
+  </data>
+  
+  <!-- Unlock Dialog -->
+  <data name="Unlock_Title" xml:space="preserve">
+    <value>IRC-klient - Låst</value>
+  </data>
+  <data name="Unlock_Header" xml:space="preserve">
+    <value>IRC-klienten er låst</value>
+  </data>
+  <data name="Unlock_Description" xml:space="preserve">
+    <value>Skriv inn master-passordet for å låse opp</value>
+  </data>
+  <data name="Unlock_MasterPassword" xml:space="preserve">
+    <value>Master-passord:</value>
+  </data>
+  <data name="Unlock_Button" xml:space="preserve">
+    <value>Lås opp</value>
+  </data>
+  <data name="Unlock_ForgotPassword" xml:space="preserve">
+    <value>Glemt passord?</value>
+  </data>
+  <data name="Unlock_ResetAll" xml:space="preserve">
+    <value>Nullstill alt</value>
+  </data>
+  <data name="Unlock_EnterPassword" xml:space="preserve">
+    <value>Skriv inn passordet.</value>
+  </data>
+  <data name="Unlock_WrongPassword" xml:space="preserve">
+    <value>Feil passord.</value>
+  </data>
+  <data name="Unlock_TooManyAttempts" xml:space="preserve">
+    <value>For mange forsøk. Vent {0} sekunder.</value>
+  </data>
+  <data name="Unlock_AttemptsCount" xml:space="preserve">
+    <value>Forsøk {0} av {1}</value>
+  </data>
+  <data name="Unlock_ResetWarning" xml:space="preserve">
+    <value>⚠️ ADVARSEL: Dette vil slette ALLE data!
+
+• Alle serverkonfigurasjoner
+• Alle passord og legitimasjon
+• All chat-historikk og logger
+• Alle innstillinger
+
+Du må sette opp alt på nytt.
+
+Er du helt sikker?</value>
+  </data>
+  <data name="Unlock_ResetConfirmTitle" xml:space="preserve">
+    <value>Bekreft nullstilling</value>
+  </data>
+  <data name="Unlock_ResetFinalConfirm" xml:space="preserve">
+    <value>Siste sjanse! Klikk Ja for å bekrefte.</value>
+  </data>
+  
+  <!-- Main Window -->
+  <data name="MainWindow_AddServer" xml:space="preserve">
+    <value>Legg til server</value>
+  </data>
+  <data name="MainWindow_JoinChannel" xml:space="preserve">
+    <value>Bli med i kanal</value>
+  </data>
+  <data name="MainWindow_SendMessage" xml:space="preserve">
+    <value>Skriv en melding...</value>
+  </data>
+  <data name="MainWindow_Users" xml:space="preserve">
+    <value>Brukere</value>
+  </data>
+  <data name="MainWindow_Channels" xml:space="preserve">
+    <value>Kanaler</value>
+  </data>
+  <data name="MainWindow_Servers" xml:space="preserve">
+    <value>Servere</value>
+  </data>
+  <data name="MainWindow_Search" xml:space="preserve">
+    <value>Søk...</value>
+  </data>
+  
+  <!-- Add Server Dialog -->
+  <data name="AddServer_Title" xml:space="preserve">
+    <value>Legg til server</value>
+  </data>
+  <data name="AddServer_ServerName" xml:space="preserve">
+    <value>Servernavn:</value>
+  </data>
+  <data name="AddServer_Address" xml:space="preserve">
+    <value>Adresse:</value>
+  </data>
+  <data name="AddServer_Port" xml:space="preserve">
+    <value>Port:</value>
+  </data>
+  <data name="AddServer_UseSSL" xml:space="preserve">
+    <value>Bruk SSL/TLS</value>
+  </data>
+  <data name="AddServer_Nickname" xml:space="preserve">
+    <value>Kallenavn:</value>
+  </data>
+  <data name="AddServer_Username" xml:space="preserve">
+    <value>Brukernavn:</value>
+  </data>
+  <data name="AddServer_RealName" xml:space="preserve">
+    <value>Virkelig navn:</value>
+  </data>
+  <data name="AddServer_Password" xml:space="preserve">
+    <value>Serverpassord:</value>
+  </data>
+  <data name="AddServer_AutoConnect" xml:space="preserve">
+    <value>Koble til automatisk ved oppstart</value>
+  </data>
+  <data name="AddServer_Channels" xml:space="preserve">
+    <value>Auto-bli med i kanaler (kommaseparert):</value>
+  </data>
+  
+  <!-- Settings Dialog -->
+  <data name="Settings_Title" xml:space="preserve">
+    <value>Innstillinger</value>
+  </data>
+  <data name="Settings_General" xml:space="preserve">
+    <value>Generelt</value>
+  </data>
+  <data name="Settings_Appearance" xml:space="preserve">
+    <value>Utseende</value>
+  </data>
+  <data name="Settings_Security" xml:space="preserve">
+    <value>Sikkerhet</value>
+  </data>
+  <data name="Settings_Notifications" xml:space="preserve">
+    <value>Varsler</value>
+  </data>
+  <data name="Settings_AutoLock" xml:space="preserve">
+    <value>Auto-lås etter inaktivitet</value>
+  </data>
+  <data name="Settings_AutoLockMinutes" xml:space="preserve">
+    <value>Minutter:</value>
+  </data>
+  <data name="Settings_ChangePassword" xml:space="preserve">
+    <value>Endre passord</value>
+  </data>
+  <data name="Settings_Theme" xml:space="preserve">
+    <value>Tema:</value>
+  </data>
+  <data name="Settings_ThemeDark" xml:space="preserve">
+    <value>Mørkt</value>
+  </data>
+  <data name="Settings_ThemeLight" xml:space="preserve">
+    <value>Lyst</value>
+  </data>
+  <data name="Settings_FontSize" xml:space="preserve">
+    <value>Skriftstørrelse:</value>
+  </data>
+  <data name="Settings_Timestamps" xml:space="preserve">
+    <value>Vis tidsstempler</value>
+  </data>
+  <data name="Settings_DesktopNotifications" xml:space="preserve">
+    <value>Skrivebordsvarsler</value>
+  </data>
+  <data name="Settings_SoundNotifications" xml:space="preserve">
+    <value>Lydvarsler</value>
+  </data>
+  
+  <!-- Status Messages -->
+  <data name="Status_Connecting" xml:space="preserve">
+    <value>Kobler til...</value>
+  </data>
+  <data name="Status_Connected" xml:space="preserve">
+    <value>Tilkoblet</value>
+  </data>
+  <data name="Status_Disconnected" xml:space="preserve">
+    <value>Frakoblet</value>
+  </data>
+  <data name="Status_Reconnecting" xml:space="preserve">
+    <value>Kobler til på nytt...</value>
+  </data>
+  <data name="Status_ConnectionFailed" xml:space="preserve">
+    <value>Tilkobling feilet</value>
+  </data>
+  
+  <!-- Context Menu -->
+  <data name="ContextMenu_Copy" xml:space="preserve">
+    <value>Kopier</value>
+  </data>
+  <data name="ContextMenu_Paste" xml:space="preserve">
+    <value>Lim inn</value>
+  </data>
+  <data name="ContextMenu_SelectAll" xml:space="preserve">
+    <value>Velg alt</value>
+  </data>
+  <data name="ContextMenu_PrivateMessage" xml:space="preserve">
+    <value>Privat melding</value>
+  </data>
+  <data name="ContextMenu_Whois" xml:space="preserve">
+    <value>Whois</value>
+  </data>
+  <data name="ContextMenu_Kick" xml:space="preserve">
+    <value>Spark ut</value>
+  </data>
+  <data name="ContextMenu_Ban" xml:space="preserve">
+    <value>Utesteng</value>
+  </data>
+  <data name="ContextMenu_Op" xml:space="preserve">
+    <value>Gi Op</value>
+  </data>
+  <data name="ContextMenu_DeOp" xml:space="preserve">
+    <value>Fjern Op</value>
+  </data>
+  <data name="ContextMenu_Voice" xml:space="preserve">
+    <value>Gi Voice</value>
+  </data>
+  <data name="ContextMenu_DeVoice" xml:space="preserve">
+    <value>Fjern Voice</value>
+  </data>
+  
+</root>

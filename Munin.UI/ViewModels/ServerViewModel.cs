@@ -29,6 +29,12 @@ public partial class ServerViewModel : ObservableObject
     /// </summary>
     [ObservableProperty]
     private bool _isConnected;
+    
+    /// <summary>
+    /// Whether the server is currently attempting to connect.
+    /// </summary>
+    [ObservableProperty]
+    private bool _isConnecting;
 
     /// <summary>
     /// Whether the server node is expanded in the tree view.
@@ -61,7 +67,7 @@ public partial class ServerViewModel : ObservableObject
     /// <summary>
     /// Status icon indicating connection state.
     /// </summary>
-    public string StatusIcon => IsConnected ? "🟢" : "⚫";
+    public string StatusIcon => IsConnecting ? "🔄" : (IsConnected ? "🟢" : "⚫");
     
     /// <summary>
     /// Formatted latency string for display.
@@ -80,6 +86,11 @@ public partial class ServerViewModel : ObservableObject
         {
             LatencyMs = 0;
         }
+    }
+    
+    partial void OnIsConnectingChanged(bool value)
+    {
+        OnPropertyChanged(nameof(StatusIcon));
     }
     
     partial void OnLatencyMsChanged(int value)

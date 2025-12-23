@@ -365,6 +365,17 @@ public class SecureStorageService
     }
     
     /// <summary>
+    /// Writes text content to a file synchronously, encrypting if encryption is enabled.
+    /// </summary>
+    /// <param name="relativePath">The path relative to the base directory.</param>
+    /// <param name="content">The text content to write.</param>
+    public void WriteTextSync(string relativePath, string content)
+    {
+        var fullPath = GetFullPath(relativePath);
+        WriteFileInternalSync(fullPath, System.Text.Encoding.UTF8.GetBytes(content), IsEncryptionEnabled);
+    }
+    
+    /// <summary>
     /// Reads binary content from a file synchronously, decrypting if necessary.
     /// </summary>
     /// <param name="relativePath">The path relative to the base directory.</param>
@@ -572,6 +583,25 @@ public class SecureStorageService
         else
         {
             await File.WriteAllBytesAsync(fullPath, content);
+        }
+    }
+    
+    private void WriteFileInternalSync(string fullPath, byte[] content, bool encrypt)
+    {
+        var directory = Path.GetDirectoryName(fullPath);
+        if (!string.IsNullOrEmpty(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+        
+        if (encrypt && IsUnlocked)
+        {
+            var encrypted = _encryptionService.Encrypt(content);
+            File.WriteAllBytes(fullPath, encrypted);
+        }
+        else
+        {
+            File.WriteAllBytes(fullPath, content);
         }
     }
     

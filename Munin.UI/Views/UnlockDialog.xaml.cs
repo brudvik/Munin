@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Input;
+using Munin.UI.Resources;
 
 namespace Munin.UI.Views;
 
@@ -48,13 +49,13 @@ public partial class UnlockDialog : Window
         if (_lockoutUntil.HasValue && DateTime.Now < _lockoutUntil.Value)
         {
             var remaining = (_lockoutUntil.Value - DateTime.Now).TotalSeconds;
-            ShowError($"For mange forsøk. Vent {remaining:F0} sekunder.");
+            ShowError(string.Format(Strings.Unlock_TooManyAttempts, remaining.ToString("F0")));
             return;
         }
         
         if (string.IsNullOrEmpty(PasswordBox.Password))
         {
-            ShowError("Skriv inn passordet.");
+            ShowError(Strings.Unlock_EnterPassword);
             return;
         }
         
@@ -76,12 +77,12 @@ public partial class UnlockDialog : Window
                 // Lock out for increasing time
                 var lockoutSeconds = Math.Min(300, 30 * (_attemptCount - MaxAttempts + 1));
                 _lockoutUntil = DateTime.Now.AddSeconds(lockoutSeconds);
-                ShowError($"For mange forsøk. Låst i {lockoutSeconds} sekunder.");
+                ShowError(string.Format(Strings.Unlock_TooManyAttempts, lockoutSeconds.ToString()));
             }
             else
             {
-                ShowError("Feil passord.");
-                AttemptsText.Text = $"Forsøk {_attemptCount} av {MaxAttempts}";
+                ShowError(Strings.Unlock_WrongPassword);
+                AttemptsText.Text = string.Format(Strings.Unlock_AttemptsCount, _attemptCount, MaxAttempts);
                 AttemptsText.Visibility = Visibility.Visible;
             }
             
@@ -93,14 +94,8 @@ public partial class UnlockDialog : Window
     private void ResetLink_Click(object sender, MouseButtonEventArgs e)
     {
         var result = MessageBox.Show(
-            "⚠️ ADVARSEL: Dette vil slette ALLE data!\n\n" +
-            "• Alle serverkonfigurasjoner\n" +
-            "• Alle passord og legitimasjon\n" +
-            "• All chat-historikk og logger\n" +
-            "• Alle innstillinger\n\n" +
-            "Du må sette opp alt på nytt.\n\n" +
-            "Er du helt sikker?",
-            "Bekreft nullstilling",
+            Strings.Unlock_ResetWarning,
+            Strings.Unlock_ResetConfirmTitle,
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
         
@@ -108,8 +103,8 @@ public partial class UnlockDialog : Window
         {
             // Double confirmation
             var confirm = MessageBox.Show(
-                "Siste sjanse! Skriv JA for å bekrefte.",
-                "Bekreft nullstilling",
+                Strings.Unlock_ResetFinalConfirm,
+                Strings.Unlock_ResetConfirmTitle,
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Stop);
             

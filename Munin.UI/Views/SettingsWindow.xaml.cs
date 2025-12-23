@@ -46,6 +46,9 @@ public partial class SettingsWindow : Window
         
         SecureDeleteEnabledCheckBox.IsChecked = settings.SecureDeleteEnabled;
         SecureDeleteEnabledCheckBox.IsEnabled = settings.AutoDeleteLogsEnabled;
+        
+        // History settings
+        HistoryLinesToLoadTextBox.Text = settings.HistoryLinesToLoad.ToString();
     }
     
     /// <summary>
@@ -277,6 +280,12 @@ public partial class SettingsWindow : Window
         }
         
         settings.SecureDeleteEnabled = SecureDeleteEnabledCheckBox.IsChecked == true;
+        
+        // History settings
+        if (int.TryParse(HistoryLinesToLoadTextBox.Text, out var historyLines) && historyLines >= 10 && historyLines <= 1000)
+        {
+            settings.HistoryLinesToLoad = historyLines;
+        }
         
         // Update auto-lock configuration
         if (Application.Current is App app)

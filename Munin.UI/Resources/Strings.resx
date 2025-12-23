@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  
+  <!-- Application -->
+  <data name="AppName" xml:space="preserve">
+    <value>Munin IRC Client</value>
+  </data>
+  <data name="AppTitle" xml:space="preserve">
+    <value>IRC Client</value>
+  </data>
+  
+  <!-- Common -->
+  <data name="OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Warning" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="Connect" xml:space="preserve">
+    <value>Connect</value>
+  </data>
+  <data name="Disconnect" xml:space="preserve">
+    <value>Disconnect</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  
+  <!-- Encryption Setup Dialog -->
+  <data name="EncryptionSetup_Title" xml:space="preserve">
+    <value>Security - Encryption</value>
+  </data>
+  <data name="EncryptionSetup_Header" xml:space="preserve">
+    <value>Enable Encryption</value>
+  </data>
+  <data name="EncryptionSetup_Description" xml:space="preserve">
+    <value>Protect your data with a master password</value>
+  </data>
+  <data name="EncryptionSetup_WillBeEncrypted" xml:space="preserve">
+    <value>This will be encrypted:</value>
+  </data>
+  <data name="EncryptionSetup_ServerConfigs" xml:space="preserve">
+    <value>Server configurations and passwords</value>
+  </data>
+  <data name="EncryptionSetup_NickServSasl" xml:space="preserve">
+    <value>NickServ and SASL credentials</value>
+  </data>
+  <data name="EncryptionSetup_ChatHistory" xml:space="preserve">
+    <value>Chat history and logs</value>
+  </data>
+  <data name="EncryptionSetup_AllSettings" xml:space="preserve">
+    <value>All settings</value>
+  </data>
+  <data name="EncryptionSetup_CreatePassword" xml:space="preserve">
+    <value>Create master password:</value>
+  </data>
+  <data name="EncryptionSetup_ConfirmPassword" xml:space="preserve">
+    <value>Confirm password:</value>
+  </data>
+  <data name="EncryptionSetup_Warning" xml:space="preserve">
+    <value>Important: If you forget the password, all data is inaccessible. There is no recovery option.</value>
+  </data>
+  <data name="EncryptionSetup_Enable" xml:space="preserve">
+    <value>Enable Encryption</value>
+  </data>
+  <data name="EncryptionSetup_Skip" xml:space="preserve">
+    <value>Skip for now</value>
+  </data>
+  <data name="EncryptionSetup_PasswordEmpty" xml:space="preserve">
+    <value>Password cannot be empty.</value>
+  </data>
+  <data name="EncryptionSetup_PasswordTooShort" xml:space="preserve">
+    <value>Password must be at least 8 characters.</value>
+  </data>
+  <data name="EncryptionSetup_PasswordMismatch" xml:space="preserve">
+    <value>Passwords do not match.</value>
+  </data>
+  <data name="EncryptionSetup_PasswordWeak" xml:space="preserve">
+    <value>Password is too weak. Use uppercase/lowercase letters, numbers or special characters.</value>
+  </data>
+  <data name="EncryptionSetup_SkipConfirmTitle" xml:space="preserve">
+    <value>Are you sure you want to continue without encryption?</value>
+  </data>
+  <data name="EncryptionSetup_SkipConfirmMessage" xml:space="preserve">
+    <value>Your server passwords and chat logs will be stored unencrypted on disk.</value>
+  </data>
+  <data name="EncryptionSetup_Failed" xml:space="preserve">
+    <value>Could not enable encryption.</value>
+  </data>
+  
+  <!-- Unlock Dialog -->
+  <data name="Unlock_Title" xml:space="preserve">
+    <value>IRC Client - Locked</value>
+  </data>
+  <data name="Unlock_Header" xml:space="preserve">
+    <value>IRC Client is locked</value>
+  </data>
+  <data name="Unlock_Description" xml:space="preserve">
+    <value>Enter the master password to unlock</value>
+  </data>
+  <data name="Unlock_MasterPassword" xml:space="preserve">
+    <value>Master password:</value>
+  </data>
+  <data name="Unlock_Button" xml:space="preserve">
+    <value>Unlock</value>
+  </data>
+  <data name="Unlock_ForgotPassword" xml:space="preserve">
+    <value>Forgot password?</value>
+  </data>
+  <data name="Unlock_ResetAll" xml:space="preserve">
+    <value>Reset all</value>
+  </data>
+  <data name="Unlock_EnterPassword" xml:space="preserve">
+    <value>Enter the password.</value>
+  </data>
+  <data name="Unlock_WrongPassword" xml:space="preserve">
+    <value>Wrong password.</value>
+  </data>
+  <data name="Unlock_TooManyAttempts" xml:space="preserve">
+    <value>Too many attempts. Wait {0} seconds.</value>
+  </data>
+  <data name="Unlock_AttemptsCount" xml:space="preserve">
+    <value>Attempt {0} of {1}</value>
+  </data>
+  <data name="Unlock_ResetWarning" xml:space="preserve">
+    <value>⚠️ WARNING: This will delete ALL data!
+
+• All server configurations
+• All passwords and credentials
+• All chat history and logs
+• All settings
+
+You will have to set everything up again.
+
+Are you absolutely sure?</value>
+  </data>
+  <data name="Unlock_ResetConfirmTitle" xml:space="preserve">
+    <value>Confirm reset</value>
+  </data>
+  <data name="Unlock_ResetFinalConfirm" xml:space="preserve">
+    <value>Last chance! Click Yes to confirm.</value>
+  </data>
+  
+  <!-- Main Window -->
+  <data name="MainWindow_AddServer" xml:space="preserve">
+    <value>Add Server</value>
+  </data>
+  <data name="MainWindow_JoinChannel" xml:space="preserve">
+    <value>Join Channel</value>
+  </data>
+  <data name="MainWindow_SendMessage" xml:space="preserve">
+    <value>Type a message...</value>
+  </data>
+  <data name="MainWindow_Users" xml:space="preserve">
+    <value>Users</value>
+  </data>
+  <data name="MainWindow_Channels" xml:space="preserve">
+    <value>Channels</value>
+  </data>
+  <data name="MainWindow_Servers" xml:space="preserve">
+    <value>Servers</value>
+  </data>
+  <data name="MainWindow_Search" xml:space="preserve">
+    <value>Search...</value>
+  </data>
+  
+  <!-- Add Server Dialog -->
+  <data name="AddServer_Title" xml:space="preserve">
+    <value>Add Server</value>
+  </data>
+  <data name="AddServer_ServerName" xml:space="preserve">
+    <value>Server name:</value>
+  </data>
+  <data name="AddServer_Address" xml:space="preserve">
+    <value>Address:</value>
+  </data>
+  <data name="AddServer_Port" xml:space="preserve">
+    <value>Port:</value>
+  </data>
+  <data name="AddServer_UseSSL" xml:space="preserve">
+    <value>Use SSL/TLS</value>
+  </data>
+  <data name="AddServer_Nickname" xml:space="preserve">
+    <value>Nickname:</value>
+  </data>
+  <data name="AddServer_Username" xml:space="preserve">
+    <value>Username:</value>
+  </data>
+  <data name="AddServer_RealName" xml:space="preserve">
+    <value>Real name:</value>
+  </data>
+  <data name="AddServer_Password" xml:space="preserve">
+    <value>Server password:</value>
+  </data>
+  <data name="AddServer_AutoConnect" xml:space="preserve">
+    <value>Connect automatically on startup</value>
+  </data>
+  <data name="AddServer_Channels" xml:space="preserve">
+    <value>Auto-join channels (comma-separated):</value>
+  </data>
+  
+  <!-- Settings Dialog -->
+  <data name="Settings_Title" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Settings_General" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="Settings_Appearance" xml:space="preserve">
+    <value>Appearance</value>
+  </data>
+  <data name="Settings_Security" xml:space="preserve">
+    <value>Security</value>
+  </data>
+  <data name="Settings_Notifications" xml:space="preserve">
+    <value>Notifications</value>
+  </data>
+  <data name="Settings_AutoLock" xml:space="preserve">
+    <value>Auto-lock after inactivity</value>
+  </data>
+  <data name="Settings_AutoLockMinutes" xml:space="preserve">
+    <value>Minutes:</value>
+  </data>
+  <data name="Settings_ChangePassword" xml:space="preserve">
+    <value>Change password</value>
+  </data>
+  <data name="Settings_Theme" xml:space="preserve">
+    <value>Theme:</value>
+  </data>
+  <data name="Settings_ThemeDark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="Settings_ThemeLight" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="Settings_FontSize" xml:space="preserve">
+    <value>Font size:</value>
+  </data>
+  <data name="Settings_Timestamps" xml:space="preserve">
+    <value>Show timestamps</value>
+  </data>
+  <data name="Settings_DesktopNotifications" xml:space="preserve">
+    <value>Desktop notifications</value>
+  </data>
+  <data name="Settings_SoundNotifications" xml:space="preserve">
+    <value>Sound notifications</value>
+  </data>
+  
+  <!-- Status Messages -->
+  <data name="Status_Connecting" xml:space="preserve">
+    <value>Connecting...</value>
+  </data>
+  <data name="Status_Connected" xml:space="preserve">
+    <value>Connected</value>
+  </data>
+  <data name="Status_Disconnected" xml:space="preserve">
+    <value>Disconnected</value>
+  </data>
+  <data name="Status_Reconnecting" xml:space="preserve">
+    <value>Reconnecting...</value>
+  </data>
+  <data name="Status_ConnectionFailed" xml:space="preserve">
+    <value>Connection failed</value>
+  </data>
+  
+  <!-- Context Menu -->
+  <data name="ContextMenu_Copy" xml:space="preserve">
+    <value>Copy</value>
+  </data>
+  <data name="ContextMenu_Paste" xml:space="preserve">
+    <value>Paste</value>
+  </data>
+  <data name="ContextMenu_SelectAll" xml:space="preserve">
+    <value>Select All</value>
+  </data>
+  <data name="ContextMenu_PrivateMessage" xml:space="preserve">
+    <value>Private Message</value>
+  </data>
+  <data name="ContextMenu_Whois" xml:space="preserve">
+    <value>Whois</value>
+  </data>
+  <data name="ContextMenu_Kick" xml:space="preserve">
+    <value>Kick</value>
+  </data>
+  <data name="ContextMenu_Ban" xml:space="preserve">
+    <value>Ban</value>
+  </data>
+  <data name="ContextMenu_Op" xml:space="preserve">
+    <value>Give Op</value>
+  </data>
+  <data name="ContextMenu_DeOp" xml:space="preserve">
+    <value>Remove Op</value>
+  </data>
+  <data name="ContextMenu_Voice" xml:space="preserve">
+    <value>Give Voice</value>
+  </data>
+  <data name="ContextMenu_DeVoice" xml:space="preserve">
+    <value>Remove Voice</value>
+  </data>
+  
+</root>

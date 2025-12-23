@@ -4,6 +4,8 @@
 
 *Named after Odin's raven who flies across the world to bring back news and information.*
 
+![Munin IRC Client](https://raw.githubusercontent.com/brudvik/Munin/main/munin.png)
+
 ![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4)
 ![Windows](https://img.shields.io/badge/Platform-Windows-0078D6)
 ![License](https://img.shields.io/badge/License-MIT-green)
@@ -27,11 +29,15 @@
 
 ### User Interface
 - **Dark theme** - Easy on the eyes
+- **Multi-language** - English and Norwegian (auto-detects system language)
 - **Tab completion** - For nicknames and commands
 - **Command history** - Arrow up/down navigation
 - **Highlight words** - Custom alert words
 - **Ignore list** - Hide messages from users
 - **Sound and flash alerts** - Configurable notifications
+- **Connection spinner** - Visual feedback during server connections
+- **History loading** - Configurable message history on channel join (10-1000 lines)
+- **History timestamps** - Shows date range when loading previous messages
 
 ### Advanced
 - **Auto-perform** - Run commands on connection
@@ -82,6 +88,15 @@ Munin/
 ```
 
 ## ⚙️ Configuration
+
+### Settings
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| History lines | Number of history messages to load | 100 |
+| Auto-lock minutes | Minutes of inactivity before lock | 5 |
+| Auto-delete logs | Days to keep log files | 30 |
+| Secure delete | Overwrite files before deletion | Off |
 
 ### Normal Mode
 Data is stored in: `%APPDATA%\Munin\`

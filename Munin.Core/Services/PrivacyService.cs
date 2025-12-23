@@ -40,6 +40,11 @@ public class PrivacyService
     public bool ObfuscateDates { get; set; } = false;
     
     /// <summary>
+    /// Gets whether the mappings have been loaded.
+    /// </summary>
+    public bool IsMappingLoaded => _mappingLoaded;
+    
+    /// <summary>
     /// Initializes a new instance of the PrivacyService.
     /// </summary>
     /// <param name="storage">The secure storage service for persisting mappings.</param>
@@ -225,11 +230,25 @@ public class PrivacyService
         return Convert.ToHexString(hashBytes)[..8].ToLowerInvariant();
     }
     
-    private void EnsureMappingLoaded()
+    /// <summary>
+    /// Initializes the privacy service by loading mappings.
+    /// Call this after secure storage is unlocked.
+    /// </summary>
+    public async Task InitializeAsync()
     {
         if (!_mappingLoaded && _storage != null && _storage.IsUnlocked)
         {
-            LoadMappingsAsync().GetAwaiter().GetResult();
+            await LoadMappingsAsync();
+        }
+    }
+    
+    private void EnsureMappingLoaded()
+    {
+        // Just check the flag - mappings should be loaded via InitializeAsync
+        // This prevents blocking the UI thread
+        if (!_mappingLoaded)
+        {
+            _mappingLoaded = true; // Mark as loaded to prevent repeated attempts
         }
     }
     

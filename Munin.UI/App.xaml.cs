@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Threading;
 using Munin.Core.Services;
+using Munin.UI.Resources;
 using Munin.UI.Views;
 using Serilog;
 
@@ -68,7 +69,11 @@ public partial class App : Application
             // Initialize Serilog for the entire application
             SerilogConfig.Initialize();
             
-            Log.Information("Munin starting up (Portable mode: {IsPortable})", PortableMode.IsPortable);
+            // Initialize localization (uses system language by default)
+            _ = Services.LocalizationService.Instance;
+            
+            Log.Information("Munin starting up (Portable mode: {IsPortable}, Language: {Language})", 
+                PortableMode.IsPortable, Services.LocalizationService.Instance.CurrentLanguageCode);
             
             // Initialize secure storage using portable-aware path
             _storage = new SecureStorageService(PortableMode.BasePath);
@@ -84,8 +89,8 @@ public partial class App : Application
             // Initialize security audit service (if not already done in HandleEncryption)
             _securityAudit ??= new SecurityAuditService(_storage);
             
-            // Initialize logging service with storage
-            LoggingService.Initialize(_storage);
+            // Initialize logging service with storage (run on thread pool to avoid UI deadlock)
+            Task.Run(() => LoggingService.InitializeAsync(_storage)).GetAwaiter().GetResult();
             
             // Start idle timer for auto-lock
             StartIdleTimer();
@@ -100,7 +105,7 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Startup error: {ex.Message}\n\n{ex.StackTrace}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show($"Startup error: {ex.Message}\n\n{ex.StackTrace}", Strings.Error, MessageBoxButton.OK, MessageBoxImage.Error);
             Shutdown();
         }
     }
@@ -280,7 +285,7 @@ public partial class App : Application
                 
                 if (!success)
                 {
-                    MessageBox.Show("Kunne ikke aktivere kryptering.", "Feil", 
+                    MessageBox.Show(Strings.EncryptionSetup_Failed, Strings.Error, 
                         MessageBoxButton.OK, MessageBoxImage.Error);
                     return false;
                 }
@@ -351,7 +356,7 @@ public partial class App : Application
             catch (Exception ex)
             {
                 Log.Error(ex, "HandleEncryption: Exception during unlock dialog");
-                MessageBox.Show($"Feil ved opplåsing: {ex.Message}\n\n{ex.StackTrace}", "Feil", 
+                MessageBox.Show($"{Strings.Error}: {ex.Message}\n\n{ex.StackTrace}", Strings.Error, 
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
@@ -372,6 +377,9 @@ public partial class App : Application
         _idleTimer?.Stop();
         _idleTimer = null;
         
+        // Dispose logging service FIRST (while storage is still unlocked, to flush buffers)
+        LoggingService.Instance.Dispose();
+        
         // Lock storage and wipe encryption keys from memory
         if (_storage != null)
         {
@@ -386,9 +394,6 @@ public partial class App : Application
         
         // Ensure all logs are flushed before exit
         SerilogConfig.CloseAndFlush();
-        
-        // Dispose logging service
-        LoggingService.Instance.Dispose();
         
         base.OnExit(e);
     }
