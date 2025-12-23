@@ -33,7 +33,8 @@ public class SecurityAuditService
         _storage = storage;
         _auditLog = new SecurityAuditLog();
         
-        LoadAuditLogAsync().GetAwaiter().GetResult();
+        // Load synchronously to avoid deadlock in UI thread
+        LoadAuditLogSync();
     }
     
     /// <summary>
@@ -212,6 +213,26 @@ public class SecurityAuditService
             await SaveAuditLogAsync();
             _logger.Information("Pruned {Count} old security audit entries", 
                 originalCount - _auditLog.Events.Count);
+        }
+    }
+    
+    private void LoadAuditLogSync()
+    {
+        try
+        {
+            if (_storage.FileExists(_auditLogPath))
+            {
+                var json = _storage.ReadTextSync(_auditLogPath);
+                if (!string.IsNullOrEmpty(json))
+                {
+                    _auditLog = JsonSerializer.Deserialize<SecurityAuditLog>(json) ?? new SecurityAuditLog();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Failed to load security audit log");
+            _auditLog = new SecurityAuditLog();
         }
     }
     

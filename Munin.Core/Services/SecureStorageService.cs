@@ -354,6 +354,28 @@ public class SecureStorageService
     }
     
     /// <summary>
+    /// Reads text content from a file synchronously, decrypting if necessary.
+    /// </summary>
+    /// <param name="relativePath">The path relative to the base directory.</param>
+    /// <returns>The text content, or null if file doesn't exist.</returns>
+    public string? ReadTextSync(string relativePath)
+    {
+        var bytes = ReadBytesSync(relativePath);
+        return bytes != null ? System.Text.Encoding.UTF8.GetString(bytes) : null;
+    }
+    
+    /// <summary>
+    /// Reads binary content from a file synchronously, decrypting if necessary.
+    /// </summary>
+    /// <param name="relativePath">The path relative to the base directory.</param>
+    /// <returns>The binary content, or null if file doesn't exist.</returns>
+    public byte[]? ReadBytesSync(string relativePath)
+    {
+        var fullPath = GetFullPath(relativePath);
+        return ReadFileInternalSync(fullPath);
+    }
+    
+    /// <summary>
     /// Reads text content from a file, decrypting if necessary.
     /// </summary>
     /// <param name="relativePath">The path relative to the base directory.</param>
@@ -551,6 +573,25 @@ public class SecureStorageService
         {
             await File.WriteAllBytesAsync(fullPath, content);
         }
+    }
+    
+    private byte[]? ReadFileInternalSync(string fullPath)
+    {
+        if (!File.Exists(fullPath))
+            return null;
+        
+        var data = File.ReadAllBytes(fullPath);
+        
+        // Check if file is encrypted
+        if (EncryptionService.IsEncrypted(data))
+        {
+            if (!_encryptionService.IsUnlocked)
+                throw new InvalidOperationException("Storage is locked. Call Unlock first.");
+            
+            return _encryptionService.Decrypt(data);
+        }
+        
+        return data;
     }
     
     private async Task<byte[]?> ReadFileInternalAsync(string fullPath)

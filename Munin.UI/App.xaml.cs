@@ -57,32 +57,52 @@ public partial class App : Application
     /// <param name="e">The startup event arguments.</param>
     protected override void OnStartup(StartupEventArgs e)
     {
-        // Initialize Serilog for the entire application
-        SerilogConfig.Initialize();
-        
-        Log.Information("Munin starting up (Portable mode: {IsPortable})", PortableMode.IsPortable);
-        
-        // Initialize secure storage using portable-aware path
-        _storage = new SecureStorageService(PortableMode.BasePath);
-        
-        // Handle encryption
-        if (!HandleEncryption())
+        try
         {
-            // User cancelled or reset - exit application
-            Shutdown();
-            return;
+            // Call base first to initialize WPF properly
+            base.OnStartup(e);
+            
+            // Prevent app from shutting down when dialogs close
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            
+            // Initialize Serilog for the entire application
+            SerilogConfig.Initialize();
+            
+            Log.Information("Munin starting up (Portable mode: {IsPortable})", PortableMode.IsPortable);
+            
+            // Initialize secure storage using portable-aware path
+            _storage = new SecureStorageService(PortableMode.BasePath);
+            
+            // Handle encryption
+            if (!HandleEncryption())
+            {
+                // User cancelled or reset - exit application
+                Shutdown();
+                return;
+            }
+            
+            // Initialize security audit service (if not already done in HandleEncryption)
+            _securityAudit ??= new SecurityAuditService(_storage);
+            
+            // Initialize logging service with storage
+            LoggingService.Initialize(_storage);
+            
+            // Start idle timer for auto-lock
+            StartIdleTimer();
+            
+            // Create and show main window explicitly
+            var mainWindow = new MainWindow();
+            MainWindow = mainWindow;
+            mainWindow.Show();
+            
+            // Now set shutdown mode to close when main window closes
+            ShutdownMode = ShutdownMode.OnMainWindowClose;
         }
-        
-        // Initialize security audit service (if not already done in HandleEncryption)
-        _securityAudit ??= new SecurityAuditService(_storage);
-        
-        // Initialize logging service with storage
-        LoggingService.Initialize(_storage);
-        
-        // Start idle timer for auto-lock
-        StartIdleTimer();
-        
-        base.OnStartup(e);
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Startup error: {ex.Message}\n\n{ex.StackTrace}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            Shutdown();
+        }
     }
     
     /// <summary>
@@ -227,14 +247,24 @@ public partial class App : Application
     /// <returns>True if the application should continue, false if it should exit.</returns>
     private bool HandleEncryption()
     {
-        if (_storage == null) return false;
+        Log.Information("HandleEncryption: Starting");
+        
+        if (_storage == null) 
+        {
+            Log.Warning("HandleEncryption: Storage is null");
+            return false;
+        }
+        
+        Log.Information("HandleEncryption: IsEncryptionEnabled = {Enabled}", _storage.IsEncryptionEnabled);
         
         // Check if this is first run (no config exists)
         bool isFirstRun = !_storage.FileExists("config.json") && !_storage.IsEncryptionEnabled;
+        Log.Information("HandleEncryption: isFirstRun = {FirstRun}", isFirstRun);
         
         if (isFirstRun)
         {
             // Show encryption setup dialog
+            Log.Information("HandleEncryption: Showing encryption setup dialog");
             var setupDialog = new EncryptionSetupDialog();
             var result = setupDialog.ShowDialog();
             
@@ -245,11 +275,10 @@ public partial class App : Application
             
             if (setupDialog.EnableEncryption && !string.IsNullOrEmpty(setupDialog.Password))
             {
-                // Enable encryption
-                var enableTask = _storage.EnableEncryptionAsync(setupDialog.Password);
-                enableTask.Wait();
+                // Enable encryption - run on thread pool to avoid UI deadlock
+                var success = Task.Run(() => _storage.EnableEncryptionAsync(setupDialog.Password)).GetAwaiter().GetResult();
                 
-                if (!enableTask.Result)
+                if (!success)
                 {
                     MessageBox.Show("Kunne ikke aktivere kryptering.", "Feil", 
                         MessageBoxButton.OK, MessageBoxImage.Error);
@@ -269,46 +298,63 @@ public partial class App : Application
         // If encryption is enabled, show unlock dialog
         if (_storage.IsEncryptionEnabled)
         {
-            // Create audit service early so we can log unlock attempts
-            _securityAudit ??= new SecurityAuditService(_storage);
+            Log.Information("HandleEncryption: Encryption is enabled, showing unlock dialog");
             
-            var unlockDialog = new UnlockDialog
+            try
             {
-                ValidatePassword = password =>
+                Log.Information("HandleEncryption: Creating unlock dialog");
+                var unlockDialog = new UnlockDialog();
+                Log.Information("HandleEncryption: Unlock dialog created");
+                
+                unlockDialog.ValidatePassword = password =>
                 {
                     var success = _storage.Unlock(password);
-                    // Log the attempt (fire and forget)
-                    _ = _securityAudit.LogUnlockAttemptAsync(success, success ? null : "Feil passord");
+                    // Log to Serilog only at this point (audit service requires unlocked storage)
+                    if (success)
+                        Log.Information("Unlock attempt successful");
+                    else
+                        Log.Warning("Unlock attempt failed: Feil passord");
                     return success;
+                };
+                
+                Log.Information("HandleEncryption: About to call ShowDialog on unlock dialog");
+                var result = unlockDialog.ShowDialog();
+                Log.Information("HandleEncryption: ShowDialog returned {Result}", result);
+                
+                if (result != true)
+                {
+                    Log.Information("HandleEncryption: User cancelled unlock dialog");
+                    return false; // User closed dialog
                 }
-            };
-            
-            var result = unlockDialog.ShowDialog();
-            
-            if (result != true)
-            {
-                return false; // User closed dialog
-            }
-            
-            if (unlockDialog.ResetRequested)
-            {
-                // Log the reset
-                _ = _securityAudit.LogDataResetAsync();
                 
-                // Reset all data
-                _storage.ResetAll();
-                Log.Warning("User reset all data");
+                if (unlockDialog.ResetRequested)
+                {
+                    // Reset all data (can't log to audit service since storage is locked)
+                    _storage.ResetAll();
+                    Log.Warning("User reset all data");
+                    
+                    // Restart with fresh setup
+                    return HandleEncryption();
+                }
                 
-                // Restart with fresh setup
-                return HandleEncryption();
+                if (string.IsNullOrEmpty(unlockDialog.Password))
+                {
+                    return false;
+                }
+                
+                // Now storage is unlocked, create audit service and log the successful unlock
+                _securityAudit = new SecurityAuditService(_storage);
+                _ = _securityAudit.LogUnlockAttemptAsync(true, null);
+                
+                Log.Information("Storage unlocked successfully");
             }
-            
-            if (string.IsNullOrEmpty(unlockDialog.Password))
+            catch (Exception ex)
             {
+                Log.Error(ex, "HandleEncryption: Exception during unlock dialog");
+                MessageBox.Show($"Feil ved opplåsing: {ex.Message}\n\n{ex.StackTrace}", "Feil", 
+                    MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
-            
-            Log.Information("Storage unlocked successfully");
         }
         
         return true;
