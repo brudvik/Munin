@@ -1,0 +1,646 @@
+<Window x:Class="IrcClient.UI.Views.MainWindow"
+        x:Name="MainWindowRoot"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:IrcClient.UI.ViewModels"
+        xmlns:controls="clr-namespace:IrcClient.UI.Controls"
+        mc:Ignorable="d"
+        Title="IRC Client" 
+        Height="700" 
+        Width="1200"
+        MinHeight="500"
+        MinWidth="800"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BackgroundDarkBrush}"
+        Foreground="{StaticResource TextPrimaryBrush}"
+        FontFamily="{StaticResource MonospaceFont}"
+        FontSize="13">
+
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <Window.InputBindings>
+        <KeyBinding Key="Return" Command="{Binding SendMessageCommand}"/>
+        <KeyBinding Key="F" Modifiers="Ctrl" Command="{Binding ToggleSearchCommand}"/>
+        <KeyBinding Key="Escape" Command="{Binding CloseSearchCommand}"/>
+    </Window.InputBindings>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title Bar -->
+        <Border Grid.Row="0" 
+                Background="{StaticResource BackgroundMediumBrush}"
+                BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="16,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Logo and Title -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="💬" FontSize="20" Margin="0,0,10,0"/>
+                    <TextBlock Text="IRC Client" 
+                               FontSize="16" 
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Current Channel Info -->
+                <StackPanel Grid.Column="1" 
+                            Orientation="Horizontal" 
+                            HorizontalAlignment="Center"
+                            Visibility="{Binding SelectedChannel, Converter={StaticResource NullToVisibilityConverter}, FallbackValue=Collapsed}">
+                    <TextBlock Text="{Binding SelectedChannel.DisplayName, FallbackValue=''}" 
+                               FontSize="14" 
+                               FontWeight="Medium"
+                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                    <TextBlock Text=" — " 
+                               Foreground="{StaticResource TextMutedBrush}"
+                               Visibility="{Binding SelectedChannel.Channel.Topic, Converter={StaticResource NullToVisibilityConverter}, FallbackValue=Collapsed}"/>
+                    <TextBlock Text="{Binding SelectedChannel.Channel.Topic, FallbackValue=''}" 
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               MaxWidth="500"
+                               TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+
+                <!-- Actions -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Button Content="⚙" 
+                            ToolTip="Settings"
+                            Command="{Binding ShowSettingsCommand}"
+                            Style="{StaticResource IconButtonStyle}"
+                            FontSize="16"
+                            Margin="0,0,4,0"/>
+                    <Button Content="🔧" 
+                            ToolTip="Raw IRC Log (Debug)"
+                            Command="{Binding ShowRawIrcLogCommand}"
+                            Style="{StaticResource IconButtonStyle}"
+                            FontSize="16"
+                            Margin="0,0,8,0"/>
+                    <Button Content="➕ Add Server" 
+                            Command="{Binding AddServerCommand}"
+                            Style="{StaticResource AccentButtonStyle}"
+                            Margin="0,0,8,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="220" MinWidth="180"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="200" MinWidth="150"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Server/Channel List -->
+            <Border Grid.Column="0" 
+                    Background="{StaticResource BackgroundMediumBrush}"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="0,0,1,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" 
+                               Text="SERVERS" 
+                               FontSize="11" 
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource TextMutedBrush}"
+                               Margin="16,16,16,8"/>
+
+                    <ListBox Grid.Row="1" 
+                             ItemsSource="{Binding Servers}"
+                             SelectedItem="{Binding SelectedServer}"
+                             HorizontalContentAlignment="Stretch">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <!-- Server Header -->
+                                    <Grid Margin="0,6,0,4" MinHeight="24">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="16"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <TextBlock Grid.Column="0" 
+                                                   Text="{Binding StatusIcon}" 
+                                                   FontSize="10"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"/>
+                                        <TextBlock Grid.Column="1" 
+                                                   Text="{Binding DisplayName}" 
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextPrimaryBrush}"/>
+                                        
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                            <Button Content="⚡" 
+                                                    ToolTip="Connect"
+                                                    Style="{StaticResource IconButtonStyle}"
+                                                    Command="{Binding DataContext.ConnectToServerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"
+                                                    Visibility="{Binding IsConnected, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                                            <Button Content="⏹" 
+                                                    ToolTip="Disconnect"
+                                                    Style="{StaticResource IconButtonStyle}"
+                                                    Command="{Binding DataContext.DisconnectFromServerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"
+                                                    Visibility="{Binding IsConnected, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                            <Button Content="✏️" 
+                                                    ToolTip="Edit server"
+                                                    Style="{StaticResource IconButtonStyle}"
+                                                    Command="{Binding DataContext.EditServerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"
+                                                    Visibility="{Binding IsConnected, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                                            <Button Content="✕" 
+                                                    ToolTip="Remove server"
+                                                    Style="{StaticResource IconButtonStyle}"
+                                                    Command="{Binding DataContext.RemoveServerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"
+                                                    Visibility="{Binding IsConnected, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <!-- Channels - always visible -->
+                                    <ItemsControl ItemsSource="{Binding Channels}" 
+                                                  Margin="16,0,0,8">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border x:Name="channelBorder" 
+                                                        Padding="8,6" 
+                                                        Margin="0,1"
+                                                        CornerRadius="4"
+                                                        Cursor="Hand"
+                                                        Background="Transparent">
+                                                    <Border.InputBindings>
+                                                        <MouseBinding MouseAction="LeftClick" 
+                                                                      Command="{Binding DataContext.SelectChannelCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                      CommandParameter="{Binding}"/>
+                                                    </Border.InputBindings>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="18"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        
+                                                        <TextBlock Grid.Column="0" 
+                                                                   Text="{Binding ChannelIcon}" 
+                                                                   Foreground="{StaticResource TextMutedBrush}"
+                                                                   HorizontalAlignment="Center"/>
+                                                        <TextBlock Grid.Column="1" 
+                                                                   Text="{Binding DisplayName}" 
+                                                                   Foreground="{StaticResource TextSecondaryBrush}"/>
+                                                        
+                                                        <!-- Unread Badge -->
+                                                        <Border Grid.Column="2" 
+                                                                Background="{StaticResource AccentDimBrush}"
+                                                                CornerRadius="10"
+                                                                Padding="6,2"
+                                                                Visibility="{Binding UnreadCount, Converter={StaticResource IntToVisibilityConverter}}">
+                                                            <TextBlock Text="{Binding UnreadCount}" 
+                                                                       FontSize="10"
+                                                                       Foreground="White"/>
+                                                        </Border>
+                                                    </Grid>
+                                                </Border>
+                                                <DataTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="channelBorder" Property="Background" 
+                                                                Value="{StaticResource BackgroundHighlightBrush}"/>
+                                                    </Trigger>
+                                                    <DataTrigger Binding="{Binding HasMention}" Value="True">
+                                                        <Setter TargetName="channelBorder" Property="Background" 
+                                                                Value="#1F2937"/>
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+
+            <GridSplitter Grid.Column="1" Width="1" Background="{StaticResource BorderBrush}"/>
+
+            <!-- Chat Area -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Search Bar (Ctrl+F) -->
+                <Border Grid.Row="0" 
+                        Background="{StaticResource BackgroundMediumBrush}"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="0,0,0,1"
+                        Padding="16,8"
+                        Visibility="{Binding IsSearchVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <TextBlock Grid.Column="0" 
+                                   Text="🔍" 
+                                   FontSize="14"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,8,0"/>
+                        
+                        <TextBox Grid.Column="1" 
+                                 x:Name="SearchTextBox"
+                                 Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
+                                 Padding="8,6"
+                                 FontSize="13">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Return" Command="{Binding SearchCommand}"/>
+                                <KeyBinding Key="Escape" Command="{Binding CloseSearchCommand}"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
+                        
+                        <Button Grid.Column="2" 
+                                Content="Search" 
+                                Command="{Binding SearchCommand}"
+                                Style="{StaticResource AccentButtonStyle}"
+                                Margin="8,0,0,0"/>
+                        
+                        <TextBlock Grid.Column="3" 
+                                   Text="{Binding SearchResultCount, StringFormat='{}{0} results'}" 
+                                   Foreground="{StaticResource TextMutedBrush}"
+                                   FontSize="12"
+                                   VerticalAlignment="Center"
+                                   Margin="12,0,0,0"/>
+                        
+                        <Button Grid.Column="4" 
+                                Content="✕" 
+                                ToolTip="Close search (Esc)"
+                                Command="{Binding CloseSearchCommand}"
+                                Style="{StaticResource IconButtonStyle}"
+                                Margin="8,0,0,0"/>
+                    </Grid>
+                </Border>
+
+                <!-- Messages -->
+                <Border Grid.Row="1" Background="{StaticResource BackgroundDarkBrush}">
+                    <ListBox x:Name="MessagesListBox"
+                             ItemsSource="{Binding SelectedChannel.Messages}"
+                             VirtualizingPanel.ScrollUnit="Pixel"
+                             ScrollViewer.CanContentScroll="True"
+                             HorizontalContentAlignment="Stretch"
+                             Loaded="MessagesListBox_Loaded">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Padding" Value="16,4"/>
+                                <Setter Property="Margin" Value="0"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border x:Name="border" 
+                                                    Background="Transparent"
+                                                    Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="border" Property="Background" 
+                                                            Value="{StaticResource BackgroundMediumBrush}"/>
+                                                </Trigger>
+                                                <DataTrigger Binding="{Binding IsHighlight}" Value="True">
+                                                    <Setter TargetName="border" Property="Background" 
+                                                            Value="#2D2A1A"/>
+                                                </DataTrigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="70"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Timestamp [HH:mm:ss] -->
+                                        <TextBlock Grid.Column="0" 
+                                                   Text="{Binding Timestamp}" 
+                                                   Foreground="{StaticResource TextMutedBrush}"
+                                                   FontSize="12"/>
+
+                                        <!-- Nickname (fixed width, right-aligned) -->
+                                        <TextBlock Grid.Column="1" 
+                                                   Width="160"
+                                                   TextAlignment="Right"
+                                                   Visibility="{Binding ShowNickname, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            <Run Text="&lt;" Foreground="{StaticResource TextMutedBrush}"/>
+                                            <Run Text="{Binding PaddedNickname, Mode=OneWay}" 
+                                                 Foreground="{Binding NicknameColor}"
+                                                 FontWeight="Medium"/>
+                                            <Run Text="&gt;" Foreground="{StaticResource TextMutedBrush}"/>
+                                        </TextBlock>
+
+                                        <!-- Separator -->
+                                        <TextBlock Grid.Column="2" 
+                                                   Text=" │ "
+                                                   Foreground="{StaticResource BorderBrush}"
+                                                   Visibility="{Binding ShowNickname, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                                        <!-- Message Content (with IRC formatting, links, emojis) -->
+                                        <ContentControl Grid.Column="3" 
+                                                        Content="{Binding Converter={StaticResource MessageToInlinesConverter}}"
+                                                        VerticalAlignment="Top"/>
+                                    </Grid>
+                                    
+                                    <!-- Link Previews -->
+                                    <ItemsControl ItemsSource="{Binding LinkPreviews}"
+                                                  Margin="70,4,0,0"
+                                                  Visibility="{Binding LinkPreviews.Count, Converter={StaticResource NullToBoolConverter}}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="{StaticResource BackgroundMediumBrush}"
+                                                        BorderBrush="{StaticResource BorderBrush}"
+                                                        BorderThickness="0,0,0,2"
+                                                        CornerRadius="6"
+                                                        Padding="10,8"
+                                                        Margin="0,2"
+                                                        MaxWidth="500"
+                                                        HorizontalAlignment="Left"
+                                                        Cursor="Hand"
+                                                        MouseLeftButtonUp="LinkPreview_MouseLeftButtonUp">
+                                                    <StackPanel>
+                                                        <TextBlock Text="{Binding Title}"
+                                                                   FontWeight="SemiBold"
+                                                                   Foreground="{StaticResource AccentBrush}"
+                                                                   TextTrimming="CharacterEllipsis"/>
+                                                        <TextBlock Text="{Binding Description}"
+                                                                   Foreground="{StaticResource TextMutedBrush}"
+                                                                   FontSize="12"
+                                                                   TextWrapping="Wrap"
+                                                                   MaxHeight="40"
+                                                                   TextTrimming="CharacterEllipsis"
+                                                                   Visibility="{Binding Description, Converter={StaticResource NullToVisibilityConverter}}"/>
+                                                        <TextBlock Text="{Binding Url}"
+                                                                   Foreground="{StaticResource TextMutedBrush}"
+                                                                   FontSize="11"
+                                                                   TextTrimming="CharacterEllipsis"
+                                                                   Margin="0,4,0,0"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Border>
+
+                <!-- Message Input -->
+                <Border Grid.Row="2" 
+                        Background="{StaticResource BackgroundMediumBrush}"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="0,1,0,0"
+                        Padding="16,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <controls:ChatInputTextBox 
+                                 Grid.Column="0" 
+                                 Text="{Binding MessageInput, UpdateSourceTrigger=PropertyChanged}"
+                                 IsEnabled="{Binding SelectedChannel, Converter={StaticResource NullToBoolConverter}}"
+                                 Nicknames="{Binding SelectedChannel.Users, Converter={StaticResource UsersToNicknamesConverter}}"
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 MaxHeight="100"
+                                 VerticalScrollBarVisibility="Auto">
+                            <controls:ChatInputTextBox.InputBindings>
+                                <KeyBinding Key="Return" Command="{Binding SendMessageCommand}"/>
+                            </controls:ChatInputTextBox.InputBindings>
+                        </controls:ChatInputTextBox>
+
+                        <Button Grid.Column="1" 
+                                Content="Send" 
+                                Command="{Binding SendMessageCommand}"
+                                Style="{StaticResource AccentButtonStyle}"
+                                Margin="8,0,0,0"
+                                IsEnabled="{Binding SelectedChannel, Converter={StaticResource NullToBoolConverter}}"/>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <GridSplitter Grid.Column="3" Width="1" Background="{StaticResource BorderBrush}"
+                          Visibility="{Binding SelectedChannel.IsPrivateMessage, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+
+            <!-- User List (hidden for private messages) -->
+            <Border Grid.Column="4" 
+                    Background="{StaticResource BackgroundMediumBrush}"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="1,0,0,0"
+                    Visibility="{Binding SelectedChannel.IsPrivateMessage, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="16,16,16,8">
+                        <TextBlock Text="USERS" 
+                                   FontSize="11" 
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextMutedBrush}"/>
+                        <TextBlock Text=" — " Foreground="{StaticResource TextMutedBrush}"/>
+                        <TextBlock Text="{Binding SelectedChannel.Users.Count, FallbackValue=0}" 
+                                   FontSize="11"
+                                   Foreground="{StaticResource TextMutedBrush}"/>
+                    </StackPanel>
+
+                    <ListBox Grid.Row="1" 
+                             ItemsSource="{Binding SelectedChannel.Users}"
+                             HorizontalContentAlignment="Stretch">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Padding" Value="12,4"/>
+                                <Setter Property="Margin" Value="4,1"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border x:Name="border" 
+                                                    Background="Transparent"
+                                                    CornerRadius="4"
+                                                    Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="border" Property="Background" 
+                                                            Value="{StaticResource BackgroundHighlightBrush}"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ToolTip="Double-click to send private message" Opacity="{Binding AwayOpacity}">
+                                    <Grid.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Send Message" 
+                                                      Command="{Binding DataContext.StartPrivateMessageCommand, Source={x:Reference Name=MainWindowRoot}}"
+                                                      CommandParameter="{Binding}">
+                                                <MenuItem.Icon>
+                                                    <TextBlock Text="💬" FontSize="12"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="Whois" 
+                                                      Command="{Binding DataContext.WhoisCommand, Source={x:Reference Name=MainWindowRoot}}"
+                                                      CommandParameter="{Binding}">
+                                                <MenuItem.Icon>
+                                                    <TextBlock Text="👤" FontSize="12"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <Separator/>
+                                            <MenuItem Header="Ignore User" 
+                                                      Command="{Binding DataContext.IgnoreUserCommand, Source={x:Reference Name=MainWindowRoot}}"
+                                                      CommandParameter="{Binding}">
+                                                <MenuItem.Icon>
+                                                    <TextBlock Text="🚫" FontSize="12"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="Unignore User" 
+                                                      Command="{Binding DataContext.UnignoreUserCommand, Source={x:Reference Name=MainWindowRoot}}"
+                                                      CommandParameter="{Binding}">
+                                                <MenuItem.Icon>
+                                                    <TextBlock Text="✓" FontSize="12"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </Grid.ContextMenu>
+                                    <Grid.InputBindings>
+                                        <MouseBinding MouseAction="LeftDoubleClick"
+                                                      Command="{Binding DataContext.StartPrivateMessageCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                      CommandParameter="{Binding}"/>
+                                    </Grid.InputBindings>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="28"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <!-- Avatar -->
+                                    <Border Grid.Column="0" 
+                                            Width="24" Height="24" 
+                                            CornerRadius="12"
+                                            ClipToBounds="True"
+                                            Background="{StaticResource BackgroundHighlightBrush}">
+                                        <Image Source="{Binding AvatarUrl}" 
+                                               Width="24" Height="24"
+                                               RenderOptions.BitmapScalingMode="HighQuality"/>
+                                    </Border>
+                                    
+                                    <!-- Nickname -->
+                                    <TextBlock Grid.Column="1" VerticalAlignment="Center">
+                                        <Run Text="{Binding User.Prefix, Mode=OneWay}" 
+                                             Foreground="{Binding ModeColor}"/>
+                                        <Run Text="{Binding Nickname, Mode=OneWay}" 
+                                             Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <Run Text=" (away)" 
+                                             Foreground="{StaticResource TextMutedBrush}"
+                                             FontStyle="Italic">
+                                            <Run.Style>
+                                                <Style TargetType="Run">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsAway}" Value="False">
+                                                            <Setter Property="Text" Value=""/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Run.Style>
+                                        </Run>
+                                    </TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="2" 
+                Background="{StaticResource BackgroundMediumBrush}"
+                BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="16,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" 
+                           Text="{Binding StatusText}" 
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           FontSize="12"/>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <!-- Latency indicator -->
+                    <Border Background="{StaticResource BackgroundDarkBrush}"
+                            CornerRadius="3"
+                            Padding="8,2"
+                            Margin="0,0,12,0"
+                            Visibility="{Binding SelectedServer.LatencyMs, Converter={StaticResource NullToBoolConverter}, FallbackValue=Collapsed}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📶 " FontSize="10" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding SelectedServer.LatencyDisplay}" 
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       FontSize="11"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <TextBlock Text="{Binding SelectedServer.Connection.CurrentNickname, FallbackValue=''}" 
+                               Foreground="{StaticResource AccentBrush}"
+                               FontWeight="Medium"
+                               Margin="0,0,16,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

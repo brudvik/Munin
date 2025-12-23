@@ -1,0 +1,129 @@
+<Window x:Class="IrcClient.UI.Views.RawIrcLogWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Raw IRC Log"
+        Height="600"
+        Width="900"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource BackgroundDarkBrush}"
+        Foreground="{StaticResource TextPrimaryBrush}"
+        FontFamily="{StaticResource MonospaceFont}"
+        FontSize="12">
+    
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+            <TextBlock Text="🔧 Raw IRC Traffic" 
+                       FontSize="14" 
+                       FontWeight="Bold"
+                       VerticalAlignment="Center"/>
+            <TextBlock Text=" — All incoming and outgoing IRC messages" 
+                       Foreground="{StaticResource TextMutedBrush}"
+                       VerticalAlignment="Center"
+                       Margin="8,0,0,0"/>
+        </StackPanel>
+
+        <!-- Log -->
+        <Border Grid.Row="1" 
+                Background="{StaticResource BackgroundMediumBrush}"
+                BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="1"
+                CornerRadius="4">
+            <ListBox x:Name="LogListBox"
+                     BorderThickness="0"
+                     Background="Transparent"
+                     VirtualizingPanel.ScrollUnit="Pixel"
+                     ScrollViewer.CanContentScroll="True">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Padding" Value="8,2"/>
+                        <Setter Property="Margin" Value="0"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBoxItem">
+                                    <Border x:Name="border" 
+                                            Background="Transparent"
+                                            Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding IsOutgoing}" Value="True">
+                                            <Setter TargetName="border" Property="Background" 
+                                                    Value="#1A2D1A"/>
+                                        </DataTrigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="border" Property="Background" 
+                                                    Value="{StaticResource BackgroundHighlightBrush}"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="30"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <TextBlock Grid.Column="0" 
+                                       Text="{Binding Timestamp}" 
+                                       Foreground="{StaticResource TextMutedBrush}"/>
+                            
+                            <TextBlock Grid.Column="1" 
+                                       Text="{Binding Direction}" 
+                                       FontWeight="Bold">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsOutgoing}" Value="True">
+                                                <Setter Property="Foreground" Value="#4ADE80"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsOutgoing}" Value="False">
+                                                <Setter Property="Foreground" Value="#60A5FA"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            
+                            <TextBlock Grid.Column="2" 
+                                       Text="{Binding Message}" 
+                                       TextWrapping="Wrap"
+                                       Foreground="{StaticResource TextSecondaryBrush}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+
+        <!-- Footer -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,8,0,0">
+            <Button Content="Clear" 
+                    Padding="16,6"
+                    Click="ClearButton_Click"/>
+            <CheckBox x:Name="AutoScrollCheckBox"
+                      Content="Auto-scroll"
+                      IsChecked="True"
+                      VerticalAlignment="Center"
+                      Margin="16,0,0,0"
+                      Foreground="{StaticResource TextSecondaryBrush}"/>
+            <TextBlock x:Name="CountText"
+                       Text="0 messages"
+                       Foreground="{StaticResource TextMutedBrush}"
+                       VerticalAlignment="Center"
+                       Margin="16,0,0,0"/>
+        </StackPanel>
+    </Grid>
+</Window>

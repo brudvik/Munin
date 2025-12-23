@@ -1,0 +1,167 @@
+<Window x:Class="IrcClient.UI.Views.EditServerDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Edit Server" 
+        Height="660" 
+        Width="450"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="{StaticResource BackgroundDarkBrush}"
+        Foreground="{StaticResource TextPrimaryBrush}"
+        FontFamily="{StaticResource MonospaceFont}"
+        FontSize="13">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,24">
+            <TextBlock Text="Edit Server" 
+                       FontSize="20" 
+                       FontWeight="SemiBold"/>
+            <TextBlock Text="Modify your IRC server settings" 
+                       Foreground="{StaticResource TextSecondaryBrush}"
+                       Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- Form -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <!-- Server Name -->
+                <TextBlock Text="Server Name" 
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           FontSize="12"
+                           Margin="0,0,0,6"/>
+                <TextBox x:Name="ServerNameTextBox" 
+                         Margin="0,0,0,16"/>
+
+                <!-- Hostname -->
+                <TextBlock Text="Hostname" 
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           FontSize="12"
+                           Margin="0,0,0,6"/>
+                <TextBox x:Name="HostnameTextBox" 
+                         Margin="0,0,0,16"/>
+
+                <!-- Port and SSL -->
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                        <TextBlock Text="Port" 
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   FontSize="12"
+                                   Margin="0,0,0,6"/>
+                        <TextBox x:Name="PortTextBox"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                        <TextBlock Text="Security" 
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   FontSize="12"
+                                   Margin="0,0,0,6"/>
+                        <CheckBox x:Name="UseSslCheckBox" 
+                                  Content="Use SSL/TLS" 
+                                  Foreground="{StaticResource TextPrimaryBrush}"
+                                  VerticalAlignment="Center"
+                                  Margin="0,8,0,0"/>
+                        <CheckBox x:Name="AcceptInvalidCertsCheckBox" 
+                                  Content="Accept invalid certificates" 
+                                  Foreground="{StaticResource TextSecondaryBrush}"
+                                  VerticalAlignment="Center"
+                                  ToolTip="Enable this for self-signed certificates"
+                                  Margin="0,6,0,0"
+                                  IsEnabled="{Binding IsChecked, ElementName=UseSslCheckBox}"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Nickname -->
+                <TextBlock Text="Nickname" 
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           FontSize="12"
+                           Margin="0,0,0,6"/>
+                <TextBox x:Name="NicknameTextBox" 
+                         Margin="0,0,0,16"/>
+
+                <!-- Username -->
+                <TextBlock Text="Username" 
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           FontSize="12"
+                           Margin="0,0,0,6"/>
+                <TextBox x:Name="UsernameTextBox" 
+                         Margin="0,0,0,16"/>
+
+                <!-- Real Name -->
+                <TextBlock Text="Real Name" 
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           FontSize="12"
+                           Margin="0,0,0,6"/>
+                <TextBox x:Name="RealNameTextBox" 
+                         Margin="0,0,0,16"/>
+
+                <!-- Server Password -->
+                <TextBlock Text="Server Password (optional)" 
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           FontSize="12"
+                           Margin="0,0,0,6"/>
+                <PasswordBox x:Name="PasswordBox" 
+                             Margin="0,0,0,16"/>
+
+                <!-- NickServ Password -->
+                <TextBlock Text="NickServ Password (optional)" 
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           FontSize="12"
+                           Margin="0,0,0,6"/>
+                <PasswordBox x:Name="NickServPasswordBox" 
+                             Margin="0,0,0,16"/>
+
+                <!-- SASL Authentication -->
+                <TextBlock Text="SASL Authentication (IRCv3)" 
+                           FontWeight="SemiBold"
+                           Margin="0,8,0,8"/>
+                
+                <TextBlock Text="SASL Username (account name)" 
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           FontSize="12"
+                           Margin="0,0,0,6"/>
+                <TextBox x:Name="SaslUsernameTextBox" 
+                         Margin="0,0,0,16"/>
+
+                <TextBlock Text="SASL Password" 
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           FontSize="12"
+                           Margin="0,0,0,6"/>
+                <PasswordBox x:Name="SaslPasswordBox" 
+                             Margin="0,0,0,16"/>
+
+                <!-- Auto-connect -->
+                <CheckBox x:Name="AutoConnectCheckBox" 
+                          Content="Connect automatically on startup" 
+                          Foreground="{StaticResource TextSecondaryBrush}"
+                          Margin="0,0,0,8"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="2" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right"
+                    Margin="0,24,0,0">
+            <Button Content="Cancel" 
+                    Click="CancelButton_Click"
+                    Width="100"
+                    Margin="0,0,12,0"/>
+            <Button Content="Save" 
+                    Click="SaveButton_Click"
+                    Style="{StaticResource AccentButtonStyle}"
+                    Width="120"/>
+        </StackPanel>
+    </Grid>
+</Window>
