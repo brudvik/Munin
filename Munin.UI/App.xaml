@@ -13,9 +13,11 @@
             <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
             <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
             <converters:NullToVisibilityInverseConverter x:Key="NullToVisibilityInverseConverter"/>
+            <converters:NullToVisibilityConverterInverse x:Key="NullToVisibilityConverterInverse"/>
             <converters:NullToBoolConverter x:Key="NullToBoolConverter"/>
             <converters:IntToVisibilityConverter x:Key="IntToVisibilityConverter"/>
             <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+            <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter"/>
             <converters:MessageToInlinesConverter x:Key="MessageToInlinesConverter"/>
             <converters:UsersToNicknamesConverter x:Key="UsersToNicknamesConverter"/>
         </ResourceDictionary>

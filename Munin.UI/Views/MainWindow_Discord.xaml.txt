@@ -1,0 +1,207 @@
+<!-- This is a working reference for the Discord-style layout -->
+<!-- Main Content Area - Discord Style -->
+<Grid Grid.Row="2">
+    <Grid.ColumnDefinitions>
+        <!-- Server Rail -->
+        <ColumnDefinition Width="72"/>
+        <!-- Channel Sidebar -->
+        <ColumnDefinition Width="240" MinWidth="200"/>
+        <!-- Chat Area (expands) -->
+        <ColumnDefinition Width="*"/>
+        <!-- User List (collapsible) -->
+        <ColumnDefinition x:Name="UserListColumn" Width="Auto"/>
+    </Grid.ColumnDefinitions>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         Server Rail (Discord-style vertical icons)
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <Border Grid.Column="0" 
+            Background="{StaticResource ServerRailBackgroundBrush}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            
+            <!-- Server Icons -->
+            <ScrollViewer Grid.Row="0" 
+                          VerticalScrollBarVisibility="Hidden"
+                          HorizontalScrollBarVisibility="Disabled">
+                <ItemsControl ItemsSource="{Binding Servers}"
+                              HorizontalAlignment="Center"
+                              Margin="0,8">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,4" ToolTip="{Binding DisplayName}">
+                                <!-- Selection indicator pill -->
+                                <Border x:Name="SelectionPill"
+                                        Width="4"
+                                        Height="20"
+                                        CornerRadius="0,4,4,0"
+                                        Background="{StaticResource TextPrimaryBrush}"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        Margin="-12,0,0,0"
+                                        Opacity="0"/>
+                                
+                                <!-- Server Icon Button -->
+                                <Button Command="{Binding DataContext.SelectServerInRailCommand, 
+                                        RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        Cursor="Hand">
+                                    <Button.Template>
+                                        <ControlTemplate>
+                                            <Grid Width="48" Height="48">
+                                                <!-- Icon Background -->
+                                                <Border x:Name="IconBorder"
+                                                        Width="48" Height="48"
+                                                        CornerRadius="24"
+                                                        Background="{Binding InitialsBackground}">
+                                                    <TextBlock Text="{Binding Initials}" 
+                                                               FontSize="16"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="White"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"/>
+                                                </Border>
+                                                <!-- Status dot overlay -->
+                                                <Ellipse x:Name="StatusDot"
+                                                         Width="14" Height="14"
+                                                         HorizontalAlignment="Right"
+                                                         VerticalAlignment="Bottom"
+                                                         Margin="0,0,-2,-2"
+                                                         Stroke="{StaticResource ServerRailBackgroundBrush}"
+                                                         StrokeThickness="3">
+                                                    <Ellipse.Style>
+                                                        <Style TargetType="Ellipse">
+                                                            <Setter Property="Fill" Value="{StaticResource TextMutedBrush}"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                                                                    <Setter Property="Fill" Value="{StaticResource SuccessBrush}"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding IsConnecting}" Value="True">
+                                                                    <Setter Property="Fill" Value="{StaticResource WarningBrush}"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Ellipse.Style>
+                                                </Ellipse>
+                                            </Grid>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="IconBorder" Property="CornerRadius" Value="16"/>
+                                                </Trigger>
+                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                    <Setter TargetName="IconBorder" Property="CornerRadius" Value="16"/>
+                                                </DataTrigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </Grid>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding DataContext.SelectedServer, 
+                                             RelativeSource={RelativeSource AncestorType=Window}}" 
+                                             Value="{Binding}">
+                                    <Setter TargetName="SelectionPill" Property="Opacity" Value="1"/>
+                                    <Setter TargetName="SelectionPill" Property="Height" Value="40"/>
+                                </DataTrigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="SelectionPill" Property="Opacity" Value="1"/>
+                                    <Setter TargetName="SelectionPill" Property="Height" Value="20"/>
+                                </Trigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+            
+            <!-- Separator and Add Server -->
+            <StackPanel Grid.Row="1" HorizontalAlignment="Center" Margin="0,0,0,8">
+                <!-- Separator -->
+                <Border Width="32" Height="2" 
+                        Background="{StaticResource BackgroundHighlightBrush}"
+                        CornerRadius="1"
+                        Margin="0,8"/>
+                
+                <!-- Add Server Button -->
+                <Button Command="{Binding AddServerCommand}"
+                        ToolTip="{loc:Localize Key=MainWindow_AddServer}"
+                        Width="48" Height="48"
+                        Cursor="Hand">
+                    <Button.Template>
+                        <ControlTemplate>
+                            <Border x:Name="AddBorder"
+                                    Width="48" Height="48"
+                                    CornerRadius="24"
+                                    Background="Transparent"
+                                    BorderBrush="{StaticResource BackgroundHighlightBrush}"
+                                    BorderThickness="2">
+                                <TextBlock Text="+" 
+                                           FontSize="28" 
+                                           FontWeight="Light"
+                                           Foreground="{StaticResource SuccessBrush}"
+                                           HorizontalAlignment="Center" 
+                                           VerticalAlignment="Center"
+                                           Margin="0,-4,0,0"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="AddBorder" Property="CornerRadius" Value="16"/>
+                                    <Setter TargetName="AddBorder" Property="Background" Value="{StaticResource SuccessBrush}"/>
+                                    <Setter TargetName="AddBorder" Property="BorderBrush" Value="{StaticResource SuccessBrush}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Border>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         Channel Sidebar (shows channels for selected server)
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <Border Grid.Column="1" 
+            Background="{StaticResource SidebarGradientBrush}"
+            BorderBrush="{StaticResource BorderSubtleBrush}"
+            BorderThickness="0,0,1,0">
+        <!-- Content shows selected server's channels -->
+    </Border>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         Chat Area
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <Grid Grid.Column="2">
+        <!-- Chat content -->
+    </Grid>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         User List (Collapsible with animation)
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <Border x:Name="UserListBorder"
+            Grid.Column="3"
+            Width="240"
+            Background="{StaticResource SidebarGradientBrush}"
+            BorderBrush="{StaticResource BorderSubtleBrush}"
+            BorderThickness="1,0,0,0">
+        <Border.Style>
+            <Style TargetType="Border">
+                <Setter Property="Visibility" Value="Visible"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsUserListVisible}" Value="False">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                    </DataTrigger>
+                    <!-- Also hide for server console and DMs -->
+                    <DataTrigger Binding="{Binding SelectedChannel.IsServerConsole}" Value="True">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding SelectedChannel.IsPrivateMessage}" Value="True">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
+        <!-- User list content -->
+    </Border>
+</Grid>

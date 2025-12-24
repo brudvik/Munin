@@ -38,9 +38,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - History timestamp separator showing date range of loaded messages
 - Copilot instructions file for development guidelines
 - Close button (X) on sidebar channels and DMs for easy leave/close
+- **Discord-style layout**: New vertical server rail with round server icons on the left side
+- Server icons with auto-generated initials and color-coded backgrounds based on server name
+- Connection status indicators on server icons (green=connected, yellow=connecting, gray=disconnected)
+- Collapsible user list panel with toggle button in header
+- User list auto-hides for server console and private messages
+- Localization strings for new UI elements (MainWindow_SelectServer, MainWindow_ToggleUserList)
 
 ### Changed
 - **Major UI refresh**: Professional polished dark theme with modern styling
+- **Discord-style navigation**: Server rail on far left, channel sidebar for selected server, expandable chat area
 - Enhanced color palette with subtle gradients and shadows for depth
 - Improved header with branded logo section and channel info pill
 - Redesigned sidebar with better visual hierarchy and colored status indicators

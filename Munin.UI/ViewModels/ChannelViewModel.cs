@@ -95,6 +95,12 @@ public partial class ChannelViewModel : ObservableObject
     private string _privateMessageTarget = string.Empty;
     
     /// <summary>
+    /// The current channel topic (observable for UI binding).
+    /// </summary>
+    [ObservableProperty]
+    private string? _topic;
+    
+    /// <summary>
     /// Whether this channel is currently selected/active.
     /// </summary>
     [ObservableProperty]
@@ -164,6 +170,7 @@ public partial class ChannelViewModel : ObservableObject
     {
         _channel = channel;
         _serverViewModel = serverViewModel;
+        _topic = channel.Topic;
         RefreshUsers();
         
         // Subscribe to collection changes to update HasNoMessages

@@ -875,4 +875,134 @@
         <Setter Property="Effect" Value="{StaticResource SubtleShadow}"/>
     </Style>
 
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
+         Discord-Style Server Rail Button
+         ═══════════════════════════════════════════════════════════════════════════════ -->
+
+    <Style x:Key="ServerRailButtonStyle" TargetType="Button">
+        <Setter Property="Width" Value="48"/>
+        <Setter Property="Height" Value="48"/>
+        <Setter Property="Margin" Value="0,4"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Background" Value="{StaticResource BackgroundHighlightBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <!-- Selection indicator pill -->
+                        <Border x:Name="SelectionPill"
+                                Width="4"
+                                Height="20"
+                                CornerRadius="0,4,4,0"
+                                Background="{StaticResource TextPrimaryBrush}"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Margin="-6,0,0,0"
+                                Opacity="0">
+                            <Border.RenderTransform>
+                                <ScaleTransform ScaleY="0"/>
+                            </Border.RenderTransform>
+                        </Border>
+                        <!-- Server icon container -->
+                        <Border x:Name="IconBorder"
+                                Width="48" Height="48"
+                                CornerRadius="24"
+                                Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="IconBorder" Property="CornerRadius" Value="16"/>
+                            <Setter TargetName="IconBorder" Property="Background" Value="{StaticResource AccentDimBrush}"/>
+                            <Setter TargetName="SelectionPill" Property="Opacity" Value="1"/>
+                            <Setter TargetName="SelectionPill" Property="Height" Value="20"/>
+                        </Trigger>
+                        <Trigger Property="Tag" Value="Selected">
+                            <Setter TargetName="IconBorder" Property="CornerRadius" Value="16"/>
+                            <Setter TargetName="IconBorder" Property="Background" Value="{StaticResource AccentDimBrush}"/>
+                            <Setter TargetName="SelectionPill" Property="Opacity" Value="1"/>
+                            <Setter TargetName="SelectionPill" Property="Height" Value="40"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <!-- Discord-Style Add Server Button -->
+    <Style x:Key="AddServerRailButtonStyle" TargetType="Button" BasedOn="{StaticResource ServerRailButtonStyle}">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource SuccessBrush}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="IconBorder"
+                            Width="48" Height="48"
+                            CornerRadius="24"
+                            Background="Transparent"
+                            BorderBrush="{StaticResource BackgroundHighlightBrush}"
+                            BorderThickness="2">
+                        <TextBlock Text="+" 
+                                   FontSize="28" 
+                                   FontWeight="Light"
+                                   Foreground="{StaticResource SuccessBrush}"
+                                   HorizontalAlignment="Center" 
+                                   VerticalAlignment="Center"
+                                   Margin="0,-4,0,0"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="IconBorder" Property="CornerRadius" Value="16"/>
+                            <Setter TargetName="IconBorder" Property="Background" Value="{StaticResource SuccessBrush}"/>
+                            <Setter TargetName="IconBorder" Property="BorderBrush" Value="{StaticResource SuccessBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="White"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <!-- User List Toggle Button -->
+    <Style x:Key="UserListToggleButtonStyle" TargetType="ToggleButton">
+        <Setter Property="Width" Value="32"/>
+        <Setter Property="Height" Value="32"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border x:Name="border"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="6"
+                            Padding="6">
+                        <TextBlock x:Name="icon"
+                                   Text="👥" 
+                                   FontSize="14"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource BackgroundHighlightBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource AccentSubtleBrush}"/>
+                            <Setter TargetName="icon" Property="Foreground" Value="{StaticResource AccentBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>

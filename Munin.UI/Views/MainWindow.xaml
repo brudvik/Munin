@@ -152,33 +152,6 @@
                     </StackPanel>
                 </StackPanel>
 
-                <!-- Current Channel Info -->
-                <Border Grid.Column="1" 
-                        HorizontalAlignment="Center"
-                        Background="{StaticResource BackgroundLightBrush}"
-                        CornerRadius="6"
-                        Padding="16,8"
-                        Visibility="{Binding SelectedChannel, Converter={StaticResource NullToVisibilityConverter}, FallbackValue=Collapsed}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding SelectedChannel.ChannelIcon, FallbackValue='#'}" 
-                                   Foreground="{StaticResource TextMutedBrush}"
-                                   FontSize="14"
-                                   Margin="0,0,6,0"/>
-                        <TextBlock Text="{Binding SelectedChannel.DisplayName, FallbackValue=''}" 
-                                   FontSize="14" 
-                                   FontWeight="Medium"
-                                   Foreground="{StaticResource TextPrimaryBrush}"/>
-                        <TextBlock Text=" · " 
-                                   Foreground="{StaticResource TextMutedBrush}"
-                                   Visibility="{Binding SelectedChannel.Channel.Topic, Converter={StaticResource NullToVisibilityConverter}, FallbackValue=Collapsed}"/>
-                        <TextBlock Text="{Binding SelectedChannel.Channel.Topic, FallbackValue=''}" 
-                                   Foreground="{StaticResource TextSecondaryBrush}"
-                                   MaxWidth="450"
-                                   TextTrimming="CharacterEllipsis"
-                                   FontSize="13"/>
-                    </StackPanel>
-                </Border>
-
                 <!-- Actions -->
                 <StackPanel Grid.Column="2" Orientation="Horizontal">
                     <Button Content="🔍" 
@@ -198,7 +171,17 @@
                             Command="{Binding ShowRawIrcLogCommand}"
                             Style="{StaticResource IconButtonStyle}"
                             FontSize="18"
-                            Margin="0,0,12,0"/>
+                            Margin="0,0,4,0"/>
+                    <!-- User List Toggle Button -->
+                    <Button x:Name="UserListToggleButton"
+                            ToolTip="{loc:Localize Key=MainWindow_ToggleUserList}"
+                            Command="{Binding ToggleUserListCommand}"
+                            Style="{StaticResource IconButtonStyle}"
+                            FontSize="16"
+                            Margin="0,0,12,0"
+                            Content="👥"
+                            Opacity="{Binding IsUserListVisible, Converter={StaticResource BoolToOpacityConverter}}"
+                            Visibility="{Binding SelectedChannel, Converter={StaticResource NullToVisibilityConverter}, FallbackValue=Collapsed}"/>
                     <Button Command="{Binding AddServerCommand}"
                             Style="{StaticResource AccentButtonStyle}"
                             Padding="14,8">
@@ -212,286 +195,367 @@
         </Border>
 
         <!-- ═══════════════════════════════════════════════════════════════════════════
-             Main Content Area
+             Main Content Area (Discord-style layout)
              ═══════════════════════════════════════════════════════════════════════════ -->
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="240" MinWidth="200"/>
-                <ColumnDefinition Width="Auto"/>
+                <!-- Server Rail -->
+                <ColumnDefinition Width="72"/>
+                <!-- Channel Sidebar -->
+                <ColumnDefinition Width="240" MinWidth="180"/>
+                <!-- Chat Area -->
                 <ColumnDefinition Width="*"/>
+                <!-- User List (collapsible) -->
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="220" MinWidth="180"/>
             </Grid.ColumnDefinitions>
 
             <!-- ═══════════════════════════════════════════════════════════════════════════
-                 Server/Channel Sidebar
+                 Server Rail (Discord-style vertical icons)
                  ═══════════════════════════════════════════════════════════════════════════ -->
             <Border Grid.Column="0" 
+                    Background="{StaticResource ServerRailBackgroundBrush}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- Server Icons -->
+                    <ScrollViewer Grid.Row="0" 
+                                  VerticalScrollBarVisibility="Hidden"
+                                  HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl ItemsSource="{Binding Servers}"
+                                      HorizontalAlignment="Center"
+                                      Margin="0,12">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,4" ToolTip="{Binding DisplayName}">
+                                        <!-- Selection indicator pill -->
+                                        <Border x:Name="SelectionPill"
+                                                Width="4"
+                                                Height="8"
+                                                CornerRadius="0,4,4,0"
+                                                Background="{StaticResource TextPrimaryBrush}"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Center"
+                                                Margin="-12,0,0,0"
+                                                Opacity="0"/>
+                                        
+                                        <!-- Server Icon Button -->
+                                        <Border x:Name="IconBorder"
+                                                Width="48" Height="48"
+                                                CornerRadius="24"
+                                                Background="{Binding InitialsBackground}"
+                                                Cursor="Hand">
+                                            <Border.InputBindings>
+                                                <MouseBinding MouseAction="LeftClick" 
+                                                              Command="{Binding DataContext.SelectServerInRailCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                              CommandParameter="{Binding}"/>
+                                            </Border.InputBindings>
+                                            <Grid>
+                                                <TextBlock Text="{Binding Initials}" 
+                                                           FontSize="16"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="White"
+                                                           HorizontalAlignment="Center"
+                                                           VerticalAlignment="Center"/>
+                                                <!-- Status dot overlay -->
+                                                <Ellipse Width="14" Height="14"
+                                                         HorizontalAlignment="Right"
+                                                         VerticalAlignment="Bottom"
+                                                         Margin="0,0,-4,-4"
+                                                         Stroke="{StaticResource ServerRailBackgroundBrush}"
+                                                         StrokeThickness="3">
+                                                    <Ellipse.Style>
+                                                        <Style TargetType="Ellipse">
+                                                            <Setter Property="Fill" Value="{StaticResource TextMutedBrush}"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                                                                    <Setter Property="Fill" Value="{StaticResource SuccessBrush}"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding IsConnecting}" Value="True">
+                                                                    <Setter Property="Fill" Value="{StaticResource WarningBrush}"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Ellipse.Style>
+                                                </Ellipse>
+                                            </Grid>
+                                        </Border>
+                                    </Grid>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                            <Setter TargetName="SelectionPill" Property="Opacity" Value="1"/>
+                                            <Setter TargetName="SelectionPill" Property="Height" Value="40"/>
+                                            <Setter TargetName="IconBorder" Property="CornerRadius" Value="16"/>
+                                        </DataTrigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="SelectionPill" Property="Opacity" Value="1"/>
+                                            <Setter TargetName="SelectionPill" Property="Height" Value="20"/>
+                                            <Setter TargetName="IconBorder" Property="CornerRadius" Value="16"/>
+                                        </Trigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                    
+                    <!-- Separator and Add Server -->
+                    <StackPanel Grid.Row="1" HorizontalAlignment="Center" Margin="0,0,0,12">
+                        <!-- Separator -->
+                        <Border Width="32" Height="2" 
+                                Background="{StaticResource BackgroundHighlightBrush}"
+                                CornerRadius="1"
+                                Margin="0,8"/>
+                        
+                        <!-- Add Server Button -->
+                        <Border x:Name="AddServerBorder"
+                                Width="48" Height="48"
+                                CornerRadius="24"
+                                Background="Transparent"
+                                BorderBrush="{StaticResource BackgroundHighlightBrush}"
+                                BorderThickness="2"
+                                Cursor="Hand"
+                                ToolTip="{loc:Localize Key=MainWindow_AddServer}">
+                            <Border.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding AddServerCommand}"/>
+                            </Border.InputBindings>
+                            <TextBlock Text="+" 
+                                       FontSize="28" 
+                                       FontWeight="Light"
+                                       Foreground="{StaticResource SuccessBrush}"
+                                       HorizontalAlignment="Center" 
+                                       VerticalAlignment="Center"
+                                       Margin="0,-4,0,0"/>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- ═══════════════════════════════════════════════════════════════════════════
+                 Channel Sidebar (shows channels for selected server)
+                 ═══════════════════════════════════════════════════════════════════════════ -->
+            <Border Grid.Column="1" 
                     Background="{StaticResource SidebarGradientBrush}"
                     BorderBrush="{StaticResource BorderSubtleBrush}"
                     BorderThickness="0,0,1,0">
-                <Border.Effect>
-                    <DropShadowEffect BlurRadius="20" ShadowDepth="0" Direction="0" Color="#000000" Opacity="0.3"/>
-                </Border.Effect>
                 <Grid>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Section Header -->
+                    <!-- Server Name Header -->
                     <Border Grid.Row="0" 
-                            Padding="16,14,16,10"
+                            Padding="16,14"
                             BorderBrush="{StaticResource BorderSubtleBrush}"
-                            BorderThickness="0,0,0,1">
-                        <TextBlock Text="{loc:Localize Key=MainWindow_Servers}" 
-                                   FontSize="11" 
-                                   FontWeight="SemiBold"
-                                   Foreground="{StaticResource TextMutedBrush}"/>
+                            BorderThickness="0,0,0,1"
+                            Visibility="{Binding SelectedServer, Converter={StaticResource NullToVisibilityConverter}, FallbackValue=Collapsed}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="{Binding SelectedServer.DisplayName, FallbackValue=''}" 
+                                       FontSize="14" 
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                       TextTrimming="CharacterEllipsis"/>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <!-- Connect/Disconnect -->
+                                <Button Content="⚡" 
+                                        ToolTip="{loc:Localize Key=Connect}"
+                                        Style="{StaticResource IconButtonStyle}"
+                                        FontSize="14"
+                                        Padding="4"
+                                        Command="{Binding ConnectToServerCommand}"
+                                        CommandParameter="{Binding SelectedServer}"
+                                        Visibility="{Binding SelectedServer.IsConnected, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                                <Button Content="⏹" 
+                                        ToolTip="{loc:Localize Key=Disconnect}"
+                                        Style="{StaticResource IconButtonStyle}"
+                                        FontSize="14"
+                                        Padding="4"
+                                        Command="{Binding DisconnectFromServerCommand}"
+                                        CommandParameter="{Binding SelectedServer}"
+                                        Visibility="{Binding SelectedServer.IsConnected, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                <!-- Settings dropdown -->
+                                <Button Content="⚙" 
+                                        ToolTip="{loc:Localize Key=MainWindow_EditServer}"
+                                        Style="{StaticResource IconButtonStyle}"
+                                        FontSize="12"
+                                        Padding="4"
+                                        Command="{Binding EditServerCommand}"
+                                        CommandParameter="{Binding SelectedServer}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- Spinning indicator during connection -->
+                    <Border Grid.Row="1"
+                            Background="{StaticResource WarningSubtleBrush}"
+                            Padding="12,8"
+                            Visibility="{Binding SelectedServer.IsConnecting, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue=Collapsed}">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <TextBlock Text="⟳" 
+                                       FontSize="14"
+                                       Foreground="{StaticResource WarningBrush}"
+                                       Margin="0,0,8,0">
+                                <TextBlock.RenderTransform>
+                                    <RotateTransform CenterX="7" CenterY="7"/>
+                                </TextBlock.RenderTransform>
+                                <TextBlock.Triggers>
+                                    <EventTrigger RoutedEvent="Loaded">
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation 
+                                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                                                    From="0" To="360" 
+                                                    Duration="0:0:1" 
+                                                    RepeatBehavior="Forever"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </TextBlock.Triggers>
+                            </TextBlock>
+                            <TextBlock Text="{loc:Localize Key=MainWindow_Connecting}"
+                                       FontSize="12"
+                                       Foreground="{StaticResource WarningBrush}"/>
+                        </StackPanel>
                     </Border>
 
-                    <ListBox Grid.Row="1" 
-                             ItemsSource="{Binding Servers}"
-                             SelectedItem="{Binding SelectedServer}"
-                             HorizontalContentAlignment="Stretch"
-                             Padding="8,8,8,8">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel>
-                                    <!-- Server Header -->
-                                    <Grid Margin="4,10,4,6" MinHeight="32">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        
-                                        <!-- Server Icon with Status Ring -->
-                                        <Grid Grid.Column="0" Width="28" Height="28" Margin="0,0,10,0">
-                                            <Border Width="28" Height="28" 
-                                                    CornerRadius="6"
-                                                    Background="{StaticResource BackgroundHighlightBrush}">
-                                                <TextBlock Text="🖥️" FontSize="14" 
-                                                           HorizontalAlignment="Center" 
-                                                           VerticalAlignment="Center"/>
-                                            </Border>
-                                            <!-- Status dot overlay -->
-                                            <Ellipse Width="10" Height="10"
-                                                     HorizontalAlignment="Right"
-                                                     VerticalAlignment="Bottom"
-                                                     Margin="0,0,-2,-2"
-                                                     Stroke="{StaticResource BackgroundDarkBrush}"
-                                                     StrokeThickness="2">
-                                                <Ellipse.Style>
-                                                    <Style TargetType="Ellipse">
-                                                        <Setter Property="Fill" Value="{StaticResource TextMutedBrush}"/>
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding IsConnected}" Value="True">
-                                                                <Setter Property="Fill" Value="{StaticResource SuccessBrush}"/>
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding IsConnecting}" Value="True">
-                                                                <Setter Property="Fill" Value="{StaticResource WarningBrush}"/>
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Ellipse.Style>
-                                            </Ellipse>
-                                        </Grid>
-                                        
-                                        <TextBlock Grid.Column="1" 
-                                                   Text="{Binding DisplayName}" 
-                                                   FontWeight="SemiBold"
-                                                   FontSize="13"
-                                                   Foreground="{StaticResource TextPrimaryBrush}"
-                                                   VerticalAlignment="Center"/>
-                                        
-                                        <StackPanel Grid.Column="2" Orientation="Horizontal">
-                                            <!-- Spinning indicator during connection -->
-                                            <TextBlock Text="⟳" 
+                    <!-- Channels List -->
+                    <ScrollViewer Grid.Row="2" 
+                                  VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  Padding="8">
+                        <ItemsControl ItemsSource="{Binding SelectedServer.Channels}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border x:Name="channelBorder" 
+                                            Padding="10,8" 
+                                            Margin="0,2"
+                                            CornerRadius="6"
+                                            Cursor="Hand"
+                                            Background="Transparent">
+                                        <Border.InputBindings>
+                                            <MouseBinding MouseAction="LeftClick" 
+                                                          Command="{Binding DataContext.SelectChannelCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                          CommandParameter="{Binding}"/>
+                                        </Border.InputBindings>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="22"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            
+                                            <TextBlock Grid.Column="0" 
+                                                       Text="{Binding ChannelIcon}" 
+                                                       Foreground="{StaticResource TextMutedBrush}"
                                                        FontSize="14"
-                                                       Foreground="{StaticResource WarningBrush}"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="1" 
+                                                       Text="{Binding DisplayName}" 
+                                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                                       FontSize="13"
                                                        VerticalAlignment="Center"
-                                                       Margin="4,0"
-                                                       Visibility="{Binding IsConnecting, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                       ToolTip="{loc:Localize Key=MainWindow_Connecting}">
-                                                <TextBlock.RenderTransform>
-                                                    <RotateTransform x:Name="SpinnerRotate" CenterX="7" CenterY="7"/>
-                                                </TextBlock.RenderTransform>
-                                                <TextBlock.Triggers>
-                                                    <EventTrigger RoutedEvent="Loaded">
-                                                        <BeginStoryboard>
-                                                            <Storyboard>
-                                                                <DoubleAnimation 
-                                                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
-                                                                    From="0" To="360" 
-                                                                    Duration="0:0:1" 
-                                                                    RepeatBehavior="Forever"/>
-                                                            </Storyboard>
-                                                        </BeginStoryboard>
-                                                    </EventTrigger>
-                                                </TextBlock.Triggers>
-                                            </TextBlock>
-                                            <Button Content="⚡" 
-                                                    ToolTip="{loc:Localize Key=Connect}"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                            
+                                            <!-- Mention Indicator (Red) -->
+                                            <Border Grid.Column="2" 
+                                                    x:Name="mentionBadge"
+                                                    Background="{StaticResource ErrorDimBrush}"
+                                                    CornerRadius="10"
+                                                    Padding="7,3"
+                                                    MinWidth="22"
+                                                    Margin="6,0,0,0"
+                                                    Visibility="Collapsed">
+                                                <TextBlock Text="{Binding UnreadCount}" 
+                                                           FontSize="11"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="White"
+                                                           HorizontalAlignment="Center"/>
+                                            </Border>
+                                            
+                                            <!-- Unread Badge (Blue - when no mention) -->
+                                            <Border Grid.Column="2" 
+                                                    x:Name="unreadBadge"
+                                                    Background="{StaticResource AccentDimBrush}"
+                                                    CornerRadius="10"
+                                                    Padding="7,3"
+                                                    MinWidth="22"
+                                                    Margin="6,0,0,0"
+                                                    Visibility="{Binding UnreadCount, Converter={StaticResource IntToVisibilityConverter}}">
+                                                <TextBlock Text="{Binding UnreadCount}" 
+                                                           FontSize="11"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="White"
+                                                           HorizontalAlignment="Center"/>
+                                            </Border>
+                                            
+                                            <!-- Close/Leave Button -->
+                                            <Button x:Name="closeButton"
+                                                    Grid.Column="3" 
+                                                    Content="✕" 
+                                                    ToolTip="{loc:Localize Key=MainWindow_LeaveChannel}"
                                                     Style="{StaticResource IconButtonStyle}"
-                                                    FontSize="14"
-                                                    Padding="6"
-                                                    Command="{Binding DataContext.ConnectToServerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                    CommandParameter="{Binding}"
-                                                    IsEnabled="{Binding IsConnecting, Converter={StaticResource InverseBoolConverter}}"
-                                                    Visibility="{Binding IsConnected, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
-                                            <Button Content="⏹" 
-                                                    ToolTip="{loc:Localize Key=Disconnect}"
-                                                    Style="{StaticResource IconButtonStyle}"
-                                                    FontSize="14"
-                                                    Padding="6"
-                                                    Command="{Binding DataContext.DisconnectFromServerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                    CommandParameter="{Binding}"
-                                                    Visibility="{Binding IsConnected, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                                            <Button Content="✏️" 
-                                                    ToolTip="{loc:Localize Key=MainWindow_EditServer}"
-                                                    Style="{StaticResource IconButtonStyle}"
-                                                    FontSize="12"
-                                                    Padding="6"
-                                                    Command="{Binding DataContext.EditServerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                    CommandParameter="{Binding}"
-                                                    IsEnabled="{Binding IsConnecting, Converter={StaticResource InverseBoolConverter}}"
-                                                    Visibility="{Binding IsConnected, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
-                                            <Button Content="✕" 
-                                                    ToolTip="{loc:Localize Key=MainWindow_RemoveServer}"
-                                                    Style="{StaticResource IconButtonStyle}"
-                                                    FontSize="12"
-                                                    Padding="6"
-                                                    Command="{Binding DataContext.RemoveServerCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                    CommandParameter="{Binding}"
-                                                    IsEnabled="{Binding IsConnecting, Converter={StaticResource InverseBoolConverter}}"
-                                                    Visibility="{Binding IsConnected, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
-                                        </StackPanel>
-                                    </Grid>
-
-                                    <!-- Channels list -->
-                                    <ItemsControl ItemsSource="{Binding Channels}" 
-                                                  Margin="12,0,0,12">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <Border x:Name="channelBorder" 
-                                                        Padding="10,8" 
-                                                        Margin="0,2"
-                                                        CornerRadius="6"
-                                                        Cursor="Hand"
-                                                        Background="Transparent">
-                                                    <Border.InputBindings>
-                                                        <MouseBinding MouseAction="LeftClick" 
-                                                                      Command="{Binding DataContext.SelectChannelCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                                      CommandParameter="{Binding}"/>
-                                                    </Border.InputBindings>
-                                                    <Grid>
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="22"/>
-                                                            <ColumnDefinition Width="*"/>
-                                                            <ColumnDefinition Width="Auto"/>
-                                                            <ColumnDefinition Width="Auto"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        
-                                                        <TextBlock Grid.Column="0" 
-                                                                   Text="{Binding ChannelIcon}" 
-                                                                   Foreground="{StaticResource TextMutedBrush}"
-                                                                   FontSize="14"
-                                                                   HorizontalAlignment="Center"
-                                                                   VerticalAlignment="Center"/>
-                                                        <TextBlock Grid.Column="1" 
-                                                                   Text="{Binding DisplayName}" 
-                                                                   Foreground="{StaticResource TextSecondaryBrush}"
-                                                                   FontSize="13"
-                                                                   VerticalAlignment="Center"
-                                                                   TextTrimming="CharacterEllipsis"/>
-                                                        
-                                                        <!-- Mention Indicator (Red) -->
-                                                        <Border Grid.Column="2" 
-                                                                x:Name="mentionBadge"
-                                                                Background="{StaticResource ErrorDimBrush}"
-                                                                CornerRadius="10"
-                                                                Padding="7,3"
-                                                                MinWidth="22"
-                                                                Margin="6,0,0,0"
-                                                                Visibility="Collapsed">
-                                                            <TextBlock Text="{Binding UnreadCount}" 
-                                                                       FontSize="11"
-                                                                       FontWeight="SemiBold"
-                                                                       Foreground="White"
-                                                                       HorizontalAlignment="Center"/>
-                                                        </Border>
-                                                        
-                                                        <!-- Unread Badge (Blue - when no mention) -->
-                                                        <Border Grid.Column="2" 
-                                                                x:Name="unreadBadge"
-                                                                Background="{StaticResource AccentDimBrush}"
-                                                                CornerRadius="10"
-                                                                Padding="7,3"
-                                                                MinWidth="22"
-                                                                Margin="6,0,0,0"
-                                                                Visibility="{Binding UnreadCount, Converter={StaticResource IntToVisibilityConverter}}">
-                                                            <TextBlock Text="{Binding UnreadCount}" 
-                                                                       FontSize="11"
-                                                                       FontWeight="SemiBold"
-                                                                       Foreground="White"
-                                                                       HorizontalAlignment="Center"/>
-                                                        </Border>
-                                                        
-                                                        <!-- Close/Leave Button -->
-                                                        <Button x:Name="closeButton"
-                                                                Grid.Column="3" 
-                                                                Content="✕" 
-                                                                ToolTip="{loc:Localize Key=MainWindow_LeaveChannel}"
-                                                                Style="{StaticResource IconButtonStyle}"
-                                                                FontSize="10"
-                                                                Padding="4,2"
-                                                                Margin="4,0,0,0"
-                                                                Visibility="Hidden"
-                                                                Command="{Binding DataContext.PartChannelCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                                CommandParameter="{Binding}"/>
-                                                    </Grid>
-                                                </Border>
-                                                <DataTemplate.Triggers>
-                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                        <Setter TargetName="channelBorder" Property="Background" 
-                                                                Value="{StaticResource AccentSubtleBrush}"/>
-                                                        <Setter TargetName="channelBorder" Property="BorderBrush" 
-                                                                Value="{StaticResource AccentDimBrush}"/>
-                                                        <Setter TargetName="channelBorder" Property="BorderThickness" 
-                                                                Value="0,0,2,0"/>
-                                                    </DataTrigger>
-                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="channelBorder" Property="Background" 
-                                                                Value="{StaticResource BackgroundHighlightBrush}"/>
-                                                    </Trigger>
-                                                    <!-- Show red mention badge when HasMention is true -->
-                                                    <DataTrigger Binding="{Binding HasMention}" Value="True">
-                                                        <Setter TargetName="channelBorder" Property="Background" 
-                                                                Value="{StaticResource MentionBackgroundBrush}"/>
-                                                        <Setter TargetName="mentionBadge" Property="Visibility" Value="Visible"/>
-                                                        <Setter TargetName="unreadBadge" Property="Visibility" Value="Collapsed"/>
-                                                    </DataTrigger>
-                                                    <!-- Show close button on hover, but not for server console -->
-                                                    <MultiDataTrigger>
-                                                        <MultiDataTrigger.Conditions>
-                                                            <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True"/>
-                                                            <Condition Binding="{Binding IsServerConsole}" Value="False"/>
-                                                        </MultiDataTrigger.Conditions>
-                                                        <Setter TargetName="closeButton" Property="Visibility" Value="Visible"/>
-                                                    </MultiDataTrigger>
-                                                </DataTemplate.Triggers>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
+                                                    FontSize="10"
+                                                    Padding="4,2"
+                                                    Margin="4,0,0,0"
+                                                    Visibility="Hidden"
+                                                    Command="{Binding DataContext.PartChannelCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"/>
+                                        </Grid>
+                                    </Border>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                            <Setter TargetName="channelBorder" Property="Background" 
+                                                    Value="{StaticResource AccentSubtleBrush}"/>
+                                        </DataTrigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="channelBorder" Property="Background" 
+                                                    Value="{StaticResource BackgroundHighlightBrush}"/>
+                                        </Trigger>
+                                        <!-- Show red mention badge when HasMention is true -->
+                                        <DataTrigger Binding="{Binding HasMention}" Value="True">
+                                            <Setter TargetName="channelBorder" Property="Background" 
+                                                    Value="{StaticResource MentionBackgroundBrush}"/>
+                                            <Setter TargetName="mentionBadge" Property="Visibility" Value="Visible"/>
+                                            <Setter TargetName="unreadBadge" Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                        <!-- Show close button on hover, but not for server console -->
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True"/>
+                                                <Condition Binding="{Binding IsServerConsole}" Value="False"/>
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter TargetName="closeButton" Property="Visibility" Value="Visible"/>
+                                        </MultiDataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                    
+                    <!-- Empty state when no server selected -->
+                    <Border Grid.Row="2"
+                            Visibility="{Binding SelectedServer, Converter={StaticResource NullToVisibilityInverseConverter}, FallbackValue=Visible}"
+                            Padding="20">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock Text="🖥️" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                            <TextBlock Text="{loc:Localize Key=MainWindow_SelectServer}" 
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       FontSize="13"
+                                       TextAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
                 </Grid>
             </Border>
-
-            <GridSplitter Grid.Column="1" Width="1" Background="{StaticResource BorderSubtleBrush}"/>
 
             <!-- ═══════════════════════════════════════════════════════════════════════════
                  Chat Area
@@ -743,7 +807,7 @@
                                     Background="{StaticResource BackgroundElevatedBrush}"
                                     BorderBrush="{StaticResource BorderSubtleBrush}"
                                     BorderThickness="0,0,0,1"
-                                    Visibility="{Binding SelectedChannel.Channel.Topic, Converter={StaticResource NullToVisibilityConverter}, FallbackValue=Collapsed}">
+                                    Visibility="{Binding SelectedChannel.Topic, Converter={StaticResource NullToVisibilityConverter}, FallbackValue=Collapsed}">
                                 <Expander x:Name="TopicExpander"
                                           IsExpanded="False"
                                           BorderThickness="0"
@@ -760,7 +824,7 @@
                                                        Margin="8,6,8,6"
                                                        VerticalAlignment="Center"/>
                                             <TextBlock Grid.Column="1" 
-                                                       Text="{Binding SelectedChannel.Channel.Topic}" 
+                                                       Text="{Binding SelectedChannel.Topic}" 
                                                        Foreground="{StaticResource TextSecondaryBrush}"
                                                        FontSize="12"
                                                        TextTrimming="CharacterEllipsis"
@@ -770,7 +834,7 @@
                                         </Grid>
                                     </Expander.Header>
                                     <Border Padding="36,8,16,12">
-                                        <TextBlock Text="{Binding SelectedChannel.Channel.Topic}" 
+                                                                                <TextBlock Text="{Binding SelectedChannel.Topic}" 
                                                    Foreground="{StaticResource TextSecondaryBrush}"
                                                    FontSize="13"
                                                    TextWrapping="Wrap"/>
@@ -1092,31 +1156,57 @@
                 </Border>
             </Grid>
 
-            <GridSplitter Grid.Column="3" Width="1" Background="{StaticResource BorderSubtleBrush}"
-                          Visibility="{Binding SelectedChannel.IsPrivateMessage, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
-
             <!-- ═══════════════════════════════════════════════════════════════════════════
-                 User List (hidden for private messages)
+                 User List (collapsible, hidden for server console and DMs)
                  ═══════════════════════════════════════════════════════════════════════════ -->
-            <Border Grid.Column="4" 
+            <Border Grid.Column="3" 
+                    x:Name="UserListPanel"
+                    Width="240"
                     Background="{StaticResource SidebarGradientBrush}"
                     BorderBrush="{StaticResource BorderSubtleBrush}"
-                    BorderThickness="1,0,0,0"
-                    Visibility="{Binding SelectedChannel.IsPrivateMessage, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                    BorderThickness="1,0,0,0">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <!-- Hide when user toggles it off -->
+                            <DataTrigger Binding="{Binding IsUserListVisible}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                            <!-- Hide for server console -->
+                            <DataTrigger Binding="{Binding SelectedChannel.IsServerConsole}" Value="True">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                            <!-- Hide for DMs -->
+                            <DataTrigger Binding="{Binding SelectedChannel.IsPrivateMessage}" Value="True">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                            <!-- Hide when no channel selected -->
+                            <DataTrigger Binding="{Binding SelectedChannel}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Section Header -->
+                    <!-- Section Header with toggle button -->
                     <Border Grid.Row="0" 
                             Padding="16,14,16,10"
                             BorderBrush="{StaticResource BorderSubtleBrush}"
                             BorderThickness="0,0,0,1">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{loc:Localize Key=MainWindow_Users}" 
-                                       FontSize="11" 
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{loc:Localize Key=MainWindow_Users}" 
+                                           FontSize="11" 
                                        FontWeight="SemiBold"
                                        Foreground="{StaticResource TextMutedBrush}"/>
                             <Border Background="{StaticResource BackgroundHighlightBrush}"
@@ -1129,6 +1219,7 @@
                                            Foreground="{StaticResource TextSecondaryBrush}"/>
                             </Border>
                         </StackPanel>
+                        </Grid>
                     </Border>
 
                     <ListBox Grid.Row="1" 

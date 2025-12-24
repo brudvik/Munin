@@ -435,6 +435,12 @@ Are you absolutely sure?</value>
   <data name="MainWindow_ChannelStats" xml:space="preserve">
     <value>Messages · Users · Time in channel</value>
   </data>
+  <data name="MainWindow_SelectServer" xml:space="preserve">
+    <value>Select a server</value>
+  </data>
+  <data name="MainWindow_ToggleUserList" xml:space="preserve">
+    <value>Toggle user list</value>
+  </data>
   
   <!-- Add Server Dialog Additional -->
   <data name="AddServer_Header" xml:space="preserve">

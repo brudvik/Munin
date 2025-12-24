@@ -56,6 +56,23 @@ public class NullToVisibilityConverter : IValueConverter
 }
 
 /// <summary>
+/// Converts a nullable value to <see cref="Visibility"/> (inverse).
+/// Returns <see cref="Visibility.Collapsed"/> if the value is not null, <see cref="Visibility.Visible"/> if null.
+/// </summary>
+public class NullToVisibilityConverterInverse : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        return value == null ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+/// <summary>
 /// Converts a nullable value to a boolean.
 /// Returns true if the value is not null, false if null.
 /// </summary>
@@ -115,6 +132,23 @@ public class NullToVisibilityInverseConverter : IValueConverter
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         return value == null ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+/// <summary>
+/// Converts a boolean value to opacity.
+/// Returns 1.0 for true, 0.5 for false.
+/// </summary>
+public class BoolToOpacityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        return value is bool b && b ? 1.0 : 0.5;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

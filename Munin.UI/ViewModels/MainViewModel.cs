@@ -36,6 +36,17 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     private ServerViewModel? _selectedServer;
+    
+    /// <summary>
+    /// Updates IsSelected on all servers when the selected server changes.
+    /// </summary>
+    partial void OnSelectedServerChanged(ServerViewModel? oldValue, ServerViewModel? newValue)
+    {
+        if (oldValue != null)
+            oldValue.IsSelected = false;
+        if (newValue != null)
+            newValue.IsSelected = true;
+    }
 
     [ObservableProperty]
     private ChannelViewModel? _selectedChannel;
@@ -60,6 +71,9 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     private ObservableCollection<string> _searchResults = new();
+
+    [ObservableProperty]
+    private bool _isUserListVisible = true;
 
     /// <summary>
     /// Returns true if no servers are configured, used to show welcome screen.
@@ -648,6 +662,20 @@ public partial class MainViewModel : ObservableObject
         _clientManager.RawMessage += (s, e) =>
         {
             _rawIrcLogWindow?.AddEntry(e.IsOutgoing, e.Message);
+        };
+        
+        _clientManager.TopicChanged += (s, e) =>
+        {
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                var server = Servers.FirstOrDefault(sv => sv.Server.Id == e.Server.Id);
+                var channelVm = server?.Channels.FirstOrDefault(c => 
+                    c.Channel.Name.Equals(e.Channel.Name, StringComparison.OrdinalIgnoreCase));
+                if (channelVm != null)
+                {
+                    channelVm.Topic = e.Channel.Topic;
+                }
+            });
         };
     }
 
@@ -1251,6 +1279,31 @@ public partial class MainViewModel : ObservableObject
             NotificationService.Instance.OnlyWhenMinimized = settings.OnlyNotifyWhenInactive;
             
             StatusText = "Settings saved";
+        }
+    }
+
+    /// <summary>
+    /// Toggles the user list visibility.
+    /// </summary>
+    [RelayCommand]
+    private void ToggleUserList()
+    {
+        IsUserListVisible = !IsUserListVisible;
+    }
+
+    /// <summary>
+    /// Selects a server and displays its channels in the sidebar.
+    /// </summary>
+    [RelayCommand]
+    private void SelectServerInRail(ServerViewModel? server)
+    {
+        if (server == null) return;
+        SelectedServer = server;
+        
+        // If the server has channels, select the first one (usually server console)
+        if (server.Channels.Count > 0 && SelectedChannel?.ServerViewModel != server)
+        {
+            SelectedChannel = server.Channels[0];
         }
     }
 }

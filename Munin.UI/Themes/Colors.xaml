@@ -151,6 +151,18 @@
         <GradientStop Color="#131920" Offset="0.5"/>
         <GradientStop Color="#0D1117" Offset="1"/>
     </LinearGradientBrush>
+    
+    <!-- Server Rail gradient (darker for Discord-style) -->
+    <LinearGradientBrush x:Key="ServerRailGradientBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#0B0E12" Offset="0"/>
+        <GradientStop Color="#080A0D" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- Server Rail Colors -->
+    <Color x:Key="ServerRailBackgroundColor">#0B0E12</Color>
+    <SolidColorBrush x:Key="ServerRailBackgroundBrush" Color="{StaticResource ServerRailBackgroundColor}"/>
+    <SolidColorBrush x:Key="ServerIconHoverBrush" Color="#3BA55D"/>
+    <SolidColorBrush x:Key="ServerIconActiveBrush" Color="#5865F2"/>
 
     <!-- ═══════════════════════════════════════════════════════════════════════════════
          Drop Shadow Effects
