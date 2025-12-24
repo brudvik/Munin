@@ -90,7 +90,7 @@ public class ConfigurationService
             
             if (_storage.FileExists(ConfigFileName))
             {
-                _configuration = await _storage.ReadJsonAsync<ClientConfiguration>(ConfigFileName, JsonOptions) 
+                _configuration = await _storage.ReadJsonAsync(ConfigFileName, JsonSourceGenerationContext.Default.ClientConfiguration) 
                     ?? new ClientConfiguration();
                 _logger.Information("Configuration loaded");
             }
@@ -124,7 +124,7 @@ public class ConfigurationService
                 return;
             }
             
-            await _storage.WriteJsonAsync(ConfigFileName, _configuration, JsonOptions);
+            await _storage.WriteJsonAsync(ConfigFileName, _configuration, JsonSourceGenerationContext.Default.ClientConfiguration);
             _logger.Debug("Configuration saved");
         }
         catch (Exception ex)

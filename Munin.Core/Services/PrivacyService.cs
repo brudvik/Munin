@@ -151,7 +151,7 @@ public class PrivacyService
             Version = 1
         };
         
-        await _storage.WriteJsonAsync(MappingFileName, mapping);
+        await _storage.WriteJsonAsync(MappingFileName, mapping, JsonSourceGenerationContext.Default.PrivacyMapping);
     }
     
     /// <summary>
@@ -164,7 +164,7 @@ public class PrivacyService
         
         try
         {
-            var mapping = await _storage.ReadJsonAsync<PrivacyMapping>(MappingFileName);
+            var mapping = await _storage.ReadJsonAsync(MappingFileName, JsonSourceGenerationContext.Default.PrivacyMapping);
             if (mapping?.HashToName != null)
             {
                 _hashToName.Clear();

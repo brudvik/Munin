@@ -225,7 +225,7 @@ public class SecurityAuditService
                 var json = _storage.ReadTextSync(_auditLogPath);
                 if (!string.IsNullOrEmpty(json))
                 {
-                    _auditLog = JsonSerializer.Deserialize<SecurityAuditLog>(json) ?? new SecurityAuditLog();
+                    _auditLog = JsonSerializer.Deserialize(json, JsonSourceGenerationContext.Default.SecurityAuditLog) ?? new SecurityAuditLog();
                 }
             }
         }
@@ -245,7 +245,7 @@ public class SecurityAuditService
                 var json = await _storage.ReadTextAsync(_auditLogPath);
                 if (!string.IsNullOrEmpty(json))
                 {
-                    _auditLog = JsonSerializer.Deserialize<SecurityAuditLog>(json) ?? new SecurityAuditLog();
+                    _auditLog = JsonSerializer.Deserialize(json, JsonSourceGenerationContext.Default.SecurityAuditLog) ?? new SecurityAuditLog();
                 }
             }
         }
@@ -260,7 +260,8 @@ public class SecurityAuditService
     {
         try
         {
-            await _storage.WriteJsonAsync(_auditLogPath, _auditLog);
+            var json = JsonSerializer.Serialize(_auditLog, JsonSourceGenerationContext.Default.SecurityAuditLog);
+            await _storage.WriteTextAsync(_auditLogPath, json);
         }
         catch (Exception ex)
         {

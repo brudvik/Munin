@@ -1,4 +1,6 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using Serilog;
 
 namespace Munin.Core.Services;
@@ -347,10 +349,39 @@ public class SecureStorageService
     /// <param name="relativePath">The path relative to the base directory.</param>
     /// <param name="obj">The object to serialize and write.</param>
     /// <param name="options">Optional JSON serializer options.</param>
+    [RequiresUnreferencedCode("Use WriteJsonAsync<T>(string, T, JsonTypeInfo<T>) for AOT compatibility.")]
     public async Task WriteJsonAsync<T>(string relativePath, T obj, JsonSerializerOptions? options = null)
     {
         var json = JsonSerializer.Serialize(obj, options ?? new JsonSerializerOptions { WriteIndented = true });
         await WriteTextAsync(relativePath, json);
+    }
+    
+    /// <summary>
+    /// Writes an object as JSON to a file, encrypting if encryption is enabled.
+    /// </summary>
+    /// <typeparam name="T">The type of object to serialize.</typeparam>
+    /// <param name="relativePath">The path relative to the base directory.</param>
+    /// <param name="obj">The object to serialize and write.</param>
+    /// <param name="jsonTypeInfo">The JSON type info for AOT-compatible serialization.</param>
+    public async Task WriteJsonAsync<T>(string relativePath, T obj, JsonTypeInfo<T> jsonTypeInfo)
+    {
+        var json = JsonSerializer.Serialize(obj, jsonTypeInfo);
+        await WriteTextAsync(relativePath, json);
+    }
+    
+    /// <summary>
+    /// Reads and deserializes JSON from a file, decrypting if necessary.
+    /// </summary>
+    /// <typeparam name="T">The type to deserialize to.</typeparam>
+    /// <param name="relativePath">The path relative to the base directory.</param>
+    /// <param name="jsonTypeInfo">The JSON type info for AOT-compatible deserialization.</param>
+    /// <returns>The deserialized object, or default if file doesn't exist.</returns>
+    public async Task<T?> ReadJsonAsync<T>(string relativePath, JsonTypeInfo<T> jsonTypeInfo)
+    {
+        var json = await ReadTextAsync(relativePath);
+        if (json == null) return default;
+        
+        return JsonSerializer.Deserialize(json, jsonTypeInfo);
     }
     
     /// <summary>
@@ -415,6 +446,7 @@ public class SecureStorageService
     /// <param name="relativePath">The path relative to the base directory.</param>
     /// <param name="options">Optional JSON serializer options.</param>
     /// <returns>The deserialized object, or default if file doesn't exist.</returns>
+    [RequiresUnreferencedCode("Use ReadJsonAsync<T>(string, JsonTypeInfo<T>) for AOT compatibility.")]
     public async Task<T?> ReadJsonAsync<T>(string relativePath, JsonSerializerOptions? options = null)
     {
         var json = await ReadTextAsync(relativePath);
@@ -650,7 +682,7 @@ public class SecureStorageService
             try
             {
                 var json = File.ReadAllText(_metadataPath);
-                _metadata = JsonSerializer.Deserialize<EncryptionMetadata>(json);
+                _metadata = JsonSerializer.Deserialize(json, JsonSourceGenerationContext.Default.EncryptionMetadata);
                 _logger.Debug("Encryption metadata loaded. Enabled: {Enabled}", _metadata?.IsEncryptionEnabled);
             }
             catch (Exception ex)
@@ -667,7 +699,8 @@ public class SecureStorageService
     
     private async Task SaveMetadataAsync()
     {
-        var json = JsonSerializer.Serialize(_metadata, new JsonSerializerOptions { WriteIndented = true });
+        if (_metadata == null) return;
+        var json = JsonSerializer.Serialize(_metadata, JsonSourceGenerationContext.Default.EncryptionMetadata);
         await File.WriteAllTextAsync(_metadataPath, json);
     }
 }

@@ -1086,9 +1086,8 @@
                                    HorizontalAlignment="Right"
                                    Margin="0,4,4,0"
                                    FontSize="11"
-                                   Foreground="{StaticResource TextMutedBrush}">
-                            <Run Text="{Binding MessageInput.Length, FallbackValue=0}"/><Run Text="/512"/>
-                        </TextBlock>
+                                   Foreground="{StaticResource TextMutedBrush}"
+                                   Text="{Binding MessageInput.Length, StringFormat={}{0}/512, FallbackValue=0/512}"/>
                     </Grid>
                 </Border>
             </Grid>
