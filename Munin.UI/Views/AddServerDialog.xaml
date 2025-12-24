@@ -3,16 +3,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:Munin.UI.Localization"
         Title="{loc:Localize Key=AddServer_Title}" 
-        Height="620" 
-        Width="450"
+        Height="680" 
+        Width="480"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Background="{StaticResource BackgroundDarkBrush}"
         Foreground="{StaticResource TextPrimaryBrush}"
-        FontFamily="{StaticResource MonospaceFont}"
+        FontFamily="{StaticResource UIFont}"
         FontSize="13">
 
-    <Grid Margin="24">
+    <Grid Margin="28">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -20,13 +20,24 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <StackPanel Grid.Row="0" Margin="0,0,0,24">
-            <TextBlock Text="{loc:Localize Key=AddServer_Header}" 
-                       FontSize="20" 
-                       FontWeight="SemiBold"/>
-            <TextBlock Text="{loc:Localize Key=AddServer_Description}" 
-                       Foreground="{StaticResource TextSecondaryBrush}"
-                       Margin="0,4,0,0"/>
+        <StackPanel Grid.Row="0" Margin="0,0,0,28">
+            <StackPanel Orientation="Horizontal">
+                <Border Background="{StaticResource AccentSubtleBrush}"
+                        CornerRadius="8"
+                        Padding="10,8"
+                        Margin="0,0,14,0">
+                    <TextBlock Text="🌐" FontSize="20"/>
+                </Border>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{loc:Localize Key=AddServer_Header}" 
+                               FontSize="22" 
+                               FontWeight="SemiBold"/>
+                    <TextBlock Text="{loc:Localize Key=AddServer_Description}" 
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               FontSize="13"
+                               Margin="0,4,0,0"/>
+                </StackPanel>
+            </StackPanel>
         </StackPanel>
 
         <!-- Form -->
@@ -36,53 +47,57 @@
                 <TextBlock Text="{loc:Localize Key=AddServer_ServerName}" 
                            Foreground="{StaticResource TextSecondaryBrush}"
                            FontSize="12"
-                           Margin="0,0,0,6"/>
+                           FontWeight="Medium"
+                           Margin="0,0,0,8"/>
                 <TextBox x:Name="ServerNameTextBox" 
                          Text="Libera.Chat"
-                         Margin="0,0,0,16"/>
+                         Margin="0,0,0,18"/>
 
                 <!-- Hostname -->
                 <TextBlock Text="{loc:Localize Key=AddServer_Hostname}" 
                            Foreground="{StaticResource TextSecondaryBrush}"
                            FontSize="12"
-                           Margin="0,0,0,6"/>
+                           FontWeight="Medium"
+                           Margin="0,0,0,8"/>
                 <TextBox x:Name="HostnameTextBox" 
                          Text="irc.libera.chat"
-                         Margin="0,0,0,16"/>
+                         Margin="0,0,0,18"/>
 
                 <!-- Port and SSL -->
-                <Grid Margin="0,0,0,16">
+                <Grid Margin="0,0,0,18">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
                         <TextBlock Text="{loc:Localize Key=AddServer_Port}" 
                                    Foreground="{StaticResource TextSecondaryBrush}"
                                    FontSize="12"
-                                   Margin="0,0,0,6"/>
+                                   FontWeight="Medium"
+                                   Margin="0,0,0,8"/>
                         <TextBox x:Name="PortTextBox" Text="6697"/>
                     </StackPanel>
 
-                    <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                    <StackPanel Grid.Column="1" Margin="10,0,0,0">
                         <TextBlock Text="{loc:Localize Key=AddServer_Security}" 
                                    Foreground="{StaticResource TextSecondaryBrush}"
                                    FontSize="12"
-                                   Margin="0,0,0,6"/>
+                                   FontWeight="Medium"
+                                   Margin="0,0,0,8"/>
                         <CheckBox x:Name="UseSslCheckBox" 
                                   Content="{loc:Localize Key=AddServer_UseSSL}" 
                                   IsChecked="True"
                                   Foreground="{StaticResource TextPrimaryBrush}"
                                   VerticalAlignment="Center"
-                                  Margin="0,8,0,0"/>
+                                  Margin="0,6,0,0"/>
                         <CheckBox x:Name="AcceptInvalidCertsCheckBox" 
                                   Content="{loc:Localize Key=AddServer_AcceptInvalidCerts}" 
                                   IsChecked="False"
                                   Foreground="{StaticResource TextSecondaryBrush}"
                                   VerticalAlignment="Center"
                                   ToolTip="{loc:Localize Key=AddServer_AcceptInvalidCertsTooltip}"
-                                  Margin="0,6,0,0"
+                                  Margin="0,8,0,0"
                                   IsEnabled="{Binding IsChecked, ElementName=UseSslCheckBox}"/>
                     </StackPanel>
                 </Grid>
@@ -91,86 +106,106 @@
                 <TextBlock Text="{loc:Localize Key=AddServer_Nickname}" 
                            Foreground="{StaticResource TextSecondaryBrush}"
                            FontSize="12"
-                           Margin="0,0,0,6"/>
+                           FontWeight="Medium"
+                           Margin="0,0,0,8"/>
                 <TextBox x:Name="NicknameTextBox" 
-                         Margin="0,0,0,16"/>
+                         Margin="0,0,0,18"/>
 
                 <!-- Username -->
                 <TextBlock Text="{loc:Localize Key=AddServer_Username}" 
                            Foreground="{StaticResource TextSecondaryBrush}"
                            FontSize="12"
-                           Margin="0,0,0,6"/>
+                           FontWeight="Medium"
+                           Margin="0,0,0,8"/>
                 <TextBox x:Name="UsernameTextBox" 
                          Text="ircclient"
-                         Margin="0,0,0,16"/>
+                         Margin="0,0,0,18"/>
 
                 <!-- Real Name -->
                 <TextBlock Text="{loc:Localize Key=AddServer_RealName}" 
                            Foreground="{StaticResource TextSecondaryBrush}"
                            FontSize="12"
-                           Margin="0,0,0,6"/>
+                           FontWeight="Medium"
+                           Margin="0,0,0,8"/>
                 <TextBox x:Name="RealNameTextBox" 
                          Text="IRC Client User"
-                         Margin="0,0,0,16"/>
+                         Margin="0,0,0,18"/>
 
                 <!-- Auto-Join Channels -->
                 <TextBlock Text="{loc:Localize Key=AddServer_Channels}" 
                            Foreground="{StaticResource TextSecondaryBrush}"
                            FontSize="12"
-                           Margin="0,0,0,6"/>
+                           FontWeight="Medium"
+                           Margin="0,0,0,8"/>
                 <TextBox x:Name="AutoJoinTextBox" 
                          Text="#test"
-                         Margin="0,0,0,16"/>
+                         Margin="0,0,0,18"/>
 
                 <!-- Server Password -->
                 <TextBlock Text="{loc:Localize Key=AddServer_ServerPasswordOptional}" 
                            Foreground="{StaticResource TextSecondaryBrush}"
                            FontSize="12"
-                           Margin="0,0,0,6"/>
+                           FontWeight="Medium"
+                           Margin="0,0,0,8"/>
                 <PasswordBox x:Name="PasswordBox" 
-                             Margin="0,0,0,16"/>
+                             Margin="0,0,0,24"/>
 
-                <!-- SASL Authentication -->
-                <TextBlock Text="{loc:Localize Key=AddServer_SaslHeader}" 
-                           FontWeight="SemiBold"
-                           Margin="0,8,0,8"/>
-                
-                <TextBlock Text="{loc:Localize Key=AddServer_SaslUsername}" 
-                           Foreground="{StaticResource TextSecondaryBrush}"
-                           FontSize="12"
-                           Margin="0,0,0,6"/>
-                <TextBox x:Name="SaslUsernameTextBox" 
-                         Margin="0,0,0,16"/>
+                <!-- SASL Authentication Section -->
+                <Border Background="{StaticResource BackgroundMediumBrush}"
+                        CornerRadius="8"
+                        Padding="16"
+                        Margin="0,0,0,18">
+                    <StackPanel>
+                        <TextBlock Text="{loc:Localize Key=AddServer_SaslHeader}" 
+                                   FontWeight="SemiBold"
+                                   FontSize="13"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,0,0,12"/>
+                        
+                        <TextBlock Text="{loc:Localize Key=AddServer_SaslUsername}" 
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   FontSize="12"
+                                   Margin="0,0,0,8"/>
+                        <TextBox x:Name="SaslUsernameTextBox" 
+                                 Margin="0,0,0,14"/>
 
-                <TextBlock Text="{loc:Localize Key=AddServer_SaslPassword}" 
-                           Foreground="{StaticResource TextSecondaryBrush}"
-                           FontSize="12"
-                           Margin="0,0,0,6"/>
-                <PasswordBox x:Name="SaslPasswordBox" 
-                             Margin="0,0,0,16"/>
+                        <TextBlock Text="{loc:Localize Key=AddServer_SaslPassword}" 
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   FontSize="12"
+                                   Margin="0,0,0,8"/>
+                        <PasswordBox x:Name="SaslPasswordBox"/>
+                    </StackPanel>
+                </Border>
 
                 <!-- Auto-connect -->
                 <CheckBox x:Name="AutoConnectCheckBox" 
                           Content="{loc:Localize Key=AddServer_AutoConnect}" 
                           IsChecked="False"
-                          Foreground="{StaticResource TextSecondaryBrush}"
                           Margin="0,0,0,8"/>
             </StackPanel>
         </ScrollViewer>
 
         <!-- Buttons -->
-        <StackPanel Grid.Row="2" 
-                    Orientation="Horizontal" 
-                    HorizontalAlignment="Right"
-                    Margin="0,24,0,0">
-            <Button Content="{loc:Localize Key=Cancel}" 
-                    Click="CancelButton_Click"
-                    Width="100"
-                    Margin="0,0,12,0"/>
-            <Button Content="{loc:Localize Key=AddServer_Title}" 
-                    Click="AddButton_Click"
-                    Style="{StaticResource AccentButtonStyle}"
-                    Width="120"/>
-        </StackPanel>
+        <Border Grid.Row="2" 
+                BorderBrush="{StaticResource BorderSubtleBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="0,20,0,0"
+                Margin="0,20,0,0">
+            <StackPanel Orientation="Horizontal" 
+                        HorizontalAlignment="Right">
+                <Button Content="{loc:Localize Key=Cancel}" 
+                        Click="CancelButton_Click"
+                        Padding="20,10"
+                        Margin="0,0,12,0"/>
+                <Button Click="AddButton_Click"
+                        Style="{StaticResource AccentButtonStyle}"
+                        Padding="24,10">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="＋" FontWeight="Bold" Margin="0,0,8,0"/>
+                        <TextBlock Text="{loc:Localize Key=AddServer_Title}"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

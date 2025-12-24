@@ -3,16 +3,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:Munin.UI.Localization"
         Title="{loc:Localize Key=EditServer_Title}" 
-        Height="660" 
-        Width="450"
+        Height="700" 
+        Width="480"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Background="{StaticResource BackgroundDarkBrush}"
         Foreground="{StaticResource TextPrimaryBrush}"
-        FontFamily="{StaticResource MonospaceFont}"
+        FontFamily="{StaticResource UIFont}"
         FontSize="13">
 
-    <Grid Margin="24">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -20,17 +20,34 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <StackPanel Grid.Row="0" Margin="0,0,0,24">
-            <TextBlock Text="{loc:Localize Key=EditServer_Header}" 
-                       FontSize="20" 
-                       FontWeight="SemiBold"/>
-            <TextBlock Text="{loc:Localize Key=EditServer_Description}" 
-                       Foreground="{StaticResource TextSecondaryBrush}"
-                       Margin="0,4,0,0"/>
-        </StackPanel>
+        <Border Grid.Row="0" 
+                Background="{StaticResource BackgroundMediumBrush}"
+                BorderBrush="{StaticResource BorderSubtleBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="24,18">
+            <StackPanel Orientation="Horizontal">
+                <Border Width="40" Height="40" 
+                        CornerRadius="8"
+                        Background="{StaticResource AccentSubtleBrush}"
+                        Margin="0,0,16,0">
+                    <TextBlock Text="✏️" FontSize="18" 
+                               HorizontalAlignment="Center" 
+                               VerticalAlignment="Center"/>
+                </Border>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{loc:Localize Key=EditServer_Header}" 
+                               FontSize="17" 
+                               FontWeight="SemiBold"/>
+                    <TextBlock Text="{loc:Localize Key=EditServer_Description}" 
+                               Foreground="{StaticResource TextMutedBrush}"
+                               FontSize="12"
+                               Margin="0,3,0,0"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
 
         <!-- Form -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="24,20,24,0">
             <StackPanel>
                 <!-- Server Name -->
                 <TextBlock Text="{loc:Localize Key=AddServer_ServerName}" 
@@ -124,23 +141,30 @@
                              Margin="0,0,0,16"/>
 
                 <!-- SASL Authentication -->
-                <TextBlock Text="{loc:Localize Key=AddServer_SaslHeader}" 
-                           FontWeight="SemiBold"
-                           Margin="0,8,0,8"/>
-                
-                <TextBlock Text="{loc:Localize Key=AddServer_SaslUsername}" 
-                           Foreground="{StaticResource TextSecondaryBrush}"
-                           FontSize="12"
-                           Margin="0,0,0,6"/>
-                <TextBox x:Name="SaslUsernameTextBox" 
-                         Margin="0,0,0,16"/>
+                <Border Background="{StaticResource BackgroundElevatedBrush}"
+                        CornerRadius="8"
+                        Padding="16"
+                        Margin="0,8,0,16">
+                    <StackPanel>
+                        <TextBlock Text="{loc:Localize Key=AddServer_SaslHeader}" 
+                                   FontWeight="SemiBold"
+                                   FontSize="13"
+                                   Margin="0,0,0,12"/>
+                        
+                        <TextBlock Text="{loc:Localize Key=AddServer_SaslUsername}" 
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   FontSize="12"
+                                   Margin="0,0,0,6"/>
+                        <TextBox x:Name="SaslUsernameTextBox" 
+                                 Margin="0,0,0,12"/>
 
-                <TextBlock Text="{loc:Localize Key=AddServer_SaslPassword}" 
-                           Foreground="{StaticResource TextSecondaryBrush}"
-                           FontSize="12"
-                           Margin="0,0,0,6"/>
-                <PasswordBox x:Name="SaslPasswordBox" 
-                             Margin="0,0,0,16"/>
+                        <TextBlock Text="{loc:Localize Key=AddServer_SaslPassword}" 
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   FontSize="12"
+                                   Margin="0,0,0,6"/>
+                        <PasswordBox x:Name="SaslPasswordBox"/>
+                    </StackPanel>
+                </Border>
 
                 <!-- Auto-connect -->
                 <CheckBox x:Name="AutoConnectCheckBox" 
@@ -151,18 +175,22 @@
         </ScrollViewer>
 
         <!-- Buttons -->
-        <StackPanel Grid.Row="2" 
-                    Orientation="Horizontal" 
-                    HorizontalAlignment="Right"
-                    Margin="0,24,0,0">
-            <Button Content="{loc:Localize Key=Cancel}" 
-                    Click="CancelButton_Click"
-                    Width="100"
-                    Margin="0,0,12,0"/>
-            <Button Content="{loc:Localize Key=Save}" 
-                    Click="SaveButton_Click"
-                    Style="{StaticResource AccentButtonStyle}"
-                    Width="120"/>
-        </StackPanel>
+        <Border Grid.Row="2"
+                BorderBrush="{StaticResource BorderSubtleBrush}"
+                BorderThickness="0,1,0,0"
+                Margin="0,16,0,0"
+                Padding="24,18">
+            <StackPanel Orientation="Horizontal" 
+                        HorizontalAlignment="Right">
+                <Button Content="{loc:Localize Key=Cancel}" 
+                        Click="CancelButton_Click"
+                        Padding="20,10"
+                        Margin="0,0,12,0"/>
+                <Button Content="{loc:Localize Key=Save}" 
+                        Click="SaveButton_Click"
+                        Style="{StaticResource AccentButtonStyle}"
+                        Padding="24,10"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

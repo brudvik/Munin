@@ -61,8 +61,18 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private ObservableCollection<string> _searchResults = new();
 
+    /// <summary>
+    /// Returns true if no servers are configured, used to show welcome screen.
+    /// </summary>
+    public bool HasNoServers => Servers.Count == 0;
+
     private readonly HashSet<string> _loadedHistoryChannels = new();
     private RawIrcLogWindow? _rawIrcLogWindow;
+
+    partial void OnServersChanged(ObservableCollection<ServerViewModel> value)
+    {
+        OnPropertyChanged(nameof(HasNoServers));
+    }
 
     partial void OnSelectedChannelChanged(ChannelViewModel? oldValue, ChannelViewModel? newValue)
     {
@@ -93,7 +103,7 @@ public partial class MainViewModel : ObservableObject
     private void LoadChannelHistory(ChannelViewModel channel)
     {
         _logger.Information("LoadChannelHistory: Starting for {Name}", channel.Channel?.Name ?? "null");
-        if (SelectedServer == null) return;
+        if (SelectedServer == null || channel.Channel == null) return;
         
         var historyKey = $"{SelectedServer.Server.Name}|{channel.Channel.Name}";
         if (_loadedHistoryChannels.Contains(historyKey))
@@ -227,6 +237,9 @@ public partial class MainViewModel : ObservableObject
         
         _logger.Information("MainViewModel initialized");
         
+        // Subscribe to collection changes to update HasNoServers
+        Servers.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasNoServers));
+        
         // Setup latency measurement timer (every 30 seconds)
         _latencyTimer = new DispatcherTimer
         {
@@ -330,7 +343,9 @@ public partial class MainViewModel : ObservableObject
                 var server = Servers.FirstOrDefault(sv => sv.Server.Id == e.Server.Id);
                 if (server != null)
                 {
+                    server.IsConnecting = false;
                     server.IsConnected = true;
+                    IsConnecting = false;
                     StatusText = $"Connected to {e.Server.Name}";
                     
                     // Update the current nickname for message coloring
@@ -346,7 +361,9 @@ public partial class MainViewModel : ObservableObject
                 var server = Servers.FirstOrDefault(sv => sv.Server.Id == e.Server.Id);
                 if (server != null)
                 {
+                    server.IsConnecting = false;
                     server.IsConnected = false;
+                    IsConnecting = false;
                     StatusText = $"Disconnected from {e.Server.Name}";
                 }
             });
@@ -731,14 +748,13 @@ public partial class MainViewModel : ObservableObject
             _logger.Information("Connecting to server {ServerName} ({Hostname}:{Port})", 
                 server.Server.Name, server.Server.Hostname, server.Server.Port);
             await server.Connection.ConnectAsync();
+            // Note: IsConnecting is set to false in ServerConnected event handler
+            // This allows the spinner to show until we receive RPL_WELCOME (001)
         }
         catch (Exception ex)
         {
             _logger.Error(ex, "Failed to connect to {ServerName}", server.Server.Name);
             StatusText = $"Failed to connect: {ex.Message}";
-        }
-        finally
-        {
             IsConnecting = false;
             server.IsConnecting = false;
         }

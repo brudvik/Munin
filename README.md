@@ -28,16 +28,27 @@
 - **Security log** - Track unlock attempts
 
 ### User Interface
-- **Dark theme** - Easy on the eyes
+- **Modern dark theme** - Professional polished design with Windows 11-style window chrome
+- **Custom title bar** - Borderless window with rounded corners and integrated controls
 - **Multi-language** - English and Norwegian (auto-detects system language)
 - **Tab completion** - For nicknames and commands
 - **Command history** - Arrow up/down navigation
-- **Highlight words** - Custom alert words
+- **Highlight words** - Custom alert words with red unread badges
 - **Ignore list** - Hide messages from users
 - **Sound and flash alerts** - Configurable notifications
 - **Connection spinner** - Visual feedback during server connections
 - **History loading** - Configurable message history on channel join (10-1000 lines)
 - **History timestamps** - Shows date range when loading previous messages
+- **Welcome screen** - Feature highlights when no servers are configured
+- **Empty states** - Friendly icons for empty channels and no selection
+- **Channel statistics** - Live message count, user count, and session duration in status bar
+- **Server latency** - Real-time ping display in status bar
+- **Topic bar** - Expandable channel topic display
+- **Enhanced user list** - Initials-based avatars, status indicators, collapsible groups
+- **Text emoticon picker** - Quick access to IRC-style emoticons
+- **Character counter** - Shows message length (512 char limit)
+- **Search messages** - Ctrl+F to search with animated slide-down bar
+- **Smooth animations** - Fade-in effects for messages and UI elements
 
 ### Advanced
 - **Auto-perform** - Run commands on connection

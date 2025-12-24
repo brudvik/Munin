@@ -3,16 +3,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:Munin.UI.Localization"
         Title="{loc:Localize Key=Settings_Title}"
-        Height="500"
-        Width="500"
+        Height="580"
+        Width="540"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Background="{StaticResource BackgroundDarkBrush}"
         Foreground="{StaticResource TextPrimaryBrush}"
-        FontFamily="{StaticResource MonospaceFont}"
+        FontFamily="{StaticResource UIFont}"
         FontSize="13">
 
-    <Grid Margin="24">
+    <Grid Margin="28">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -20,264 +20,342 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <StackPanel Grid.Row="0" Margin="0,0,0,24">
-            <TextBlock Text="{loc:Localize Key=Settings_Title}" 
-                       FontSize="20" 
-                       FontWeight="SemiBold"/>
-            <TextBlock Text="{loc:Localize Key=Settings_Description}" 
-                       Foreground="{StaticResource TextSecondaryBrush}"
-                       Margin="0,4,0,0"/>
+        <StackPanel Grid.Row="0" Margin="0,0,0,28">
+            <StackPanel Orientation="Horizontal">
+                <Border Background="{StaticResource BackgroundHighlightBrush}"
+                        CornerRadius="8"
+                        Padding="10,8"
+                        Margin="0,0,14,0">
+                    <TextBlock Text="⚙" FontSize="20"/>
+                </Border>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{loc:Localize Key=Settings_Title}" 
+                               FontSize="22" 
+                               FontWeight="SemiBold"/>
+                    <TextBlock Text="{loc:Localize Key=Settings_Description}" 
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               FontSize="13"
+                               Margin="0,4,0,0"/>
+                </StackPanel>
+            </StackPanel>
         </StackPanel>
 
         <!-- Settings -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel>
                 <!-- Notifications Section -->
-                <TextBlock Text="{loc:Localize Key=Settings_NotificationsHeader}" 
-                           FontSize="11" 
-                           FontWeight="SemiBold"
-                           Foreground="{StaticResource TextMutedBrush}"
-                           Margin="0,0,0,12"/>
+                <Border Background="{StaticResource BackgroundMediumBrush}"
+                        CornerRadius="8"
+                        Padding="16"
+                        Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="{loc:Localize Key=Settings_NotificationsHeader}" 
+                                   FontSize="12" 
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,0,0,14"/>
 
-                <CheckBox x:Name="EnableSoundCheckBox" 
-                          Content="{loc:Localize Key=Settings_EnableSound}" 
-                          Margin="0,0,0,8"/>
-                <CheckBox x:Name="EnableFlashCheckBox" 
-                          Content="{loc:Localize Key=Settings_FlashTaskbar}" 
-                          Margin="0,0,0,8"/>
-                <CheckBox x:Name="OnlyWhenInactiveCheckBox" 
-                          Content="{loc:Localize Key=Settings_NotifyInactive}" 
-                          Margin="0,0,0,24"/>
+                        <CheckBox x:Name="EnableSoundCheckBox" 
+                                  Content="{loc:Localize Key=Settings_EnableSound}" 
+                                  Margin="0,0,0,10"/>
+                        <CheckBox x:Name="EnableFlashCheckBox" 
+                                  Content="{loc:Localize Key=Settings_FlashTaskbar}" 
+                                  Margin="0,0,0,10"/>
+                        <CheckBox x:Name="OnlyWhenInactiveCheckBox" 
+                                  Content="{loc:Localize Key=Settings_NotifyInactive}"/>
+                    </StackPanel>
+                </Border>
 
                 <!-- Highlighting Section -->
-                <TextBlock Text="{loc:Localize Key=Settings_HighlightingHeader}" 
-                           FontSize="11" 
-                           FontWeight="SemiBold"
-                           Foreground="{StaticResource TextMutedBrush}"
-                           Margin="0,0,0,12"/>
+                <Border Background="{StaticResource BackgroundMediumBrush}"
+                        CornerRadius="8"
+                        Padding="16"
+                        Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="{loc:Localize Key=Settings_HighlightingHeader}" 
+                                   FontSize="12" 
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,0,0,14"/>
 
-                <TextBlock Text="{loc:Localize Key=Settings_HighlightWords}" 
-                           Foreground="{StaticResource TextSecondaryBrush}"
-                           FontSize="12"
-                           Margin="0,0,0,6"/>
-                <TextBox x:Name="HighlightWordsTextBox" 
-                         AcceptsReturn="True"
-                         TextWrapping="Wrap"
-                         Height="80"
-                         VerticalScrollBarVisibility="Auto"
-                         Margin="0,0,0,24"/>
+                        <TextBlock Text="{loc:Localize Key=Settings_HighlightWords}" 
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   FontSize="12"
+                                   Margin="0,0,0,8"/>
+                        <TextBox x:Name="HighlightWordsTextBox" 
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 Height="80"
+                                 VerticalScrollBarVisibility="Auto"/>
+                    </StackPanel>
+                </Border>
 
                 <!-- Ignored Users Section -->
-                <TextBlock Text="{loc:Localize Key=Settings_IgnoredUsersHeader}" 
-                           FontSize="11" 
-                           FontWeight="SemiBold"
-                           Foreground="{StaticResource TextMutedBrush}"
-                           Margin="0,0,0,12"/>
+                <Border Background="{StaticResource BackgroundMediumBrush}"
+                        CornerRadius="8"
+                        Padding="16"
+                        Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="{loc:Localize Key=Settings_IgnoredUsersHeader}" 
+                                   FontSize="12" 
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,0,0,14"/>
 
-                <TextBlock Text="{loc:Localize Key=Settings_IgnoredUsers}" 
-                           Foreground="{StaticResource TextSecondaryBrush}"
-                           FontSize="12"
-                           Margin="0,0,0,6"/>
-                <TextBox x:Name="IgnoredUsersTextBox" 
-                         AcceptsReturn="True"
-                         TextWrapping="Wrap"
-                         Height="80"
-                         VerticalScrollBarVisibility="Auto"
-                         Margin="0,0,0,24"/>
+                        <TextBlock Text="{loc:Localize Key=Settings_IgnoredUsers}" 
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   FontSize="12"
+                                   Margin="0,0,0,8"/>
+                        <TextBox x:Name="IgnoredUsersTextBox" 
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 Height="80"
+                                 VerticalScrollBarVisibility="Auto"/>
+                    </StackPanel>
+                </Border>
 
                 <!-- Security Section -->
-                <TextBlock Text="{loc:Localize Key=Settings_SecurityHeader}" 
-                           FontSize="11" 
-                           FontWeight="SemiBold"
-                           Foreground="{StaticResource TextMutedBrush}"
-                           Margin="0,0,0,12"/>
+                <Border Background="{StaticResource BackgroundMediumBrush}"
+                        CornerRadius="8"
+                        Padding="16"
+                        Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="{loc:Localize Key=Settings_SecurityHeader}" 
+                                   FontSize="12" 
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,0,0,14"/>
 
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                    <TextBlock Text="{loc:Localize Key=Settings_Encryption}" 
-                               Foreground="{StaticResource TextSecondaryBrush}"
-                               VerticalAlignment="Center"/>
-                    <TextBlock x:Name="EncryptionStatusText" 
-                               Text="{loc:Localize Key=Settings_EncryptionEnabled}" 
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                            <TextBlock Text="{loc:Localize Key=Settings_Encryption}" 
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock x:Name="EncryptionStatusText" 
+                                       Text="{loc:Localize Key=Settings_EncryptionEnabled}" 
                                VerticalAlignment="Center"
                                FontWeight="SemiBold"/>
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                    <Button x:Name="ChangePasswordButton" 
-                            Content="{loc:Localize Key=Settings_ChangeMasterPassword}" 
-                            Click="ChangePasswordButton_Click"
-                            Margin="0,0,10,0"/>
-                    <Button x:Name="DisableEncryptionButton" 
-                            Content="{loc:Localize Key=Settings_DisableEncryption}" 
-                            Click="DisableEncryptionButton_Click"/>
-                </StackPanel>
-                
-                <StackPanel x:Name="EnableEncryptionPanel"
-                           Orientation="Horizontal"
-                           Visibility="Collapsed"
-                           Margin="0,0,0,8">
-                    <Button x:Name="EnableEncryptionButton" 
-                            Content="{loc:Localize Key=Settings_EnableEncryption}" 
-                            Click="EnableEncryptionButton_Click"
-                            Style="{StaticResource AccentButtonStyle}"/>
-                </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                            <Button x:Name="ChangePasswordButton" 
+                                    Content="{loc:Localize Key=Settings_ChangeMasterPassword}" 
+                                    Click="ChangePasswordButton_Click"
+                                    Padding="14,8"
+                                    Margin="0,0,10,0"/>
+                            <Button x:Name="DisableEncryptionButton" 
+                                    Content="{loc:Localize Key=Settings_DisableEncryption}" 
+                                    Click="DisableEncryptionButton_Click"
+                                    Padding="14,8"/>
+                        </StackPanel>
+                        
+                        <StackPanel x:Name="EnableEncryptionPanel"
+                                   Orientation="Horizontal"
+                                   Visibility="Collapsed"
+                                   Margin="0,0,0,8">
+                            <Button x:Name="EnableEncryptionButton" 
+                                    Content="{loc:Localize Key=Settings_EnableEncryption}" 
+                                    Click="EnableEncryptionButton_Click"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    Padding="14,8"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
                 
                 <!-- Auto-lock Section -->
-                <TextBlock Text="{loc:Localize Key=Settings_AutoLockHeader}" 
-                           FontSize="11" 
-                           FontWeight="SemiBold"
-                           Foreground="{StaticResource TextMutedBrush}"
-                           Margin="0,16,0,12"/>
-                
-                <CheckBox x:Name="AutoLockEnabledCheckBox" 
-                          Content="{loc:Localize Key=Settings_AutoLockAfterInactivity}" 
-                          Checked="AutoLockEnabledCheckBox_Changed"
-                          Unchecked="AutoLockEnabledCheckBox_Changed"
-                          Margin="0,0,0,8"/>
-                
-                <StackPanel Orientation="Horizontal" Margin="20,0,0,16">
-                    <TextBlock Text="{loc:Localize Key=Settings_MinutesBeforeLock}" 
-                               Foreground="{StaticResource TextSecondaryBrush}"
-                               VerticalAlignment="Center"
-                               Margin="0,0,8,0"/>
-                    <TextBox x:Name="AutoLockMinutesTextBox" 
-                             Width="60"
-                             Text="5"/>
-                    <TextBlock Text="(1-60)" 
-                               Foreground="{StaticResource TextMutedBrush}"
-                               VerticalAlignment="Center"
-                               FontSize="11"
-                               Margin="8,0,0,0"/>
-                </StackPanel>
+                <Border Background="{StaticResource BackgroundMediumBrush}"
+                        CornerRadius="8"
+                        Padding="16"
+                        Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="{loc:Localize Key=Settings_AutoLockHeader}" 
+                                   FontSize="12" 
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,0,0,14"/>
+                        
+                        <CheckBox x:Name="AutoLockEnabledCheckBox" 
+                                  Content="{loc:Localize Key=Settings_AutoLockAfterInactivity}" 
+                                  Checked="AutoLockEnabledCheckBox_Changed"
+                                  Unchecked="AutoLockEnabledCheckBox_Changed"
+                                  Margin="0,0,0,12"/>
+                        
+                        <StackPanel Orientation="Horizontal" Margin="24,0,0,0">
+                            <TextBlock Text="{loc:Localize Key=Settings_MinutesBeforeLock}" 
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,10,0"/>
+                            <TextBox x:Name="AutoLockMinutesTextBox" 
+                                     Width="70"
+                                     Text="5"/>
+                            <TextBlock Text="(1-60)" 
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       VerticalAlignment="Center"
+                                       FontSize="11"
+                                       Margin="10,0,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
                 
                 <!-- Auto-delete logs Section -->
-                <TextBlock Text="{loc:Localize Key=Settings_LogCleanupHeader}" 
-                           FontSize="11" 
-                           FontWeight="SemiBold"
-                           Foreground="{StaticResource TextMutedBrush}"
-                           Margin="0,0,0,12"/>
-                
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                    <TextBlock Text="{loc:Localize Key=Settings_HistoryLinesToLoad}" 
-                               Foreground="{StaticResource TextSecondaryBrush}"
-                               VerticalAlignment="Center"
-                               Margin="0,0,8,0"/>
-                    <TextBox x:Name="HistoryLinesToLoadTextBox" 
-                             Width="60"
-                             Text="100"/>
-                    <TextBlock Text="(10-1000)" 
-                               Foreground="{StaticResource TextMutedBrush}"
-                               VerticalAlignment="Center"
-                               FontSize="11"
-                               Margin="8,0,0,0"/>
-                </StackPanel>
-                
-                <CheckBox x:Name="AutoDeleteLogsEnabledCheckBox" 
-                          Content="{loc:Localize Key=Settings_DeleteOldLogs}" 
-                          Checked="AutoDeleteLogsEnabledCheckBox_Changed"
-                          Unchecked="AutoDeleteLogsEnabledCheckBox_Changed"
-                          Margin="0,0,0,8"/>
-                
-                <StackPanel Orientation="Horizontal" Margin="20,0,0,8">
-                    <TextBlock Text="{loc:Localize Key=Settings_KeepLogsFor}" 
-                               Foreground="{StaticResource TextSecondaryBrush}"
-                               VerticalAlignment="Center"
-                               Margin="0,0,8,0"/>
-                    <TextBox x:Name="AutoDeleteLogsDaysTextBox" 
-                             Width="60"
-                             Text="30"/>
-                    <TextBlock Text="{loc:Localize Key=Settings_Days}" 
-                               Foreground="{StaticResource TextMutedBrush}"
-                               VerticalAlignment="Center"
-                               FontSize="11"
-                               Margin="8,0,0,0"/>
-                </StackPanel>
-                
-                <CheckBox x:Name="SecureDeleteEnabledCheckBox" 
-                          Content="{loc:Localize Key=Settings_UseSecureDelete}" 
-                          Margin="20,0,0,8"/>
-                
-                <Button x:Name="DeleteOldLogsButton" 
-                        Content="{loc:Localize Key=Settings_DeleteOldLogsNow}" 
-                        Click="DeleteOldLogsButton_Click"
-                        HorizontalAlignment="Left"
-                        Margin="20,8,0,16"/>
+                <Border Background="{StaticResource BackgroundMediumBrush}"
+                        CornerRadius="8"
+                        Padding="16"
+                        Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="{loc:Localize Key=Settings_LogCleanupHeader}" 
+                                   FontSize="12" 
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,0,0,14"/>
+                        
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                            <TextBlock Text="{loc:Localize Key=Settings_HistoryLinesToLoad}" 
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,10,0"/>
+                            <TextBox x:Name="HistoryLinesToLoadTextBox" 
+                                     Width="70"
+                                     Text="100"/>
+                            <TextBlock Text="(10-1000)" 
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       VerticalAlignment="Center"
+                                       FontSize="11"
+                                       Margin="10,0,0,0"/>
+                        </StackPanel>
+                        
+                        <CheckBox x:Name="AutoDeleteLogsEnabledCheckBox" 
+                                  Content="{loc:Localize Key=Settings_DeleteOldLogs}" 
+                                  Checked="AutoDeleteLogsEnabledCheckBox_Changed"
+                                  Unchecked="AutoDeleteLogsEnabledCheckBox_Changed"
+                                  Margin="0,0,0,12"/>
+                        
+                        <StackPanel Orientation="Horizontal" Margin="24,0,0,12">
+                            <TextBlock Text="{loc:Localize Key=Settings_KeepLogsFor}" 
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,10,0"/>
+                            <TextBox x:Name="AutoDeleteLogsDaysTextBox" 
+                                     Width="70"
+                                     Text="30"/>
+                            <TextBlock Text="{loc:Localize Key=Settings_Days}" 
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       VerticalAlignment="Center"
+                                       FontSize="11"
+                                       Margin="10,0,0,0"/>
+                        </StackPanel>
+                        
+                        <CheckBox x:Name="SecureDeleteEnabledCheckBox" 
+                                  Content="{loc:Localize Key=Settings_UseSecureDelete}" 
+                                  Margin="24,0,0,12"/>
+                        
+                        <Button x:Name="DeleteOldLogsButton" 
+                                Content="{loc:Localize Key=Settings_DeleteOldLogsNow}" 
+                                Click="DeleteOldLogsButton_Click"
+                                HorizontalAlignment="Left"
+                                Padding="14,8"
+                                Margin="24,4,0,0"/>
+                    </StackPanel>
+                </Border>
                 
                 <!-- Security Audit Section -->
-                <TextBlock Text="{loc:Localize Key=Settings_SecurityLogHeader}" 
-                           FontSize="11" 
-                           FontWeight="SemiBold"
-                           Foreground="{StaticResource TextMutedBrush}"
-                           Margin="0,0,0,12"/>
-                
-                <Button x:Name="ViewSecurityLogButton" 
-                        Content="{loc:Localize Key=Settings_ShowSecurityLog}" 
-                        Click="ViewSecurityLogButton_Click"
-                        HorizontalAlignment="Left"
-                        Margin="0,0,0,8"/>
-                
-                <TextBlock x:Name="RecentUnlockAttemptsText"
-                           Text=""
-                           Foreground="{StaticResource TextMutedBrush}"
-                           FontSize="11"
-                           TextWrapping="Wrap"
-                           Margin="0,0,0,24"/>
+                <Border Background="{StaticResource BackgroundMediumBrush}"
+                        CornerRadius="8"
+                        Padding="16"
+                        Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="{loc:Localize Key=Settings_SecurityLogHeader}" 
+                                   FontSize="12" 
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,0,0,14"/>
+                        
+                        <Button x:Name="ViewSecurityLogButton" 
+                                Content="{loc:Localize Key=Settings_ShowSecurityLog}" 
+                                Click="ViewSecurityLogButton_Click"
+                                HorizontalAlignment="Left"
+                                Padding="14,8"
+                                Margin="0,0,0,10"/>
+                        
+                        <TextBlock x:Name="RecentUnlockAttemptsText"
+                                   Text=""
+                                   Foreground="{StaticResource TextMutedBrush}"
+                                   FontSize="11"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
                 
                 <!-- Portable Mode Section -->
-                <TextBlock Text="{loc:Localize Key=Settings_PortableModeHeader}" 
-                           FontSize="11" 
-                           FontWeight="SemiBold"
-                           Foreground="{StaticResource TextMutedBrush}"
-                           Margin="0,0,0,12"/>
-                
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                    <TextBlock Text="{loc:Localize Key=Settings_Mode}" 
-                               Foreground="{StaticResource TextSecondaryBrush}"
-                               VerticalAlignment="Center"/>
-                    <TextBlock x:Name="PortableModeStatusText" 
-                               Text="{loc:Localize Key=Settings_ModeNormal}" 
-                               VerticalAlignment="Center"
-                               FontWeight="SemiBold"/>
-                </StackPanel>
-                
-                <TextBlock x:Name="DataLocationText"
-                           Text=""
-                           Foreground="{StaticResource TextMutedBrush}"
-                           FontSize="11"
-                           TextWrapping="Wrap"
-                           Margin="0,0,0,8"/>
-                
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                    <Button x:Name="TogglePortableModeButton" 
-                            Content="{loc:Localize Key=Settings_EnablePortableMode}" 
-                            Click="TogglePortableModeButton_Click"
-                            Margin="0,0,10,0"/>
-                    <Button x:Name="OpenDataFolderButton" 
-                            Content="{loc:Localize Key=Settings_OpenDataFolder}" 
-                            Click="OpenDataFolderButton_Click"/>
-                </StackPanel>
-                
-                <TextBlock Text="{loc:Localize Key=Settings_PortableModeDescription}"
-                           Foreground="{StaticResource TextMutedBrush}"
-                           FontSize="11"
-                           TextWrapping="Wrap"
-                           Margin="0,0,0,16"/>
+                <Border Background="{StaticResource BackgroundMediumBrush}"
+                        CornerRadius="8"
+                        Padding="16"
+                        Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="{loc:Localize Key=Settings_PortableModeHeader}" 
+                                   FontSize="12" 
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,0,0,14"/>
+                        
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="{loc:Localize Key=Settings_Mode}" 
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock x:Name="PortableModeStatusText" 
+                                       Text="{loc:Localize Key=Settings_ModeNormal}" 
+                                       VerticalAlignment="Center"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource AccentBrush}"/>
+                        </StackPanel>
+                        
+                        <TextBlock x:Name="DataLocationText"
+                                   Text=""
+                                   Foreground="{StaticResource TextMutedBrush}"
+                                   FontSize="11"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,12"/>
+                        
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                            <Button x:Name="TogglePortableModeButton" 
+                                    Content="{loc:Localize Key=Settings_EnablePortableMode}" 
+                                    Click="TogglePortableModeButton_Click"
+                                    Padding="14,8"
+                                    Margin="0,0,10,0"/>
+                            <Button x:Name="OpenDataFolderButton" 
+                                    Content="{loc:Localize Key=Settings_OpenDataFolder}" 
+                                    Click="OpenDataFolderButton_Click"
+                                    Padding="14,8"/>
+                        </StackPanel>
+                        
+                        <TextBlock Text="{loc:Localize Key=Settings_PortableModeDescription}"
+                                   Foreground="{StaticResource TextMutedBrush}"
+                                   FontSize="11"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
             </StackPanel>
         </ScrollViewer>
 
         <!-- Buttons -->
-        <StackPanel Grid.Row="2" 
-                    Orientation="Horizontal" 
-                    HorizontalAlignment="Right"
-                    Margin="0,24,0,0">
-            <Button Content="{loc:Localize Key=Cancel}" 
-                    Click="CancelButton_Click"
-                    Width="100"
-                    Margin="0,0,12,0"/>
-            <Button Content="{loc:Localize Key=Save}" 
-                    Click="SaveButton_Click"
-                    Style="{StaticResource AccentButtonStyle}"
-                    Width="100"/>
-        </StackPanel>
+        <Border Grid.Row="2" 
+                BorderBrush="{StaticResource BorderSubtleBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="0,20,0,0"
+                Margin="0,16,0,0">
+            <StackPanel Orientation="Horizontal" 
+                        HorizontalAlignment="Right">
+                <Button Content="{loc:Localize Key=Cancel}" 
+                        Click="CancelButton_Click"
+                        Padding="20,10"
+                        Margin="0,0,12,0"/>
+                <Button Click="SaveButton_Click"
+                        Style="{StaticResource AccentButtonStyle}"
+                        Padding="24,10">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="✓" FontWeight="Bold" Margin="0,0,8,0"/>
+                        <TextBlock Text="{loc:Localize Key=Save}"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

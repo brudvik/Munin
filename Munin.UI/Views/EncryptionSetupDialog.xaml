@@ -3,34 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:res="clr-namespace:Munin.UI.Resources"
         Title="{x:Static res:Strings.EncryptionSetup_Title}" 
-        Height="650" Width="520"
+        Height="680" Width="540"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
-        Background="#1e1e1e">
+        Background="{DynamicResource BackgroundDarkBrush}"
+        FontFamily="{StaticResource UIFont}">
     
-    <Window.Resources>
-        <Style TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#e0e0e0"/>
-            <Setter Property="FontSize" Value="13"/>
-        </Style>
-        <Style TargetType="PasswordBox">
-            <Setter Property="Background" Value="#2d2d2d"/>
-            <Setter Property="Foreground" Value="#e0e0e0"/>
-            <Setter Property="BorderBrush" Value="#3d3d3d"/>
-            <Setter Property="Padding" Value="8,6"/>
-            <Setter Property="FontSize" Value="14"/>
-        </Style>
-        <Style TargetType="Button">
-            <Setter Property="Background" Value="#0078d4"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="20,10"/>
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="Cursor" Value="Hand"/>
-        </Style>
-    </Window.Resources>
-    
-    <Grid Margin="30">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -38,66 +17,110 @@
         </Grid.RowDefinitions>
         
         <!-- Header -->
-        <StackPanel Grid.Row="0" Margin="0,0,0,20">
-            <TextBlock Text="🔐" FontSize="48" HorizontalAlignment="Center"/>
-            <TextBlock Text="{x:Static res:Strings.EncryptionSetup_Header}" FontSize="20" FontWeight="SemiBold" 
-                       HorizontalAlignment="Center" Margin="0,10,0,5"/>
-            <TextBlock Text="{x:Static res:Strings.EncryptionSetup_Description}" 
-                       HorizontalAlignment="Center" Foreground="#888"/>
-        </StackPanel>
+        <Border Grid.Row="0" 
+                Background="{DynamicResource BackgroundMediumBrush}"
+                Padding="30,24">
+            <StackPanel HorizontalAlignment="Center">
+                <Border Width="64" Height="64" 
+                        CornerRadius="32"
+                        Background="{DynamicResource AccentSubtleBrush}"
+                        Margin="0,0,0,16">
+                    <TextBlock Text="🔐" FontSize="28" 
+                               HorizontalAlignment="Center" 
+                               VerticalAlignment="Center"/>
+                </Border>
+                <TextBlock Text="{x:Static res:Strings.EncryptionSetup_Header}" 
+                           FontSize="18" 
+                           FontWeight="SemiBold" 
+                           Foreground="{DynamicResource TextPrimaryBrush}"
+                           HorizontalAlignment="Center"/>
+                <TextBlock Text="{x:Static res:Strings.EncryptionSetup_Description}" 
+                           HorizontalAlignment="Center" 
+                           Foreground="{DynamicResource TextMutedBrush}"
+                           FontSize="13"
+                           Margin="0,6,0,0"/>
+            </StackPanel>
+        </Border>
         
         <!-- Content -->
-        <StackPanel Grid.Row="1" VerticalAlignment="Center">
+        <StackPanel Grid.Row="1" Margin="30,20,30,0">
             <!-- Info box -->
-            <Border Background="#2a3a4a" CornerRadius="6" Padding="15" Margin="0,0,0,20">
+            <Border Background="{DynamicResource AccentSubtleBrush}" CornerRadius="8" Padding="16" Margin="0,0,0,20">
                 <StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                        <TextBlock Text="🛡️ " FontWeight="SemiBold"/>
-                        <TextBlock Text="{x:Static res:Strings.EncryptionSetup_WillBeEncrypted}" FontWeight="SemiBold"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <TextBlock Text="🛡️" FontSize="14" Margin="0,0,8,0"/>
+                        <TextBlock Text="{x:Static res:Strings.EncryptionSetup_WillBeEncrypted}" 
+                                   FontWeight="SemiBold" 
+                                   Foreground="{DynamicResource TextPrimaryBrush}"/>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="15,2,0,0">
-                        <TextBlock Text="• "/>
-                        <TextBlock Text="{x:Static res:Strings.EncryptionSetup_ServerConfigs}"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="15,2,0,0">
-                        <TextBlock Text="• "/>
-                        <TextBlock Text="{x:Static res:Strings.EncryptionSetup_NickServSasl}"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="15,2,0,0">
-                        <TextBlock Text="• "/>
-                        <TextBlock Text="{x:Static res:Strings.EncryptionSetup_ChatHistory}"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="15,2,0,0">
-                        <TextBlock Text="• "/>
-                        <TextBlock Text="{x:Static res:Strings.EncryptionSetup_AllSettings}"/>
+                    <StackPanel Margin="26,0,0,0">
+                        <TextBlock Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,3">
+                            <Run Text="•"/>
+                            <Run Text="{x:Static res:Strings.EncryptionSetup_ServerConfigs}"/>
+                        </TextBlock>
+                        <TextBlock Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,3">
+                            <Run Text="•"/>
+                            <Run Text="{x:Static res:Strings.EncryptionSetup_NickServSasl}"/>
+                        </TextBlock>
+                        <TextBlock Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,3">
+                            <Run Text="•"/>
+                            <Run Text="{x:Static res:Strings.EncryptionSetup_ChatHistory}"/>
+                        </TextBlock>
+                        <TextBlock Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,3">
+                            <Run Text="•"/>
+                            <Run Text="{x:Static res:Strings.EncryptionSetup_AllSettings}"/>
+                        </TextBlock>
                     </StackPanel>
                 </StackPanel>
             </Border>
             
             <!-- Password fields -->
-            <TextBlock Text="{x:Static res:Strings.EncryptionSetup_CreatePassword}" Margin="0,0,0,5"/>
-            <PasswordBox x:Name="PasswordBox" Margin="0,0,0,15"/>
-            
-            <TextBlock Text="{x:Static res:Strings.EncryptionSetup_ConfirmPassword}" Margin="0,0,0,5"/>
-            <PasswordBox x:Name="ConfirmPasswordBox" Margin="0,0,0,10"/>
-            
-            <TextBlock x:Name="ErrorText" Foreground="#ff6b6b" Text="" Margin="0,0,0,10" 
-                       Visibility="Collapsed"/>
+            <Border Background="{DynamicResource BackgroundElevatedBrush}" CornerRadius="8" Padding="16" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="{x:Static res:Strings.EncryptionSetup_CreatePassword}" 
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               FontSize="12"
+                               Margin="0,0,0,6"/>
+                    <PasswordBox x:Name="PasswordBox" Margin="0,0,0,16"/>
+                    
+                    <TextBlock Text="{x:Static res:Strings.EncryptionSetup_ConfirmPassword}" 
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               FontSize="12"
+                               Margin="0,0,0,6"/>
+                    <PasswordBox x:Name="ConfirmPasswordBox"/>
+                    
+                    <TextBlock x:Name="ErrorText" 
+                               Foreground="{DynamicResource ErrorBrush}" 
+                               Text="" 
+                               Margin="0,12,0,0" 
+                               Visibility="Collapsed"/>
+                </StackPanel>
+            </Border>
             
             <!-- Warning -->
-            <Border Background="#4a3a2a" CornerRadius="6" Padding="12" Margin="0,10,0,0">
+            <Border Background="{DynamicResource WarningDimBrush}" CornerRadius="8" Padding="14">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="⚠️ " Foreground="#ffa500"/>
-                    <TextBlock Text="{x:Static res:Strings.EncryptionSetup_Warning}" TextWrapping="Wrap" Foreground="#ffa500"/>
+                    <TextBlock Text="⚠️" FontSize="14" Margin="0,0,10,0"/>
+                    <TextBlock Text="{x:Static res:Strings.EncryptionSetup_Warning}" 
+                               TextWrapping="Wrap" 
+                               Foreground="{DynamicResource WarningBrush}"
+                               FontSize="12"/>
                 </StackPanel>
             </Border>
         </StackPanel>
         
         <!-- Buttons -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
-            <Button x:Name="SkipButton" Content="{x:Static res:Strings.EncryptionSetup_Skip}" Click="SkipButton_Click"
-                    Background="#444" Margin="0,0,10,0"/>
-            <Button x:Name="EnableButton" Content="{x:Static res:Strings.EncryptionSetup_Enable}" Click="EnableButton_Click"/>
-        </StackPanel>
+        <Border Grid.Row="2"
+                BorderBrush="{DynamicResource BorderSubtleBrush}"
+                BorderThickness="0,1,0,0"
+                Margin="0,16,0,0"
+                Padding="30,20">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button x:Name="SkipButton" Content="{x:Static res:Strings.EncryptionSetup_Skip}" Click="SkipButton_Click"
+                        Padding="20,10" Margin="0,0,12,0"/>
+                <Button x:Name="EnableButton" Content="{x:Static res:Strings.EncryptionSetup_Enable}" Click="EnableButton_Click"
+                        Style="{StaticResource AccentButtonStyle}" Padding="20,10"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

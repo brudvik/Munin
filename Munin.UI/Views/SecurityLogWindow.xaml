@@ -3,15 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:Munin.UI.Localization"
         Title="{loc:Localize Key=SecurityLog_Title}"
-        Height="450"
-        Width="650"
+        Height="500"
+        Width="700"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource BackgroundDarkBrush}"
         Foreground="{StaticResource TextPrimaryBrush}"
-        FontFamily="{StaticResource MonospaceFont}"
+        FontFamily="{StaticResource UIFont}"
         FontSize="13">
 
-    <Grid Margin="16">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -19,60 +19,90 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <StackPanel Grid.Row="0" Margin="0,0,0,16">
-            <TextBlock Text="{loc:Localize Key=SecurityLog_Title}" 
-                       FontSize="18" 
-                       FontWeight="SemiBold"/>
-            <TextBlock Text="{loc:Localize Key=SecurityLog_Description}" 
-                       Foreground="{StaticResource TextSecondaryBrush}"
-                       Margin="0,4,0,0"/>
-        </StackPanel>
+        <Border Grid.Row="0" 
+                Background="{StaticResource BackgroundMediumBrush}"
+                BorderBrush="{StaticResource BorderSubtleBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="20,16">
+            <StackPanel Orientation="Horizontal">
+                <Border Width="36" Height="36" 
+                        CornerRadius="8"
+                        Background="{StaticResource AccentSubtleBrush}"
+                        Margin="0,0,14,0">
+                    <TextBlock Text="🛡️" FontSize="18" 
+                               HorizontalAlignment="Center" 
+                               VerticalAlignment="Center"/>
+                </Border>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{loc:Localize Key=SecurityLog_Title}" 
+                               FontSize="16" 
+                               FontWeight="SemiBold"/>
+                    <TextBlock Text="{loc:Localize Key=SecurityLog_Description}" 
+                               Foreground="{StaticResource TextMutedBrush}"
+                               FontSize="12"
+                               Margin="0,2,0,0"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
 
         <!-- Event List -->
-        <DataGrid Grid.Row="1" 
-                  x:Name="EventsDataGrid"
-                  AutoGenerateColumns="False"
-                  IsReadOnly="True"
-                  CanUserAddRows="False"
-                  CanUserDeleteRows="False"
-                  GridLinesVisibility="Horizontal"
-                  HeadersVisibility="Column"
-                  Background="{StaticResource BackgroundDarkBrush}"
-                  Foreground="{StaticResource TextPrimaryBrush}"
-                  BorderBrush="{StaticResource BorderBrush}"
-                  RowBackground="{StaticResource BackgroundDarkBrush}"
-                  AlternatingRowBackground="{StaticResource BackgroundLightBrush}">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="{loc:Localize Key=SecurityLog_Time}" 
-                                    Binding="{Binding Timestamp, StringFormat='{}{0:dd.MM.yyyy HH:mm:ss}'}" 
-                                    Width="140"/>
-                <DataGridTextColumn Header="{loc:Localize Key=SecurityLog_Status}" 
-                                    Binding="{Binding StatusIcon}" 
-                                    Width="50"/>
-                <DataGridTextColumn Header="{loc:Localize Key=SecurityLog_Event}" 
-                                    Binding="{Binding Description}" 
-                                    Width="*"/>
-                <DataGridTextColumn Header="{loc:Localize Key=SecurityLog_Machine}" 
-                                    Binding="{Binding MachineName}" 
-                                    Width="100"/>
-                <DataGridTextColumn Header="{loc:Localize Key=SecurityLog_User}" 
-                                    Binding="{Binding UserName}" 
-                                    Width="100"/>
-            </DataGrid.Columns>
-        </DataGrid>
+        <Border Grid.Row="1" 
+                Background="{StaticResource BackgroundMediumBrush}"
+                BorderBrush="{StaticResource BorderSubtleBrush}"
+                BorderThickness="1"
+                CornerRadius="6"
+                Margin="20,16,20,0">
+            <DataGrid x:Name="EventsDataGrid"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      GridLinesVisibility="Horizontal"
+                      HeadersVisibility="Column"
+                      Background="Transparent"
+                      Foreground="{StaticResource TextPrimaryBrush}"
+                      BorderThickness="0"
+                      FontFamily="{StaticResource MonospaceFont}"
+                      FontSize="12"
+                      RowBackground="{StaticResource BackgroundMediumBrush}"
+                      AlternatingRowBackground="{StaticResource BackgroundLightBrush}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="{loc:Localize Key=SecurityLog_Time}" 
+                                        Binding="{Binding Timestamp, StringFormat='{}{0:dd.MM.yyyy HH:mm:ss}'}" 
+                                        Width="145"/>
+                    <DataGridTextColumn Header="{loc:Localize Key=SecurityLog_Status}" 
+                                        Binding="{Binding StatusIcon}" 
+                                        Width="50"/>
+                    <DataGridTextColumn Header="{loc:Localize Key=SecurityLog_Event}" 
+                                        Binding="{Binding Description}" 
+                                        Width="*"/>
+                    <DataGridTextColumn Header="{loc:Localize Key=SecurityLog_Machine}" 
+                                        Binding="{Binding MachineName}" 
+                                        Width="100"/>
+                    <DataGridTextColumn Header="{loc:Localize Key=SecurityLog_User}" 
+                                        Binding="{Binding UserName}" 
+                                        Width="100"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
 
         <!-- Buttons -->
-        <StackPanel Grid.Row="2" 
-                    Orientation="Horizontal" 
-                    HorizontalAlignment="Right"
-                    Margin="0,16,0,0">
-            <Button Content="{loc:Localize Key=SecurityLog_Refresh}" 
-                    Click="RefreshButton_Click"
-                    Width="100"
-                    Margin="0,0,12,0"/>
-            <Button Content="{loc:Localize Key=Close}" 
-                    Click="CloseButton_Click"
-                    Width="100"/>
-        </StackPanel>
+        <Border Grid.Row="2"
+                BorderBrush="{StaticResource BorderSubtleBrush}"
+                BorderThickness="0,1,0,0"
+                Margin="0,16,0,0"
+                Padding="20,16">
+            <StackPanel Orientation="Horizontal" 
+                        HorizontalAlignment="Right">
+                <Button Content="{loc:Localize Key=SecurityLog_Refresh}" 
+                        Click="RefreshButton_Click"
+                        Padding="20,10"
+                        Margin="0,0,12,0"/>
+                <Button Content="{loc:Localize Key=Close}" 
+                        Click="CloseButton_Click"
+                        Style="{StaticResource AccentButtonStyle}"
+                        Padding="20,10"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

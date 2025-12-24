@@ -3,15 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:Munin.UI.Localization"
         Title="{loc:Localize Key=UserInfo_Title}"
-        Height="300"
-        Width="400"
+        Height="340"
+        Width="440"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Background="{StaticResource BackgroundDarkBrush}"
         Foreground="{StaticResource TextPrimaryBrush}"
-        FontFamily="{StaticResource MonospaceFont}">
+        FontFamily="{StaticResource UIFont}">
     
-    <Grid Margin="16">
+    <Grid Margin="24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -19,27 +19,39 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
-            <TextBlock Text="👤" FontSize="24" VerticalAlignment="Center" Margin="0,0,12,0"/>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
+            <Border Background="{StaticResource AccentSubtleBrush}"
+                    CornerRadius="8"
+                    Padding="12,10"
+                    Margin="0,0,14,0">
+                <TextBlock Text="👤" FontSize="22"/>
+            </Border>
             <TextBlock x:Name="NicknameText" 
-                       FontSize="18" 
-                       FontWeight="Bold"
+                       FontSize="20" 
+                       FontWeight="SemiBold"
                        VerticalAlignment="Center"/>
         </StackPanel>
 
         <!-- Info -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <TextBlock x:Name="InfoText"
-                       TextWrapping="Wrap"
-                       Foreground="{StaticResource TextSecondaryBrush}"/>
-        </ScrollViewer>
+        <Border Grid.Row="1" 
+                Background="{StaticResource BackgroundMediumBrush}"
+                CornerRadius="8"
+                Padding="16">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <TextBlock x:Name="InfoText"
+                           TextWrapping="Wrap"
+                           FontFamily="{StaticResource MonospaceFont}"
+                           LineHeight="22"
+                           Foreground="{StaticResource TextSecondaryBrush}"/>
+            </ScrollViewer>
+        </Border>
 
         <!-- Close button -->
         <Button Grid.Row="2" 
                 Content="{loc:Localize Key=Common_Close}" 
                 HorizontalAlignment="Right"
-                Margin="0,16,0,0"
-                Padding="20,8"
+                Margin="0,20,0,0"
+                Padding="24,10"
                 Style="{StaticResource AccentButtonStyle}"
                 Click="CloseButton_Click"/>
     </Grid>

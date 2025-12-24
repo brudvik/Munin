@@ -72,7 +72,7 @@ public partial class ServerViewModel : ObservableObject
     /// <summary>
     /// Formatted latency string for display.
     /// </summary>
-    public string LatencyDisplay => LatencyMs > 0 ? $"{LatencyMs}ms" : "";
+    public string LatencyDisplay => LatencyMs > 0 ? $"{LatencyMs}ms" : "—";
 
     public ServerViewModel(IrcServer server)
     {

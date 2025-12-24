@@ -105,3 +105,20 @@ public class InverseBoolConverter : IValueConverter
         return value is bool b && !b;
     }
 }
+
+/// <summary>
+/// Converts a nullable value to <see cref="Visibility"/> (inverse).
+/// Returns <see cref="Visibility.Collapsed"/> if the value is not null, <see cref="Visibility.Visible"/> if null.
+/// </summary>
+public class NullToVisibilityInverseConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        return value == null ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}

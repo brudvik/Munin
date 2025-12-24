@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Shapes;
 
 namespace Munin.UI.Views;
 
@@ -21,7 +22,103 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         _logger = SerilogConfig.ForContext<MainWindow>();
+        
+        // Update maximize icon when window state changes
+        StateChanged += MainWindow_StateChanged;
     }
+
+    #region Window Chrome Event Handlers
+    
+    /// <summary>
+    /// Handles title bar mouse down for window dragging.
+    /// </summary>
+    private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ClickCount == 2)
+        {
+            // Double-click to toggle maximize
+            ToggleMaximize();
+        }
+        else
+        {
+            // Start drag
+            if (WindowState == WindowState.Maximized)
+            {
+                // Restore before dragging when maximized
+                var point = PointToScreen(e.GetPosition(this));
+                WindowState = WindowState.Normal;
+                Left = point.X - Width / 2;
+                Top = point.Y - 20;
+            }
+            DragMove();
+        }
+    }
+    
+    /// <summary>
+    /// Handles title bar mouse up event.
+    /// </summary>
+    private void TitleBar_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        // Released - nothing special needed
+    }
+    
+    /// <summary>
+    /// Handles title bar mouse move for potential snap functionality.
+    /// </summary>
+    private void TitleBar_MouseMove(object sender, MouseEventArgs e)
+    {
+        // Future: Could add window snap preview
+    }
+    
+    /// <summary>
+    /// Minimizes the window.
+    /// </summary>
+    private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState.Minimized;
+    }
+    
+    /// <summary>
+    /// Toggles between maximized and normal window state.
+    /// </summary>
+    private void MaximizeButton_Click(object sender, RoutedEventArgs e)
+    {
+        ToggleMaximize();
+    }
+    
+    /// <summary>
+    /// Closes the window.
+    /// </summary>
+    private void CloseButton_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
+    
+    /// <summary>
+    /// Toggles the window between maximized and normal state.
+    /// </summary>
+    private void ToggleMaximize()
+    {
+        WindowState = WindowState == WindowState.Maximized 
+            ? WindowState.Normal 
+            : WindowState.Maximized;
+    }
+    
+    /// <summary>
+    /// Updates the maximize button icon based on window state.
+    /// </summary>
+    private void MainWindow_StateChanged(object? sender, EventArgs e)
+    {
+        if (MaximizeIcon != null)
+        {
+            // Change icon to restore icon when maximized
+            MaximizeIcon.Data = WindowState == WindowState.Maximized
+                ? System.Windows.Media.Geometry.Parse("M0,3 H7 V10 H0 Z M3,0 H10 V7 H7 M3,3 V0")  // Restore icon
+                : System.Windows.Media.Geometry.Parse("M0,0 H10 V10 H0 Z");  // Maximize icon
+        }
+    }
+    
+    #endregion
 
     /// <summary>
     /// Handles the Loaded event for the messages list box.
@@ -71,4 +168,35 @@ public partial class MainWindow : Window
             }
         }
     }
+    
+    #region Emoji Picker
+    
+    /// <summary>
+    /// Opens the emoji picker popup.
+    /// </summary>
+    private void EmojiButton_Click(object sender, RoutedEventArgs e)
+    {
+        EmojiPopup.IsOpen = !EmojiPopup.IsOpen;
+    }
+    
+    /// <summary>
+    /// Inserts the selected text emoji into the message input.
+    /// </summary>
+    private void InsertEmoji_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is string emoji)
+        {
+            // Get current cursor position and insert emoji
+            var caretIndex = MessageInputTextBox.CaretIndex;
+            var currentText = MessageInputTextBox.Text ?? "";
+            
+            MessageInputTextBox.Text = currentText.Insert(caretIndex, emoji + " ");
+            MessageInputTextBox.CaretIndex = caretIndex + emoji.Length + 1;
+            MessageInputTextBox.Focus();
+            
+            EmojiPopup.IsOpen = false;
+        }
+    }
+    
+    #endregion
 }

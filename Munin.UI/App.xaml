@@ -12,6 +12,7 @@
             <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
             <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
             <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+            <converters:NullToVisibilityInverseConverter x:Key="NullToVisibilityInverseConverter"/>
             <converters:NullToBoolConverter x:Key="NullToBoolConverter"/>
             <converters:IntToVisibilityConverter x:Key="IntToVisibilityConverter"/>
             <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>

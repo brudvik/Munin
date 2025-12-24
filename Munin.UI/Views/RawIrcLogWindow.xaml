@@ -3,15 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:Munin.UI.Localization"
         Title="{loc:Localize Key=RawLog_Title}"
-        Height="600"
-        Width="900"
+        Height="650"
+        Width="950"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource BackgroundDarkBrush}"
         Foreground="{StaticResource TextPrimaryBrush}"
-        FontFamily="{StaticResource MonospaceFont}"
-        FontSize="12">
+        FontFamily="{StaticResource UIFont}"
+        FontSize="13">
     
-    <Grid Margin="8">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -19,31 +19,49 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
-            <TextBlock Text="🔧 Raw IRC Traffic" 
-                       FontSize="14" 
-                       FontWeight="Bold"
-                       VerticalAlignment="Center"/>
-            <TextBlock Text=" — All incoming and outgoing IRC messages" 
-                       Foreground="{StaticResource TextMutedBrush}"
-                       VerticalAlignment="Center"
-                       Margin="8,0,0,0"/>
-        </StackPanel>
+        <Border Grid.Row="0" 
+                Background="{StaticResource BackgroundMediumBrush}"
+                BorderBrush="{StaticResource BorderSubtleBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="20,16">
+            <StackPanel Orientation="Horizontal">
+                <Border Width="36" Height="36" 
+                        CornerRadius="8"
+                        Background="{StaticResource AccentSubtleBrush}"
+                        Margin="0,0,14,0">
+                    <TextBlock Text="🔧" FontSize="18" 
+                               HorizontalAlignment="Center" 
+                               VerticalAlignment="Center"/>
+                </Border>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Raw IRC Traffic" 
+                               FontSize="16" 
+                               FontWeight="SemiBold"/>
+                    <TextBlock Text="All incoming and outgoing IRC messages" 
+                               Foreground="{StaticResource TextMutedBrush}"
+                               FontSize="12"
+                               Margin="0,2,0,0"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
 
         <!-- Log -->
         <Border Grid.Row="1" 
                 Background="{StaticResource BackgroundMediumBrush}"
-                BorderBrush="{StaticResource BorderBrush}"
+                BorderBrush="{StaticResource BorderSubtleBrush}"
                 BorderThickness="1"
-                CornerRadius="4">
+                CornerRadius="6"
+                Margin="20,16,20,0">
             <ListBox x:Name="LogListBox"
                      BorderThickness="0"
                      Background="Transparent"
+                     FontFamily="{StaticResource MonospaceFont}"
+                     FontSize="12"
                      VirtualizingPanel.ScrollUnit="Pixel"
                      ScrollViewer.CanContentScroll="True">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
-                        <Setter Property="Padding" Value="8,2"/>
+                        <Setter Property="Padding" Value="12,4"/>
                         <Setter Property="Margin" Value="0"/>
                         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                         <Setter Property="Template">
@@ -51,13 +69,15 @@
                                 <ControlTemplate TargetType="ListBoxItem">
                                     <Border x:Name="border" 
                                             Background="Transparent"
-                                            Padding="{TemplateBinding Padding}">
+                                            Padding="{TemplateBinding Padding}"
+                                            BorderBrush="{StaticResource BorderSubtleBrush}"
+                                            BorderThickness="0,0,0,1">
                                         <ContentPresenter/>
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <DataTrigger Binding="{Binding IsOutgoing}" Value="True">
                                             <Setter TargetName="border" Property="Background" 
-                                                    Value="#1A2D1A"/>
+                                                    Value="#0A4ADE80"/>
                                         </DataTrigger>
                                         <Trigger Property="IsMouseOver" Value="True">
                                             <Setter TargetName="border" Property="Background" 
@@ -110,21 +130,35 @@
         </Border>
 
         <!-- Footer -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,8,0,0">
-            <Button Content="{loc:Localize Key=RawLog_Clear}" 
-                    Padding="16,6"
-                    Click="ClearButton_Click"/>
-            <CheckBox x:Name="AutoScrollCheckBox"
-                      Content="{loc:Localize Key=RawLog_AutoScroll}"
-                      IsChecked="True"
-                      VerticalAlignment="Center"
-                      Margin="16,0,0,0"
-                      Foreground="{StaticResource TextSecondaryBrush}"/>
-            <TextBlock x:Name="CountText"
-                       Text="0 messages"
-                       Foreground="{StaticResource TextMutedBrush}"
-                       VerticalAlignment="Center"
-                       Margin="16,0,0,0"/>
-        </StackPanel>
+        <Border Grid.Row="2"
+                BorderBrush="{StaticResource BorderSubtleBrush}"
+                BorderThickness="0,1,0,0"
+                Margin="0,16,0,0"
+                Padding="20,14">
+            <Grid>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Button Content="{loc:Localize Key=RawLog_Clear}" 
+                            Padding="16,8"
+                            Click="ClearButton_Click"/>
+                    <CheckBox x:Name="AutoScrollCheckBox"
+                              Content="{loc:Localize Key=RawLog_AutoScroll}"
+                              IsChecked="True"
+                              VerticalAlignment="Center"
+                              Margin="20,0,0,0"
+                              Foreground="{StaticResource TextSecondaryBrush}"/>
+                </StackPanel>
+                <Border HorizontalAlignment="Right"
+                        Background="{StaticResource AccentSubtleBrush}"
+                        CornerRadius="10"
+                        Padding="10,4"
+                        VerticalAlignment="Center">
+                    <TextBlock x:Name="CountText"
+                               Text="0 messages"
+                               Foreground="{StaticResource AccentBrush}"
+                               FontSize="12"
+                               FontWeight="Medium"/>
+                </Border>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

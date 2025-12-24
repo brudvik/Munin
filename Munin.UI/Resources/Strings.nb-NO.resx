@@ -236,6 +236,9 @@ Er du helt sikker?</value>
   <data name="MainWindow_Search" xml:space="preserve">
     <value>Søk...</value>
   </data>
+  <data name="MainWindow_SearchMessages" xml:space="preserve">
+    <value>Søk i meldinger (Ctrl+F)</value>
+  </data>
   <data name="MainWindow_LeaveChannel" xml:space="preserve">
     <value>Forlat kanal</value>
   </data>
@@ -387,6 +390,15 @@ Er du helt sikker?</value>
   <data name="MainWindow_Connecting" xml:space="preserve">
     <value>Kobler til...</value>
   </data>
+  <data name="MainWindow_Minimize" xml:space="preserve">
+    <value>Minimer</value>
+  </data>
+  <data name="MainWindow_Maximize" xml:space="preserve">
+    <value>Maksimer</value>
+  </data>
+  <data name="MainWindow_Close" xml:space="preserve">
+    <value>Lukk</value>
+  </data>
   <data name="MainWindow_EditServer" xml:space="preserve">
     <value>Rediger server</value>
   </data>
@@ -398,6 +410,12 @@ Er du helt sikker?</value>
   </data>
   <data name="MainWindow_Send" xml:space="preserve">
     <value>Send</value>
+  </data>
+  <data name="MainWindow_InsertEmoji" xml:space="preserve">
+    <value>Sett inn tekstbasert smiley</value>
+  </data>
+  <data name="MainWindow_TextEmojis" xml:space="preserve">
+    <value>Tekstbaserte smileys</value>
   </data>
   <data name="MainWindow_DoubleClickPM" xml:space="preserve">
     <value>Dobbeltklikk for å sende privat melding</value>
@@ -413,6 +431,9 @@ Er du helt sikker?</value>
   </data>
   <data name="MainWindow_UnignoreUser" xml:space="preserve">
     <value>Slutt å ignorere bruker</value>
+  </data>
+  <data name="MainWindow_ChannelStats" xml:space="preserve">
+    <value>Meldinger · Brukere · Tid i kanal</value>
   </data>
   
   <!-- Add Server Dialog Additional -->
@@ -706,6 +727,41 @@ Perfekt for USB-minnepinne.</value>
   </data>
   <data name="Common_Loading" xml:space="preserve">
     <value>Laster...</value>
+  </data>
+  
+  <!-- Welcome/Empty States -->
+  <data name="Welcome_Title" xml:space="preserve">
+    <value>Velkommen til Munin</value>
+  </data>
+  <data name="Welcome_Subtitle" xml:space="preserve">
+    <value>Din moderne IRC-opplevelse starter her</value>
+  </data>
+  <data name="Welcome_AddServerHint" xml:space="preserve">
+    <value>Klikk "Legg til server" for å koble til dine favoritt IRC-nettverk</value>
+  </data>
+  <data name="Welcome_Feature1" xml:space="preserve">
+    <value>🔒 Sikre tilkoblinger med SSL/TLS</value>
+  </data>
+  <data name="Welcome_Feature2" xml:space="preserve">
+    <value>🔐 SASL-autentiseringsstøtte</value>
+  </data>
+  <data name="Welcome_Feature3" xml:space="preserve">
+    <value>💾 Kryptert lokal lagring</value>
+  </data>
+  <data name="Welcome_Feature4" xml:space="preserve">
+    <value>🌍 Flerspråklig støtte</value>
+  </data>
+  <data name="NoMessages_Title" xml:space="preserve">
+    <value>Ingen meldinger ennå</value>
+  </data>
+  <data name="NoMessages_Hint" xml:space="preserve">
+    <value>Start samtalen eller vent på at andre blir med</value>
+  </data>
+  <data name="NoChannel_Title" xml:space="preserve">
+    <value>Velg en kanal</value>
+  </data>
+  <data name="NoChannel_Hint" xml:space="preserve">
+    <value>Velg en kanal eller privat samtale fra sidepanelet</value>
   </data>
   
 </root>

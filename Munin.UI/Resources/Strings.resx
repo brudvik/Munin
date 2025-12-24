@@ -236,6 +236,9 @@ Are you absolutely sure?</value>
   <data name="MainWindow_Search" xml:space="preserve">
     <value>Search...</value>
   </data>
+  <data name="MainWindow_SearchMessages" xml:space="preserve">
+    <value>Search messages (Ctrl+F)</value>
+  </data>
   <data name="MainWindow_LeaveChannel" xml:space="preserve">
     <value>Leave channel</value>
   </data>
@@ -387,6 +390,15 @@ Are you absolutely sure?</value>
   <data name="MainWindow_Connecting" xml:space="preserve">
     <value>Connecting...</value>
   </data>
+  <data name="MainWindow_Minimize" xml:space="preserve">
+    <value>Minimize</value>
+  </data>
+  <data name="MainWindow_Maximize" xml:space="preserve">
+    <value>Maximize</value>
+  </data>
+  <data name="MainWindow_Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
   <data name="MainWindow_EditServer" xml:space="preserve">
     <value>Edit server</value>
   </data>
@@ -398,6 +410,12 @@ Are you absolutely sure?</value>
   </data>
   <data name="MainWindow_Send" xml:space="preserve">
     <value>Send</value>
+  </data>
+  <data name="MainWindow_InsertEmoji" xml:space="preserve">
+    <value>Insert text emoticon</value>
+  </data>
+  <data name="MainWindow_TextEmojis" xml:space="preserve">
+    <value>Text Emoticons</value>
   </data>
   <data name="MainWindow_DoubleClickPM" xml:space="preserve">
     <value>Double-click to send private message</value>
@@ -413,6 +431,9 @@ Are you absolutely sure?</value>
   </data>
   <data name="MainWindow_UnignoreUser" xml:space="preserve">
     <value>Unignore User</value>
+  </data>
+  <data name="MainWindow_ChannelStats" xml:space="preserve">
+    <value>Messages · Users · Time in channel</value>
   </data>
   
   <!-- Add Server Dialog Additional -->
@@ -706,6 +727,41 @@ Perfect for USB drives.</value>
   </data>
   <data name="Common_Loading" xml:space="preserve">
     <value>Loading...</value>
+  </data>
+  
+  <!-- Welcome/Empty States -->
+  <data name="Welcome_Title" xml:space="preserve">
+    <value>Welcome to Munin</value>
+  </data>
+  <data name="Welcome_Subtitle" xml:space="preserve">
+    <value>Your modern IRC experience starts here</value>
+  </data>
+  <data name="Welcome_AddServerHint" xml:space="preserve">
+    <value>Click "Add Server" to connect to your favorite IRC networks</value>
+  </data>
+  <data name="Welcome_Feature1" xml:space="preserve">
+    <value>🔒 Secure connections with SSL/TLS</value>
+  </data>
+  <data name="Welcome_Feature2" xml:space="preserve">
+    <value>🔐 SASL authentication support</value>
+  </data>
+  <data name="Welcome_Feature3" xml:space="preserve">
+    <value>💾 Encrypted local storage</value>
+  </data>
+  <data name="Welcome_Feature4" xml:space="preserve">
+    <value>🌍 Multi-language support</value>
+  </data>
+  <data name="NoMessages_Title" xml:space="preserve">
+    <value>No messages yet</value>
+  </data>
+  <data name="NoMessages_Hint" xml:space="preserve">
+    <value>Start the conversation or wait for others to join</value>
+  </data>
+  <data name="NoChannel_Title" xml:space="preserve">
+    <value>Select a channel</value>
+  </data>
+  <data name="NoChannel_Hint" xml:space="preserve">
+    <value>Choose a channel or private message from the sidebar</value>
   </data>
   
 </root>

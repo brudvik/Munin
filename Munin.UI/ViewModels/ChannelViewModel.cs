@@ -38,10 +38,31 @@ public partial class ChannelViewModel : ObservableObject
     private ObservableCollection<MessageViewModel> _messages = new();
 
     /// <summary>
+    /// Returns true if the channel has no messages, used to show empty state.
+    /// </summary>
+    public bool HasNoMessages => Messages.Count == 0;
+
+    /// <summary>
     /// Collection of users in the channel.
     /// </summary>
     [ObservableProperty]
     private ObservableCollection<UserViewModel> _users = new();
+
+    /// <summary>
+    /// Gets a grouped view of users by their mode (Operators, Voiced, Users).
+    /// </summary>
+    public System.ComponentModel.ICollectionView GroupedUsers
+    {
+        get
+        {
+            var view = System.Windows.Data.CollectionViewSource.GetDefaultView(Users);
+            if (view.GroupDescriptions.Count == 0)
+            {
+                view.GroupDescriptions.Add(new System.Windows.Data.PropertyGroupDescription("GroupName"));
+            }
+            return view;
+        }
+    }
 
     /// <summary>
     /// Number of unread messages.
@@ -95,6 +116,42 @@ public partial class ChannelViewModel : ObservableObject
     /// </summary>
     public DateTime JoinedAt { get; } = DateTime.Now;
 
+    /// <summary>
+    /// Duration since joining the channel.
+    /// </summary>
+    public TimeSpan Duration => DateTime.Now - JoinedAt;
+
+    /// <summary>
+    /// Formatted duration string (e.g., "2h 30m").
+    /// </summary>
+    public string FormattedDuration
+    {
+        get
+        {
+            var d = Duration;
+            if (d.TotalDays >= 1)
+                return $"{(int)d.TotalDays}d {d.Hours}h";
+            if (d.TotalHours >= 1)
+                return $"{(int)d.TotalHours}h {d.Minutes}m";
+            return $"{(int)d.TotalMinutes}m";
+        }
+    }
+
+    /// <summary>
+    /// Messages per minute rate.
+    /// </summary>
+    public double MessagesPerMinute => Duration.TotalMinutes > 0 ? TotalMessageCount / Duration.TotalMinutes : 0;
+
+    /// <summary>
+    /// Formatted messages per minute.
+    /// </summary>
+    public string FormattedMessagesPerMinute => MessagesPerMinute.ToString("F1");
+
+    /// <summary>
+    /// Number of unique users who have sent messages.
+    /// </summary>
+    public int UniqueMessageUsers => _userMessageCounts.Count;
+
     public string DisplayName => IsPrivateMessage ? PrivateMessageTarget : Channel.Name;
     
     public string DisplayNameWithBadge => UnreadCount > 0 
@@ -108,6 +165,9 @@ public partial class ChannelViewModel : ObservableObject
         _channel = channel;
         _serverViewModel = serverViewModel;
         RefreshUsers();
+        
+        // Subscribe to collection changes to update HasNoMessages
+        Messages.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasNoMessages));
     }
 
     public void RefreshUsers()
@@ -130,6 +190,7 @@ public partial class ChannelViewModel : ObservableObject
     {
         var message = IrcMessage.CreateSystem(text);
         Messages.Add(new MessageViewModel(message));
+        OnPropertyChanged(nameof(HasNoMessages));
     }
     
     /// <summary>
@@ -141,8 +202,18 @@ public partial class ChannelViewModel : ObservableObject
         
         if (!string.IsNullOrEmpty(nickname))
         {
+            var wasNew = !_userMessageCounts.ContainsKey(nickname);
             _userMessageCounts.AddOrUpdate(nickname, 1, (_, count) => count + 1);
+            
+            if (wasNew)
+            {
+                OnPropertyChanged(nameof(UniqueMessageUsers));
+            }
         }
+        
+        // Update stats display
+        OnPropertyChanged(nameof(MessagesPerMinute));
+        OnPropertyChanged(nameof(FormattedMessagesPerMinute));
     }
     
     /// <summary>
