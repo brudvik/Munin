@@ -1,0 +1,239 @@
+<Window x:Class="Munin.UI.Views.TriggerBuilderDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:Munin.UI.Localization"
+        Title="{loc:Localize Key=TriggerBuilder_Title}"
+        Height="550" Width="580"
+        MinHeight="400" MinWidth="450"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        ResizeMode="CanResizeWithGrip"
+        Background="Transparent"
+        WindowStartupLocation="CenterOwner">
+    
+    <Border Background="{StaticResource BackgroundDarkBrush}"
+            CornerRadius="8"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <!-- Custom Title Bar -->
+            <Border Grid.Row="0" 
+                    Background="{StaticResource BackgroundMediumBrush}"
+                    CornerRadius="8,8,0,0"
+                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid Height="36">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="12,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="⚡" FontSize="14" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBlock Text="{loc:Localize Key=TriggerBuilder_Title}" 
+                                   FontSize="13" 
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <Button Grid.Column="2"
+                            Click="CloseButton_Click"
+                            Style="{StaticResource WindowCloseButtonStyle}">
+                        <Path Data="M0,0 L10,10 M10,0 L0,10" 
+                              Stroke="{StaticResource TextSecondaryBrush}" 
+                              StrokeThickness="1"
+                              Width="10" Height="10"/>
+                    </Button>
+                </Grid>
+            </Border>
+            
+            <!-- Content -->
+            <Grid Grid.Row="1" Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <!-- Header -->
+                <StackPanel Grid.Row="0" Margin="0,0,0,15">
+                    <TextBlock Text="{loc:Localize Key=TriggerBuilder_Description}"
+                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                </StackPanel>
+                
+                <!-- Form -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <!-- Event Type -->
+                        <TextBlock Text="{loc:Localize Key=TriggerBuilder_WhenEvent}"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   FontWeight="SemiBold" Margin="0,0,0,5"/>
+                        <ComboBox x:Name="EventTypeCombo"
+                                  Padding="10,8"
+                                  Margin="0,0,0,15"
+                                  SelectionChanged="EventTypeCombo_SelectionChanged">
+                            <ComboBoxItem Content="Message received" Tag="message"/>
+                            <ComboBoxItem Content="User joins channel" Tag="join"/>
+                            <ComboBoxItem Content="User leaves channel" Tag="part"/>
+                            <ComboBoxItem Content="User quits" Tag="quit"/>
+                            <ComboBoxItem Content="Nick mention (highlight)" Tag="highlight"/>
+                            <ComboBoxItem Content="Topic changed" Tag="topic"/>
+                            <ComboBoxItem Content="User kicked" Tag="kick"/>
+                            <ComboBoxItem Content="Mode changed" Tag="mode"/>
+                            <ComboBoxItem Content="Invited to channel" Tag="invite"/>
+                            <ComboBoxItem Content="CTCP received" Tag="ctcp"/>
+                        </ComboBox>
+                        
+                <!-- Match Pattern (optional) -->
+                <TextBlock Text="{loc:Localize Key=TriggerBuilder_MatchPattern}"
+                           Foreground="{DynamicResource ForegroundBrush}"
+                           FontWeight="SemiBold" Margin="0,0,0,5"/>
+                <TextBox x:Name="MatchPatternBox"
+                         Padding="10,8"
+                         Margin="0,0,0,5"
+                         Background="{DynamicResource InputBackgroundBrush}"
+                         Foreground="{DynamicResource ForegroundBrush}"/>
+                <TextBlock Text="{loc:Localize Key=TriggerBuilder_MatchPatternHint}"
+                           FontSize="11"
+                           Foreground="{DynamicResource PlaceholderForegroundBrush}"
+                           Margin="0,0,0,15"/>
+                
+                <!-- Match Type -->
+                <TextBlock Text="{loc:Localize Key=TriggerBuilder_MatchType}"
+                           Foreground="{DynamicResource ForegroundBrush}"
+                           FontWeight="SemiBold" Margin="0,0,0,5"/>
+                <ComboBox x:Name="MatchTypeCombo"
+                          Padding="10,8"
+                          Margin="0,0,0,15">
+                    <ComboBoxItem Content="Contains (case-insensitive)" Tag="contains" IsSelected="True"/>
+                    <ComboBoxItem Content="Exact match" Tag="exact"/>
+                    <ComboBoxItem Content="Starts with" Tag="startsWith"/>
+                    <ComboBoxItem Content="Ends with" Tag="endsWith"/>
+                    <ComboBoxItem Content="Regular expression" Tag="regex"/>
+                    <ComboBoxItem Content="Wildcard (*?)" Tag="wildcard"/>
+                </ComboBox>
+                
+                <!-- Channel Filter -->
+                <TextBlock Text="{loc:Localize Key=TriggerBuilder_ChannelFilter}"
+                           Foreground="{DynamicResource ForegroundBrush}"
+                           FontWeight="SemiBold" Margin="0,0,0,5"/>
+                <TextBox x:Name="ChannelFilterBox"
+                         Padding="10,8"
+                         Margin="0,0,0,5"
+                         Background="{DynamicResource InputBackgroundBrush}"
+                         Foreground="{DynamicResource ForegroundBrush}"/>
+                <TextBlock Text="{loc:Localize Key=TriggerBuilder_ChannelFilterHint}"
+                           FontSize="11"
+                           Foreground="{DynamicResource PlaceholderForegroundBrush}"
+                           Margin="0,0,0,15"/>
+                
+                <!-- Action -->
+                <TextBlock Text="{loc:Localize Key=TriggerBuilder_ThenAction}"
+                           Foreground="{DynamicResource ForegroundBrush}"
+                           FontWeight="SemiBold" Margin="0,0,0,5"/>
+                <ComboBox x:Name="ActionTypeCombo"
+                          Padding="10,8"
+                          Margin="0,0,0,15"
+                          SelectionChanged="ActionTypeCombo_SelectionChanged">
+                    <ComboBoxItem Content="Reply in channel" Tag="reply"/>
+                    <ComboBoxItem Content="Send message to channel" Tag="send"/>
+                    <ComboBoxItem Content="Send private message" Tag="msg"/>
+                    <ComboBoxItem Content="Run command" Tag="command"/>
+                    <ComboBoxItem Content="Show notification" Tag="notify"/>
+                    <ComboBoxItem Content="Play sound" Tag="sound"/>
+                    <ComboBoxItem Content="Highlight message" Tag="highlight"/>
+                    <ComboBoxItem Content="Log to file" Tag="log"/>
+                </ComboBox>
+                
+                <!-- Action Message -->
+                <StackPanel x:Name="MessagePanel">
+                    <TextBlock Text="{loc:Localize Key=TriggerBuilder_Message}"
+                               Foreground="{DynamicResource ForegroundBrush}"
+                               FontWeight="SemiBold" Margin="0,0,0,5"/>
+                    <TextBox x:Name="MessageTextBox"
+                             Padding="10,8"
+                             Margin="0,0,0,5"
+                             AcceptsReturn="True"
+                             Height="60"
+                             TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Auto"
+                             Background="{DynamicResource InputBackgroundBrush}"
+                             Foreground="{DynamicResource ForegroundBrush}"/>
+                    <TextBlock Text="{loc:Localize Key=TriggerBuilder_MessageHint}"
+                               FontSize="11"
+                               Foreground="{DynamicResource PlaceholderForegroundBrush}"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,15"/>
+                </StackPanel>
+                
+                <!-- Target Channel (for send action) -->
+                <StackPanel x:Name="TargetChannelPanel" Visibility="Collapsed">
+                    <TextBlock Text="{loc:Localize Key=TriggerBuilder_TargetChannel}"
+                               Foreground="{DynamicResource ForegroundBrush}"
+                               FontWeight="SemiBold" Margin="0,0,0,5"/>
+                    <TextBox x:Name="TargetChannelBox"
+                             Padding="10,8"
+                             Margin="0,0,0,15"
+                             Background="{DynamicResource InputBackgroundBrush}"
+                             Foreground="{DynamicResource ForegroundBrush}"/>
+                </StackPanel>
+                
+                <!-- Command (for command action) -->
+                <StackPanel x:Name="CommandPanel" Visibility="Collapsed">
+                    <TextBlock Text="{loc:Localize Key=TriggerBuilder_Command}"
+                               Foreground="{DynamicResource ForegroundBrush}"
+                               FontWeight="SemiBold" Margin="0,0,0,5"/>
+                    <TextBox x:Name="CommandBox"
+                             Padding="10,8"
+                             Margin="0,0,0,5"
+                             Background="{DynamicResource InputBackgroundBrush}"
+                             Foreground="{DynamicResource ForegroundBrush}"/>
+                    <TextBlock Text="{loc:Localize Key=TriggerBuilder_CommandHint}"
+                               FontSize="11"
+                               Foreground="{DynamicResource PlaceholderForegroundBrush}"
+                               Margin="0,0,0,15"/>
+                </StackPanel>
+                
+                <!-- Sound (for sound action) -->
+                <StackPanel x:Name="SoundPanel" Visibility="Collapsed">
+                    <TextBlock Text="{loc:Localize Key=TriggerBuilder_Sound}"
+                               Foreground="{DynamicResource ForegroundBrush}"
+                               FontWeight="SemiBold" Margin="0,0,0,5"/>
+                    <ComboBox x:Name="SoundCombo"
+                              Padding="10,8"
+                              Margin="0,0,0,15">
+                        <ComboBoxItem Content="Default notification" Tag="default"/>
+                        <ComboBoxItem Content="Ping" Tag="ping"/>
+                        <ComboBoxItem Content="Mention" Tag="mention"/>
+                        <ComboBoxItem Content="Custom..." Tag="custom"/>
+                    </ComboBox>
+                </StackPanel>
+            </StackPanel>
+                    </ScrollViewer>
+                    
+                    <!-- Buttons -->
+                    <StackPanel Grid.Row="2" 
+                                Orientation="Horizontal" 
+                                HorizontalAlignment="Right"
+                                Margin="0,15,0,0">
+                        <Button x:Name="CreateButton"
+                                Content="{loc:Localize Key=TriggerBuilder_Create}"
+                                Padding="20,8"
+                                Margin="0,0,8,0"
+                                Click="CreateButton_Click"
+                                Style="{StaticResource AccentButtonStyle}"/>
+                        <Button x:Name="CancelButton"
+                                Content="{loc:Localize Key=Cancel}"
+                                Padding="20,8"
+                                Click="CancelButton_Click"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Border>
+</Window>

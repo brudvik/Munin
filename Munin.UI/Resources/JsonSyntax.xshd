@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- JSON Syntax Highlighting for AvalonEdit -->
+<SyntaxDefinition name="JSON" extensions=".json" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+    
+    <!-- Colors -->
+    <Color name="String" foreground="#CE9178"/>
+    <Color name="PropertyName" foreground="#9CDCFE"/>
+    <Color name="Number" foreground="#B5CEA8"/>
+    <Color name="Boolean" foreground="#569CD6"/>
+    <Color name="Null" foreground="#569CD6" fontStyle="italic"/>
+    <Color name="Punctuation" foreground="#D4D4D4"/>
+    
+    <RuleSet ignoreCase="false">
+        
+        <!-- Property names (keys) -->
+        <Span color="PropertyName">
+            <Begin>"</Begin>
+            <End>"(?=\s*:)</End>
+            <RuleSet>
+                <Span begin="\\" end="."/>
+            </RuleSet>
+        </Span>
+        
+        <!-- String values -->
+        <Span color="String">
+            <Begin>"</Begin>
+            <End>"</End>
+            <RuleSet>
+                <Span begin="\\" end="."/>
+            </RuleSet>
+        </Span>
+        
+        <!-- Boolean -->
+        <Keywords color="Boolean">
+            <Word>true</Word>
+            <Word>false</Word>
+        </Keywords>
+        
+        <!-- Null -->
+        <Keywords color="Null">
+            <Word>null</Word>
+        </Keywords>
+        
+        <!-- Numbers -->
+        <Rule color="Number">
+            \b-?\d+\.?\d*([eE][+-]?\d+)?\b
+        </Rule>
+        
+        <!-- Punctuation -->
+        <Rule color="Punctuation">
+            [\[\]{}:,]
+        </Rule>
+        
+    </RuleSet>
+</SyntaxDefinition>

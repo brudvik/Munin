@@ -15,6 +15,11 @@ namespace Munin.UI.Converters;
 /// </summary>
 public class MessageToInlinesConverter : IValueConverter
 {
+    /// <summary>
+    /// Monospace font family for IRC messages.
+    /// </summary>
+    private static readonly FontFamily MonospaceFont = new("Cascadia Mono, Consolas, Courier New");
+    
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is not MessageViewModel message)
@@ -23,7 +28,8 @@ public class MessageToInlinesConverter : IValueConverter
         var textBlock = new TextBlock
         {
             TextWrapping = TextWrapping.Wrap,
-            Foreground = message.MessageColor
+            Foreground = message.MessageColor,
+            FontFamily = MonospaceFont
         };
 
         try

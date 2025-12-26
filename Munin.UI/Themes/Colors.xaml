@@ -54,6 +54,9 @@
     <Color x:Key="MentionBackgroundColor">#2D2A1A</Color>
     <Color x:Key="MentionBorderColor">#6E5F00</Color>
     
+    <!-- Zebra Stripe Color (very subtle) -->
+    <Color x:Key="ZebraStripeColor">#0A0E14</Color>
+    
     <!-- ═══════════════════════════════════════════════════════════════════════════════
          Solid Color Brushes
          ═══════════════════════════════════════════════════════════════════════════════ -->
@@ -101,6 +104,9 @@
     
     <SolidColorBrush x:Key="MentionBackgroundBrush" Color="{StaticResource MentionBackgroundColor}"/>
     <SolidColorBrush x:Key="MentionBorderBrush" Color="{StaticResource MentionBorderColor}"/>
+    
+    <!-- Zebra stripe brush for alternating row backgrounds -->
+    <SolidColorBrush x:Key="ZebraStripeBrush" Color="{StaticResource ZebraStripeColor}"/>
 
     <!-- ═══════════════════════════════════════════════════════════════════════════════
          Gradient Brushes for Elevated Surfaces
@@ -195,5 +201,20 @@
                       Direction="0" 
                       Color="{StaticResource AccentGlowColor}" 
                       Opacity="0.4"/>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════════
+         Brush Aliases for consistency
+         ═══════════════════════════════════════════════════════════════════════════════ -->
+    
+    <!-- Window and Container Backgrounds -->
+    <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{StaticResource BackgroundDarkColor}"/>
+    <SolidColorBrush x:Key="HeaderBackgroundBrush" Color="{StaticResource BackgroundMediumColor}"/>
+    <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="{StaticResource BackgroundMediumColor}"/>
+    <SolidColorBrush x:Key="EditorBackgroundBrush" Color="{StaticResource BackgroundDarkColor}"/>
+    
+    <!-- Text Aliases -->
+    <SolidColorBrush x:Key="ForegroundBrush" Color="{StaticResource TextPrimaryColor}"/>
+    <SolidColorBrush x:Key="SecondaryForegroundBrush" Color="{StaticResource TextSecondaryColor}"/>
+    <SolidColorBrush x:Key="PlaceholderForegroundBrush" Color="{StaticResource TextMutedColor}"/>
 
 </ResourceDictionary>

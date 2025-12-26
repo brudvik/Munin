@@ -44,6 +44,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Collapsible user list panel with toggle button in header
 - User list auto-hides for server console and private messages
 - Localization strings for new UI elements (MainWindow_SelectServer, MainWindow_ToggleUserList)
+- **Hybrid Scripting System**: Full automation and integration capabilities
+  - **Lua Scripting** (MoonSharp): Primary scripting with sandboxed execution
+  - **JSON Triggers**: Simple automation without coding for common tasks
+  - **C# Plugins**: Advanced users can create compiled DLL plugins
+
+### Changed
+- **Chromeless window style**: All dialog windows now use custom windowless title bar matching MainWindow
+  - Updated: AddServerDialog, EditServerDialog, SettingsWindow, ChannelListWindow, ChannelStatsWindow
+  - Updated: WhoisWindow, RawIrcLogWindow, SecurityLogWindow, UserProfileWindow
+  - Updated: ChangePasswordDialog, EncryptionSetupDialog, UnlockDialog, TriggerBuilderDialog
+  - Updated: ScriptConsoleWindow, ScriptManagerWindow, InputDialog
+- **Enhanced Chat Window UX**:
+  - Smart auto-scroll: Pauses when user scrolls up, resumes when scrolling to bottom
+  - "Jump to Latest" button with unread message count when scrolled up
+  - Message grouping: Consecutive messages from same user show compact headers (just timestamp)
+  - Alternating row backgrounds (zebra striping) for better message tracking
+  - Right-click context menu on messages: Copy message, Copy nickname, Whois, Open query, Ignore user
+  - Double-click to copy message text to clipboard
+  - Keyboard shortcuts: Ctrl+End to jump to latest, Page Up/Down for scrolling, Ctrl+F for search
+  - Search highlighting: Matching messages are visually highlighted in the message list
+  - Complete IRC API: send messages, join/part channels, kick/ban, mode changes
+  - Event system: message, join, part, quit, nick, topic, mode, connect, disconnect, CTCP, invite
+  - Timer API: setTimeout, setInterval for scheduled tasks
+  - Storage API: persistent key-value storage for scripts
+  - Custom command registration for plugins
+- **Command Autocomplete**: Popup with all available IRC commands when typing "/" in chat input
+  - Shows command name, usage syntax, and description
+  - Keyboard navigation with Up/Down arrows, Tab/Enter to select, Escape to close
+  - Helps users discover available commands without memorizing them
+- **Script Manager Window**: Comprehensive GUI for managing scripts and automation
+  - **Editor Tab**: Built-in code editor with file tree, save/run buttons, output panel
+  - **Scripts Tab**: List all loaded scripts with enable/disable toggles and reload buttons
+  - **Triggers Tab**: Visual trigger builder - create automation without writing code
+  - **Quick Actions Tab**: One-click templates for common automation:
+    - Auto-Away, Highlight Logger, URL Logger, Auto-Rejoin
+    - Greet Bot, Anti-Spam, Nick Highlighter, Auto-Op Friends
+- **Extended /script Command**: Full scripting control from command line
+  - `/script` or `/scripts` - Open Script Manager window
+  - `/script list` - List all loaded scripts in channel
+  - `/script enable <name>` - Enable/load a script
+  - `/script disable <name>` - Disable/unload a script
+  - `/script reload [name]` - Reload one or all scripts
+  - `/script console` - Open the script console for REPL
+- Example scripts in `scripts/examples/` folder
 
 ### Changed
 - **Major UI refresh**: Professional polished dark theme with modern styling

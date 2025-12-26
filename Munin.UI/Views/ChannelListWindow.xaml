@@ -6,88 +6,129 @@
         Height="550"
         Width="750"
         WindowStartupLocation="CenterOwner"
-        Background="{StaticResource BackgroundDarkBrush}"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
         Foreground="{StaticResource TextPrimaryBrush}"
         FontFamily="{StaticResource UIFont}"
         FontSize="13">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <Border Background="{StaticResource BackgroundDarkBrush}"
+            CornerRadius="8"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <!-- Header -->
-        <Border Grid.Row="0" 
-                Background="{StaticResource BackgroundMediumBrush}"
-                BorderBrush="{StaticResource BorderSubtleBrush}"
-                BorderThickness="0,0,0,1"
-                Padding="20,16">
-            <StackPanel Orientation="Horizontal">
-                <Border Width="36" Height="36" 
-                        CornerRadius="8"
-                        Background="{StaticResource AccentSubtleBrush}"
-                        Margin="0,0,14,0">
-                    <TextBlock Text="📋" FontSize="18" 
-                               HorizontalAlignment="Center" 
-                               VerticalAlignment="Center"/>
-                </Border>
-                <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="{loc:Localize Key=ChannelList_Title}" 
-                               FontSize="16" 
-                               FontWeight="SemiBold"/>
-                    <TextBlock x:Name="StatusText"
-                               Text="{loc:Localize Key=ChannelList_Loading}" 
-                               Foreground="{StaticResource TextMutedBrush}"
-                               FontSize="12"
-                               Margin="0,2,0,0"/>
-                </StackPanel>
-            </StackPanel>
-        </Border>
-
-        <!-- Search -->
-        <Grid Grid.Row="1" Margin="20,16,20,12">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            
-            <TextBox Grid.Column="0" 
-                     x:Name="SearchTextBox"
-                     Padding="10,8"
-                     TextChanged="SearchTextBox_TextChanged"/>
-            <TextBlock Grid.Column="0" 
-                       Text="{loc:Localize Key=MainWindow_Search}" 
-                       Foreground="{StaticResource TextMutedBrush}"
-                       Margin="14,0,0,0"
-                       VerticalAlignment="Center"
-                       IsHitTestVisible="False"
-                       Visibility="{Binding Text.Length, ElementName=SearchTextBox, Converter={StaticResource IntToVisibilityConverter}, ConverterParameter=Invert}"/>
-            
-            <!-- Count Badge -->
-            <Border Grid.Column="1" 
-                    Background="{StaticResource AccentSubtleBrush}"
-                    CornerRadius="10"
-                    Padding="10,4"
-                    Margin="12,0,0,0"
-                    VerticalAlignment="Center">
-                <TextBlock x:Name="CountText"
-                           Text="0 channels"
-                           Foreground="{StaticResource AccentBrush}"
-                           FontSize="12"
-                           FontWeight="Medium"/>
+            <!-- Custom Title Bar -->
+            <Border Grid.Row="0" 
+                    Background="{StaticResource BackgroundMediumBrush}"
+                    CornerRadius="8,8,0,0"
+                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid Height="38">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="12,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="📋" FontSize="14" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBlock Text="{loc:Localize Key=ChannelList_Title}" 
+                                   FontSize="13" 
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <Button Grid.Column="1" 
+                            Click="CloseButton_Click"
+                            Style="{StaticResource WindowCloseButtonStyle}"
+                            ToolTip="{loc:Localize Key=MainWindow_Close}">
+                        <Path Data="M0,0 L10,10 M10,0 L0,10" 
+                              Stroke="{StaticResource TextSecondaryBrush}" 
+                              StrokeThickness="1"
+                              Width="10" Height="10"
+                              VerticalAlignment="Center"
+                              HorizontalAlignment="Center"/>
+                    </Button>
+                </Grid>
             </Border>
-        </Grid>
 
-        <!-- Channel List -->
-        <Border Grid.Row="2" 
-                Background="{StaticResource BackgroundMediumBrush}"
-                BorderBrush="{StaticResource BorderSubtleBrush}"
-                BorderThickness="1"
-                CornerRadius="6"
-                Margin="20,0,20,0">
+            <!-- Header -->
+            <Border Grid.Row="1" 
+                    Background="{StaticResource BackgroundMediumBrush}"
+                    BorderBrush="{StaticResource BorderSubtleBrush}"
+                    BorderThickness="0,0,0,1"
+                    Padding="20,16">
+                <StackPanel Orientation="Horizontal">
+                    <Border Width="36" Height="36" 
+                            CornerRadius="8"
+                            Background="{StaticResource AccentSubtleBrush}"
+                            Margin="0,0,14,0">
+                        <TextBlock Text="📋" FontSize="18" 
+                                   HorizontalAlignment="Center" 
+                                   VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="{loc:Localize Key=ChannelList_Title}" 
+                                   FontSize="16" 
+                                   FontWeight="SemiBold"/>
+                        <TextBlock x:Name="StatusText"
+                                   Text="{loc:Localize Key=ChannelList_Loading}" 
+                                   Foreground="{StaticResource TextMutedBrush}"
+                                   FontSize="12"
+                                   Margin="0,2,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Search -->
+            <Grid Grid.Row="2" Margin="20,16,20,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <TextBox Grid.Column="0" 
+                         x:Name="SearchTextBox"
+                         Padding="10,8"
+                         TextChanged="SearchTextBox_TextChanged"/>
+                <TextBlock Grid.Column="0" 
+                           Text="{loc:Localize Key=MainWindow_Search}" 
+                           Foreground="{StaticResource TextMutedBrush}"
+                           Margin="14,0,0,0"
+                           VerticalAlignment="Center"
+                           IsHitTestVisible="False"
+                           Visibility="{Binding Text.Length, ElementName=SearchTextBox, Converter={StaticResource IntToVisibilityConverter}, ConverterParameter=Invert}"/>
+                
+                <!-- Count Badge -->
+                <Border Grid.Column="1" 
+                        Background="{StaticResource AccentSubtleBrush}"
+                        CornerRadius="10"
+                        Padding="10,4"
+                        Margin="12,0,0,0"
+                        VerticalAlignment="Center">
+                    <TextBlock x:Name="CountText"
+                               Text="0 channels"
+                               Foreground="{StaticResource AccentBrush}"
+                               FontSize="12"
+                               FontWeight="Medium"/>
+                </Border>
+            </Grid>
+
+            <!-- Channel List -->
+            <Border Grid.Row="3" 
+                    Background="{StaticResource BackgroundMediumBrush}"
+                    BorderBrush="{StaticResource BorderSubtleBrush}"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Margin="20,0,20,0">
             <ListView x:Name="ChannelListView"
                       Background="Transparent"
                       BorderThickness="0"
@@ -100,27 +141,28 @@
                         <GridViewColumn Header="{loc:Localize Key=ChannelList_Topic}" Width="420" DisplayMemberBinding="{Binding Topic}"/>
                     </GridView>
                 </ListView.View>
-            </ListView>
-        </Border>
+                </ListView>
+            </Border>
 
-        <!-- Buttons -->
-        <Border Grid.Row="3"
-                BorderBrush="{StaticResource BorderSubtleBrush}"
-                BorderThickness="0,1,0,0"
-                Margin="0,16,0,0"
-                Padding="20,16">
-            <StackPanel Orientation="Horizontal" 
-                        HorizontalAlignment="Right">
-                <Button Content="{loc:Localize Key=ChannelList_Refresh}" 
-                        Click="RefreshButton_Click"
-                        Padding="20,10"
-                        Margin="0,0,12,0"/>
-                <Button Content="{loc:Localize Key=ChannelList_Join}" 
-                        Click="JoinButton_Click"
-                        Style="{StaticResource AccentButtonStyle}"
-                        Padding="20,10"
-                        IsEnabled="{Binding SelectedItem, ElementName=ChannelListView, Converter={StaticResource NullToBoolConverter}}"/>
-            </StackPanel>
-        </Border>
-    </Grid>
+            <!-- Buttons -->
+            <Border Grid.Row="4"
+                    BorderBrush="{StaticResource BorderSubtleBrush}"
+                    BorderThickness="0,1,0,0"
+                    Margin="0,16,0,0"
+                    Padding="20,16">
+                <StackPanel Orientation="Horizontal" 
+                            HorizontalAlignment="Right">
+                    <Button Content="{loc:Localize Key=ChannelList_Refresh}" 
+                            Click="RefreshButton_Click"
+                            Padding="20,10"
+                            Margin="0,0,12,0"/>
+                    <Button Content="{loc:Localize Key=ChannelList_Join}" 
+                            Click="JoinButton_Click"
+                            Style="{StaticResource AccentButtonStyle}"
+                            Padding="20,10"
+                            IsEnabled="{Binding SelectedItem, ElementName=ChannelListView, Converter={StaticResource NullToBoolConverter}}"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
 </Window>

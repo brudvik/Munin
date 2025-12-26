@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Windows;
+using System.Windows.Input;
 
 namespace Munin.UI.Views;
 
@@ -58,6 +59,25 @@ public partial class RawIrcLogWindow : Window
                 Message = message.TrimEnd('\r', '\n')
             });
         });
+    }
+
+    /// <summary>
+    /// Handles mouse drag on the custom title bar to move the window.
+    /// </summary>
+    private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ClickCount == 2)
+            return; // No maximize for dialogs
+        
+        DragMove();
+    }
+
+    /// <summary>
+    /// Handles the close button click.
+    /// </summary>
+    private void CloseButton_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
     }
 
     private void ClearButton_Click(object sender, RoutedEventArgs e)

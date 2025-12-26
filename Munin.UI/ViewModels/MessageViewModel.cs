@@ -64,6 +64,18 @@ public partial class MessageViewModel : ObservableObject
     private bool _isSearchMatch;
     
     /// <summary>
+    /// True if this message should show a compact header (grouped with previous message from same sender).
+    /// </summary>
+    [ObservableProperty]
+    private bool _isGrouped;
+    
+    /// <summary>
+    /// The row index for zebra striping (0 = even, 1 = odd).
+    /// </summary>
+    [ObservableProperty]
+    private int _rowIndex;
+    
+    /// <summary>
     /// True if this message was sent by the current user.
     /// </summary>
     public bool IsOwnMessage => !string.IsNullOrEmpty(Source) && 

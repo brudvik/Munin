@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace Munin.UI.Converters;
 
@@ -149,6 +150,49 @@ public class BoolToOpacityConverter : IValueConverter
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         return value is bool b && b ? 1.0 : 0.5;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+/// <summary>
+/// Converts a row index (0 or 1) to a background brush for zebra striping.
+/// Returns transparent for even rows, subtle highlight for odd rows.
+/// </summary>
+public class RowIndexToBackgroundConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is int rowIndex && rowIndex % 2 == 1)
+        {
+            // Odd row - subtle highlight
+            return Application.Current.TryFindResource("ZebraStripeBrush") ?? Brushes.Transparent;
+        }
+        return Brushes.Transparent;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+/// <summary>
+/// Converts a zero length to Visible, non-zero to Collapsed.
+/// Used for showing placeholder text in empty text boxes.
+/// </summary>
+public class ZeroToVisibleConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is int intValue)
+        {
+            return intValue == 0 ? Visibility.Visible : Visibility.Collapsed;
+        }
+        return Visibility.Collapsed;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

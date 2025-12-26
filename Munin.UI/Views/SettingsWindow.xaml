@@ -3,45 +3,86 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:Munin.UI.Localization"
         Title="{loc:Localize Key=Settings_Title}"
-        Height="580"
+        Height="620"
         Width="540"
         WindowStartupLocation="CenterOwner"
+        WindowStyle="None"
+        AllowsTransparency="True"
         ResizeMode="NoResize"
-        Background="{StaticResource BackgroundDarkBrush}"
+        Background="Transparent"
         Foreground="{StaticResource TextPrimaryBrush}"
         FontFamily="{StaticResource UIFont}"
         FontSize="13">
 
-    <Grid Margin="28">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <Border Background="{StaticResource BackgroundDarkBrush}"
+            CornerRadius="8"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <!-- Header -->
-        <StackPanel Grid.Row="0" Margin="0,0,0,28">
-            <StackPanel Orientation="Horizontal">
-                <Border Background="{StaticResource BackgroundHighlightBrush}"
-                        CornerRadius="8"
-                        Padding="10,8"
-                        Margin="0,0,14,0">
-                    <TextBlock Text="⚙" FontSize="20"/>
-                </Border>
-                <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="{loc:Localize Key=Settings_Title}" 
-                               FontSize="22" 
-                               FontWeight="SemiBold"/>
-                    <TextBlock Text="{loc:Localize Key=Settings_Description}" 
-                               Foreground="{StaticResource TextSecondaryBrush}"
-                               FontSize="13"
-                               Margin="0,4,0,0"/>
+            <!-- Custom Title Bar -->
+            <Border Grid.Row="0" 
+                    Background="{StaticResource BackgroundMediumBrush}"
+                    CornerRadius="8,8,0,0"
+                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid Height="38">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="12,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="⚙" FontSize="14" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBlock Text="{loc:Localize Key=Settings_Title}" 
+                                   FontSize="13" 
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <Button Grid.Column="1" 
+                            Click="CloseButton_Click"
+                            Style="{StaticResource WindowCloseButtonStyle}"
+                            ToolTip="{loc:Localize Key=MainWindow_Close}">
+                        <Path Data="M0,0 L10,10 M10,0 L0,10" 
+                              Stroke="{StaticResource TextSecondaryBrush}" 
+                              StrokeThickness="1"
+                              Width="10" Height="10"
+                              VerticalAlignment="Center"
+                              HorizontalAlignment="Center"/>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- Header -->
+            <StackPanel Grid.Row="1" Margin="28,20,28,20">
+                <StackPanel Orientation="Horizontal">
+                    <Border Background="{StaticResource BackgroundHighlightBrush}"
+                            CornerRadius="8"
+                            Padding="10,8"
+                            Margin="0,0,14,0">
+                        <TextBlock Text="⚙" FontSize="20"/>
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="{loc:Localize Key=Settings_Title}" 
+                                   FontSize="22" 
+                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="{loc:Localize Key=Settings_Description}" 
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   FontSize="13"
+                                   Margin="0,4,0,0"/>
+                    </StackPanel>
                 </StackPanel>
             </StackPanel>
-        </StackPanel>
 
-        <!-- Settings -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <!-- Settings -->
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="28,0,28,0">
             <StackPanel>
                 <!-- Notifications Section -->
                 <Border Background="{StaticResource BackgroundMediumBrush}"
@@ -335,27 +376,27 @@
             </StackPanel>
         </ScrollViewer>
 
-        <!-- Buttons -->
-        <Border Grid.Row="2" 
-                BorderBrush="{StaticResource BorderSubtleBrush}"
-                BorderThickness="0,1,0,0"
-                Padding="0,20,0,0"
-                Margin="0,16,0,0">
-            <StackPanel Orientation="Horizontal" 
-                        HorizontalAlignment="Right">
-                <Button Content="{loc:Localize Key=Cancel}" 
-                        Click="CancelButton_Click"
-                        Padding="20,10"
-                        Margin="0,0,12,0"/>
-                <Button Click="SaveButton_Click"
-                        Style="{StaticResource AccentButtonStyle}"
-                        Padding="24,10">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="✓" FontWeight="Bold" Margin="0,0,8,0"/>
-                        <TextBlock Text="{loc:Localize Key=Save}"/>
-                    </StackPanel>
-                </Button>
-            </StackPanel>
-        </Border>
-    </Grid>
+            <!-- Buttons -->
+            <Border Grid.Row="3" 
+                    BorderBrush="{StaticResource BorderSubtleBrush}"
+                    BorderThickness="0,1,0,0"
+                    Padding="28,16">
+                <StackPanel Orientation="Horizontal" 
+                            HorizontalAlignment="Right">
+                    <Button Content="{loc:Localize Key=Cancel}" 
+                            Click="CancelButton_Click"
+                            Padding="20,10"
+                            Margin="0,0,12,0"/>
+                    <Button Click="SaveButton_Click"
+                            Style="{StaticResource AccentButtonStyle}"
+                            Padding="24,10">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="✓" FontWeight="Bold" Margin="0,0,8,0"/>
+                            <TextBlock Text="{loc:Localize Key=Save}"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
 </Window>

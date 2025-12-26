@@ -1,11 +1,16 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Munin.Core.Models;
+using Munin.Core.Scripting;
+using Munin.Core.Scripting.Lua;
+using Munin.Core.Scripting.Plugins;
+using Munin.Core.Scripting.Triggers;
 using Munin.Core.Services;
 using Munin.UI.Services;
 using Munin.UI.Views;
 using Serilog;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Windows.Threading;
 
 namespace Munin.UI.ViewModels;
@@ -30,6 +35,9 @@ public partial class MainViewModel : ObservableObject
     private readonly IrcClientManager _clientManager;
     private readonly ConfigurationService _configService;
     private readonly DispatcherTimer _latencyTimer;
+    private readonly ScriptManager _scriptManager;
+    private ScriptConsoleWindow? _scriptConsoleWindow;
+    private ScriptManagerWindow? _scriptManagerWindow;
 
     [ObservableProperty]
     private ObservableCollection<ServerViewModel> _servers = new();
@@ -249,6 +257,43 @@ public partial class MainViewModel : ObservableObject
             ? new ConfigurationService(storage) 
             : new ConfigurationService();
         
+        // Initialize scripting system
+        var scriptsDir = Path.Combine(
+            PortableMode.IsPortable 
+                ? Path.GetDirectoryName(Environment.ProcessPath) ?? Environment.CurrentDirectory
+                : Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            PortableMode.IsPortable ? "scripts" : "Munin\\scripts");
+        var scriptContext = new ScriptContext(_clientManager, scriptsDir);
+        _scriptManager = new ScriptManager(scriptContext);
+        
+        // Register script engines
+        _scriptManager.RegisterEngine(new LuaScriptEngine());
+        _scriptManager.RegisterEngine(new TriggerEngine());
+        _scriptManager.RegisterEngine(new PluginEngine());
+        
+        // Handle script output
+        _scriptManager.ScriptOutput += (s, e) =>
+        {
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                _scriptConsoleWindow?.AddOutput("Script", e.Message);
+            });
+        };
+        
+        _scriptManager.ScriptError += (s, e) =>
+        {
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                _scriptConsoleWindow?.AddError(e.Source, e.Message);
+                _logger.Warning("Script error in {Source}: {Error}", e.Source, e.Message);
+            });
+        };
+        
+        _scriptManager.ScriptLoaded += (s, e) =>
+        {
+            _logger.Information("Script loaded: {ScriptName} from {FilePath}", e.ScriptName, e.FilePath);
+        };
+        
         _logger.Information("MainViewModel initialized");
         
         // Subscribe to collection changes to update HasNoServers
@@ -270,6 +315,44 @@ public partial class MainViewModel : ObservableObject
         
         SetupEventHandlers();
         _ = LoadConfigurationAsync();
+        _ = LoadScriptsAsync();
+    }
+
+    /// <summary>
+    /// Loads all scripts from the scripts directory.
+    /// </summary>
+    private async Task LoadScriptsAsync()
+    {
+        try
+        {
+            _logger.Information("Loading scripts from: {ScriptsDir}", _scriptManager.Context.ScriptsDirectory);
+            
+            await _scriptManager.LoadAllScriptsAsync();
+            var scripts = _scriptManager.GetLoadedScripts().ToList();
+            
+            if (scripts.Count > 0)
+            {
+                _logger.Information("Loaded {Count} scripts:", scripts.Count);
+                foreach (var script in scripts)
+                {
+                    _logger.Information("  - {Name} ({Engine})", script.Name, script.Engine.Name);
+                }
+                
+                // Show in status bar
+                await App.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    StatusText = $"Loaded {scripts.Count} script(s)";
+                });
+            }
+            else
+            {
+                _logger.Information("No scripts found in {ScriptsDir}", _scriptManager.Context.ScriptsDirectory);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Failed to load scripts");
+        }
     }
 
     private async Task LoadConfigurationAsync()
@@ -364,6 +447,9 @@ public partial class MainViewModel : ObservableObject
                     
                     // Update the current nickname for message coloring
                     MessageViewModel.CurrentNickname = server.Connection?.CurrentNickname;
+                    
+                    // Dispatch to scripts
+                    _ = _scriptManager.DispatchEventAsync(new ConnectEvent(e.Server.Name));
                 }
             });
         };
@@ -379,6 +465,9 @@ public partial class MainViewModel : ObservableObject
                     server.IsConnected = false;
                     IsConnecting = false;
                     StatusText = $"Disconnected from {e.Server.Name}";
+                    
+                    // Dispatch to scripts
+                    _ = _scriptManager.DispatchEventAsync(new DisconnectEvent(e.Server.Name, "Disconnected", false));
                 }
             });
         };
@@ -423,14 +512,18 @@ public partial class MainViewModel : ObservableObject
                     {
                         var channelVm = new ChannelViewModel(e.Channel, server);
                         server.Channels.Add(channelVm);
-                        if (SelectedChannel == null || SelectedChannel.IsServerConsole)
-                        {
-                            SelectedChannel = channelVm;
-                        }
+                        
+                        // Always select the newly joined channel
+                        SelectedChannel = channelVm;
                         
                         // Save channel to auto-join list
                         _configService.AddChannelToServer(e.Server.Id, e.Channel.Name);
                         _ = SaveConfigurationAsync();
+                    }
+                    else
+                    {
+                        // Channel already exists, just select it
+                        SelectedChannel = existing;
                     }
                 }
             });
@@ -443,17 +536,35 @@ public partial class MainViewModel : ObservableObject
                 var server = Servers.FirstOrDefault(sv => sv.Server.Id == e.Server.Id);
                 if (server != null)
                 {
-                    // Remove channel from UI
+                    // Find the channel to remove
                     var channelVm = server.Channels.FirstOrDefault(c => c.Channel?.Name == e.Channel.Name);
                     if (channelVm != null)
                     {
-                        server.Channels.Remove(channelVm);
-                        
-                        // If we were viewing this channel, switch to another
+                        // If we were viewing this channel, switch to another before removing
                         if (SelectedChannel == channelVm)
                         {
-                            SelectedChannel = server.Channels.FirstOrDefault();
+                            var channelIndex = server.Channels.IndexOf(channelVm);
+                            
+                            // Try to select the previous channel, or the next one, or the server console
+                            if (channelIndex > 0)
+                            {
+                                // Select the channel before this one
+                                SelectedChannel = server.Channels[channelIndex - 1];
+                            }
+                            else if (server.Channels.Count > 1)
+                            {
+                                // Select the next channel (index 1 after removal will be at index 0)
+                                SelectedChannel = server.Channels.FirstOrDefault(c => c != channelVm);
+                            }
+                            else
+                            {
+                                // No more channels, select server console
+                                SelectedChannel = server.Channels.FirstOrDefault(c => c.IsServerConsole);
+                            }
                         }
+                        
+                        // Remove channel from UI
+                        server.Channels.Remove(channelVm);
                     }
                     
                     // Remove channel from auto-join list
@@ -475,10 +586,7 @@ public partial class MainViewModel : ObservableObject
                 var channel = server?.Channels.FirstOrDefault(c => c.Channel.Name == e.Channel.Name);
                 if (channel != null)
                 {
-                    channel.Messages.Add(new MessageViewModel(e.Message));
-                    
-                    // Track message for statistics
-                    channel.TrackMessage(e.Message.Source);
+                    channel.AddMessage(new MessageViewModel(e.Message));
                     
                     // Log the message
                     LoggingService.Instance.LogMessage(e.Server.Name, e.Channel.Name, e.Message);
@@ -497,6 +605,15 @@ public partial class MainViewModel : ObservableObject
                                 e.Message.Content);
                         }
                     }
+                    
+                    // Dispatch to scripts
+                    var scriptEvent = new MessageEvent(
+                        e.Server.Name,
+                        e.Channel.Name,
+                        e.Message.Source ?? "",
+                        e.Message.Content,
+                        e.Message.Type == MessageType.Action);
+                    _ = _scriptManager.DispatchEventAsync(scriptEvent);
                 }
             });
         };
@@ -522,7 +639,16 @@ public partial class MainViewModel : ObservableObject
                     channel.RefreshUsers();
                     // Add join message to channel
                     var joinMsg = IrcMessage.CreateJoin(e.User.Nickname, e.Channel?.Name ?? "");
-                    channel.Messages.Add(new MessageViewModel(joinMsg));
+                    channel.AddMessage(new MessageViewModel(joinMsg), trackStats: false);
+                    
+                    // Dispatch to scripts
+                    var scriptEvent = new JoinEvent(
+                        e.Server.Name,
+                        e.Channel?.Name ?? "",
+                        e.User.Nickname,
+                        e.User.Username,
+                        e.User.Hostname);
+                    _ = _scriptManager.DispatchEventAsync(scriptEvent);
                 }
             });
         };
@@ -538,7 +664,15 @@ public partial class MainViewModel : ObservableObject
                     channel.RefreshUsers();
                     // Add part message to channel
                     var partMsg = IrcMessage.CreatePart(e.User.Nickname, e.Channel?.Name ?? "");
-                    channel.Messages.Add(new MessageViewModel(partMsg));
+                    channel.AddMessage(new MessageViewModel(partMsg), trackStats: false);
+                    
+                    // Dispatch to scripts
+                    var scriptEvent = new PartEvent(
+                        e.Server.Name,
+                        e.Channel?.Name ?? "",
+                        e.User.Nickname,
+                        null);
+                    _ = _scriptManager.DispatchEventAsync(scriptEvent);
                 }
             });
         };
@@ -548,6 +682,7 @@ public partial class MainViewModel : ObservableObject
             App.Current.Dispatcher.Invoke(() =>
             {
                 // Add quit message to all channels where this user was present
+                var channelNames = new List<string>();
                 foreach (var server in Servers.Where(sv => sv.Server.Id == e.Server.Id))
                 {
                     foreach (var channel in server.Channels.Where(c => !c.IsServerConsole && !c.IsPrivateMessage))
@@ -556,10 +691,15 @@ public partial class MainViewModel : ObservableObject
                         if (channel.Users.Any(u => u.User.Nickname.Equals(e.User.Nickname, StringComparison.OrdinalIgnoreCase)))
                         {
                             var quitMsg = IrcMessage.CreateQuit(e.User.Nickname);
-                            channel.Messages.Add(new MessageViewModel(quitMsg));
+                            channel.AddMessage(new MessageViewModel(quitMsg), trackStats: false);
+                            channelNames.Add(channel.Channel.Name);
                         }
                         channel.RefreshUsers();
                     }
+                    
+                    // Dispatch to scripts
+                    var scriptEvent = new QuitEvent(e.Server.Name, e.User.Nickname, null, channelNames);
+                    _ = _scriptManager.DispatchEventAsync(scriptEvent);
                 }
             });
         };
@@ -581,9 +721,13 @@ public partial class MainViewModel : ObservableObject
                     var nickMsg = IrcMessage.CreateNickChange(e.OldNick, e.NewNick);
                     foreach (var channel in server.Channels.Where(c => !c.IsServerConsole))
                     {
-                        channel.Messages.Add(new MessageViewModel(nickMsg));
+                        channel.AddMessage(new MessageViewModel(nickMsg), trackStats: false);
                         channel.RefreshUsers();
                     }
+                    
+                    // Dispatch to scripts
+                    var scriptEvent = new NickChangeEvent(e.Server.Name, e.OldNick, e.NewNick);
+                    _ = _scriptManager.DispatchEventAsync(scriptEvent);
                 }
             });
         };
@@ -599,7 +743,7 @@ public partial class MainViewModel : ObservableObject
                 var console = server?.Channels.FirstOrDefault(c => c.IsServerConsole);
                 if (console != null)
                 {
-                    console.Messages.Add(new MessageViewModel(IrcMessage.CreateError(e.Message)));
+                    console.AddMessage(new MessageViewModel(IrcMessage.CreateError(e.Message)), trackStats: false);
                 }
             });
         };
@@ -620,7 +764,7 @@ public partial class MainViewModel : ObservableObject
                             Type = MessageType.System,
                             Content = e.Message
                         };
-                        console.Messages.Add(new MessageViewModel(message));
+                        console.AddMessage(new MessageViewModel(message), trackStats: false);
                         
                         if (console != SelectedChannel)
                         {
@@ -639,7 +783,7 @@ public partial class MainViewModel : ObservableObject
                 if (server != null)
                 {
                     var dmChannel = GetOrCreatePrivateMessageChannel(server, e.From);
-                    dmChannel.Messages.Add(new MessageViewModel(e.Message));
+                    dmChannel.AddMessage(new MessageViewModel(e.Message));
                     
                     // Log the private message
                     LoggingService.Instance.LogMessage(e.Server.Name, $"PM-{e.From}", e.Message);
@@ -655,6 +799,14 @@ public partial class MainViewModel : ObservableObject
                             e.From,
                             e.Message.Content);
                     }
+                    
+                    // Dispatch to scripts
+                    var scriptEvent = new PrivateMessageEvent(
+                        e.Server.Name,
+                        e.From,
+                        e.Message.Content,
+                        e.Message.Type == MessageType.Action);
+                    _ = _scriptManager.DispatchEventAsync(scriptEvent);
                 }
             });
         };
@@ -662,6 +814,28 @@ public partial class MainViewModel : ObservableObject
         _clientManager.RawMessage += (s, e) =>
         {
             _rawIrcLogWindow?.AddEntry(e.IsOutgoing, e.Message);
+            
+            // Dispatch to scripts (only incoming messages)
+            if (!e.IsOutgoing)
+            {
+                // Parse minimal info from raw message
+                var parts = e.Message.Split(' ');
+                var prefix = parts.Length > 0 && parts[0].StartsWith(':') ? parts[0][1..] : "";
+                var command = parts.Length > 1 ? parts[1] : (parts.Length > 0 ? parts[0] : "");
+                var parameters = new List<string>();
+                for (int i = 2; i < parts.Length; i++)
+                {
+                    if (parts[i].StartsWith(':'))
+                    {
+                        parameters.Add(string.Join(' ', parts.Skip(i))[1..]);
+                        break;
+                    }
+                    parameters.Add(parts[i]);
+                }
+                
+                var scriptEvent = new RawEvent(e.Server.Name, e.Message, command, prefix, parameters);
+                _ = _scriptManager.DispatchEventAsync(scriptEvent);
+            }
         };
         
         _clientManager.TopicChanged += (s, e) =>
@@ -674,6 +848,10 @@ public partial class MainViewModel : ObservableObject
                 if (channelVm != null)
                 {
                     channelVm.Topic = e.Channel.Topic;
+                    
+                    // Dispatch to scripts
+                    var scriptEvent = new TopicEvent(e.Server.Name, e.Channel.Name, "", e.Channel.Topic ?? "");
+                    _ = _scriptManager.DispatchEventAsync(scriptEvent);
                 }
             });
         };
@@ -843,37 +1021,49 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task SendMessageAsync()
     {
-        if (string.IsNullOrWhiteSpace(MessageInput) || SelectedChannel == null) return;
-
-        var connection = SelectedChannel.ServerViewModel.Connection;
-        if (connection == null || !connection.IsConnected) return;
+        if (string.IsNullOrWhiteSpace(MessageInput)) return;
 
         var message = MessageInput;
         MessageInput = string.Empty;
 
-        // Handle commands
+        // Handle commands - some commands work without a connection
         if (message.StartsWith('/'))
         {
-            await HandleCommandAsync(message, connection);
+            var connection = SelectedChannel?.ServerViewModel.Connection;
+            try
+            {
+                await HandleCommandAsync(message, connection);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error handling command: {Command}", message);
+                StatusText = $"Command error: {ex.Message}";
+            }
             return;
         }
+
+        // For regular messages, we need a channel and connection
+        if (SelectedChannel == null) return;
+
+        var messageConnection = SelectedChannel.ServerViewModel.Connection;
+        if (messageConnection == null || !messageConnection.IsConnected) return;
 
         // Determine the target - for private messages use the nickname, otherwise the channel name
         var target = SelectedChannel.IsPrivateMessage 
             ? SelectedChannel.PrivateMessageTarget 
             : SelectedChannel.Channel.Name;
 
-        await connection.SendMessageAsync(target, message);
+        await messageConnection.SendMessageAsync(target, message);
 
         // Add our own message to the channel
         var ircMessage = new IrcMessage
         {
             Type = MessageType.Normal,
-            Source = connection.CurrentNickname,
+            Source = messageConnection.CurrentNickname,
             Target = target,
             Content = message
         };
-        SelectedChannel.Messages.Add(new MessageViewModel(ircMessage));
+        SelectedChannel.AddMessage(new MessageViewModel(ircMessage));
 
         // Log our own message
         var serverName = SelectedChannel.ServerViewModel.Server.Name;
@@ -883,11 +1073,34 @@ public partial class MainViewModel : ObservableObject
         LoggingService.Instance.LogMessage(serverName, logTarget, ircMessage);
     }
 
-    private async Task HandleCommandAsync(string input, IrcConnection connection)
+    private async Task HandleCommandAsync(string input, IrcConnection? connection)
     {
         var parts = input[1..].Split(' ', 2);
         var command = parts[0].ToUpperInvariant();
         var args = parts.Length > 1 ? parts[1] : "";
+
+        // Commands that don't require a connection
+        switch (command)
+        {
+            case "SCRIPT":
+                await HandleScriptCommandAsync(args, connection);
+                return;
+                
+            case "SCRIPTS":
+                ShowScriptManager();
+                return;
+                
+            case "STATS":
+                ShowChannelStats();
+                return;
+        }
+        
+        // Commands that require a connection
+        if (connection == null || !connection.IsConnected)
+        {
+            StatusText = "Not connected to a server";
+            return;
+        }
 
         switch (command)
         {
@@ -939,7 +1152,7 @@ public partial class MainViewModel : ObservableObject
                                 Target = targetNick,
                                 Content = msgContent
                             };
-                            dmChannel.Messages.Add(new MessageViewModel(ircMessage));
+                            dmChannel.AddMessage(new MessageViewModel(ircMessage));
                             LoggingService.Instance.LogMessage(server.Server.Name, $"PM-{targetNick}", ircMessage);
                             SelectedChannel = dmChannel;
                         }
@@ -971,7 +1184,7 @@ public partial class MainViewModel : ObservableObject
                                 Target = targetUser,
                                 Content = queryMsg
                             };
-                            dmChannel.Messages.Add(new MessageViewModel(ircMessage));
+                            dmChannel.AddMessage(new MessageViewModel(ircMessage));
                             LoggingService.Instance.LogMessage(server.Server.Name, $"PM-{targetUser}", ircMessage);
                         }
                     }
@@ -986,7 +1199,7 @@ public partial class MainViewModel : ObservableObject
                         : SelectedChannel.Channel.Name;
                     await connection.SendActionAsync(meTarget, args);
                     var actionMsg = IrcMessage.CreateAction(connection.CurrentNickname, args);
-                    SelectedChannel.Messages.Add(new MessageViewModel(actionMsg));
+                    SelectedChannel.AddMessage(new MessageViewModel(actionMsg));
                     
                     // Log the action
                     var serverName = SelectedChannel.ServerViewModel.Server.Name;
@@ -1044,8 +1257,26 @@ public partial class MainViewModel : ObservableObject
                 }
                 break;
                 
-            case "STATS":
-                ShowChannelStats();
+            case "RELOAD":
+                if (!string.IsNullOrEmpty(args))
+                {
+                    // Reload a specific script
+                    var result = await _scriptManager.ReloadScriptAsync(args.Trim());
+                    if (result.Success)
+                    {
+                        StatusText = $"Script '{args.Trim()}' reloaded";
+                    }
+                    else
+                    {
+                        StatusText = $"Failed to reload script: {result.Error}";
+                    }
+                }
+                else
+                {
+                    // Reload all scripts
+                    await LoadScriptsAsync();
+                    StatusText = $"Reloaded {_scriptManager.GetLoadedScripts().Count()} scripts";
+                }
                 break;
 
             default:
@@ -1053,6 +1284,125 @@ public partial class MainViewModel : ObservableObject
                 await connection.SendRawAsync($"{command} {args}".Trim());
                 break;
         }
+    }
+    
+    /// <summary>
+    /// Handles the /script command with subcommands.
+    /// </summary>
+    private async Task HandleScriptCommandAsync(string args, IrcConnection? connection)
+    {
+        var parts = args.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+        var subCommand = parts.Length > 0 ? parts[0].ToUpper() : string.Empty;
+        var scriptArg = parts.Length > 1 ? parts[1] : string.Empty;
+        
+        switch (subCommand)
+        {
+            case "LIST":
+                var scripts = _scriptManager.GetLoadedScripts().ToList();
+                if (SelectedChannel != null)
+                {
+                    SelectedChannel.AddSystemMessage($"Loaded scripts ({scripts.Count}):");
+                    foreach (var script in scripts)
+                    {
+                        SelectedChannel.AddSystemMessage($"  • {script.Name} ({Path.GetExtension(script.FilePath)})");
+                    }
+                }
+                break;
+                
+            case "ENABLE":
+            case "LOAD":
+                if (string.IsNullOrEmpty(scriptArg))
+                {
+                    StatusText = "Usage: /script enable <script_name>";
+                    return;
+                }
+                var loadPath = FindScriptPath(scriptArg);
+                if (loadPath != null)
+                {
+                    var loadResult = await _scriptManager.LoadScriptAsync(loadPath);
+                    StatusText = loadResult.Success 
+                        ? $"Enabled: {scriptArg}" 
+                        : $"Failed to enable: {loadResult.Error}";
+                }
+                else
+                {
+                    StatusText = $"Script not found: {scriptArg}";
+                }
+                break;
+                
+            case "DISABLE":
+            case "UNLOAD":
+                if (string.IsNullOrEmpty(scriptArg))
+                {
+                    StatusText = "Usage: /script disable <script_name>";
+                    return;
+                }
+                if (_scriptManager.UnloadScript(scriptArg))
+                {
+                    StatusText = $"Disabled: {scriptArg}";
+                }
+                else
+                {
+                    StatusText = $"Script not loaded: {scriptArg}";
+                }
+                break;
+                
+            case "RELOAD":
+                if (string.IsNullOrEmpty(scriptArg))
+                {
+                    await LoadScriptsAsync();
+                    StatusText = $"Reloaded {_scriptManager.GetLoadedScripts().Count()} scripts";
+                }
+                else
+                {
+                    var reloadResult = await _scriptManager.ReloadScriptAsync(scriptArg);
+                    StatusText = reloadResult.Success 
+                        ? $"Reloaded: {scriptArg}" 
+                        : $"Failed to reload: {reloadResult.Error}";
+                }
+                break;
+                
+            case "NEW":
+                ShowScriptManager();
+                break;
+                
+            case "CONSOLE":
+                ShowScriptConsole();
+                break;
+                
+            case "":
+            default:
+                ShowScriptManager();
+                break;
+        }
+    }
+    
+    /// <summary>
+    /// Finds a script file path by name.
+    /// </summary>
+    private string? FindScriptPath(string scriptName)
+    {
+        var scriptsDir = _scriptManager.Context.ScriptsDirectory;
+        if (!Directory.Exists(scriptsDir)) return null;
+        
+        // Try exact match first
+        var extensions = new[] { ".lua", ".triggers.json", ".cs" };
+        foreach (var ext in extensions)
+        {
+            var path = Path.Combine(scriptsDir, scriptName + ext);
+            if (File.Exists(path)) return path;
+            
+            path = Path.Combine(scriptsDir, scriptName);
+            if (File.Exists(path)) return path;
+        }
+        
+        // Search recursively
+        foreach (var file in Directory.GetFiles(scriptsDir, $"*{scriptName}*", SearchOption.AllDirectories))
+        {
+            return file;
+        }
+        
+        return null;
     }
 
     [RelayCommand]
@@ -1073,6 +1423,55 @@ public partial class MainViewModel : ObservableObject
         if (listWindow.ShowDialog() == true && !string.IsNullOrEmpty(listWindow.SelectedChannelName))
         {
             _ = connection.JoinChannelAsync(listWindow.SelectedChannelName);
+        }
+    }
+    
+    /// <summary>
+    /// Shows the script manager window.
+    /// </summary>
+    [RelayCommand]
+    private void ShowScriptManager()
+    {
+        try
+        {
+            if (_scriptManagerWindow == null || !_scriptManagerWindow.IsLoaded)
+            {
+                _scriptManagerWindow = new ScriptManagerWindow(_scriptManager);
+                if (App.Current.MainWindow != null && App.Current.MainWindow != _scriptManagerWindow)
+                {
+                    _scriptManagerWindow.Owner = App.Current.MainWindow;
+                }
+                _scriptManagerWindow.Closed += (s, e) => _scriptManagerWindow = null;
+                _scriptManagerWindow.Show();
+            }
+            else
+            {
+                _scriptManagerWindow.Activate();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Failed to show script manager");
+            StatusText = $"Error opening Script Manager: {ex.Message}";
+        }
+    }
+    
+    /// <summary>
+    /// Shows the script console window.
+    /// </summary>
+    [RelayCommand]
+    private void ShowScriptConsole()
+    {
+        if (_scriptConsoleWindow == null || !_scriptConsoleWindow.IsLoaded)
+        {
+            _scriptConsoleWindow = new ScriptConsoleWindow(_scriptManager);
+            _scriptConsoleWindow.Owner = App.Current.MainWindow;
+            _scriptConsoleWindow.Closed += (s, e) => _scriptConsoleWindow = null;
+            _scriptConsoleWindow.Show();
+        }
+        else
+        {
+            _scriptConsoleWindow.Activate();
         }
     }
     
@@ -1155,6 +1554,22 @@ public partial class MainViewModel : ObservableObject
         SearchQuery = string.Empty;
         SearchResultCount = 0;
         SearchResults.Clear();
+        
+        // Clear search highlights in messages
+        if (SelectedChannel != null)
+        {
+            foreach (var msg in SelectedChannel.Messages)
+            {
+                msg.IsSearchMatch = false;
+            }
+        }
+    }
+    
+    [RelayCommand]
+    private void JumpToLatest()
+    {
+        // This command is handled in the view (MainWindow.xaml.cs)
+        // via the JumpToLatestButton_Click handler
     }
 
     [RelayCommand]

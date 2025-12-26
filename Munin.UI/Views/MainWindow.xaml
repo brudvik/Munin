@@ -30,6 +30,7 @@
         <KeyBinding Key="Return" Command="{Binding SendMessageCommand}"/>
         <KeyBinding Key="F" Modifiers="Ctrl" Command="{Binding ToggleSearchCommand}"/>
         <KeyBinding Key="Escape" Command="{Binding CloseSearchCommand}"/>
+        <KeyBinding Key="End" Modifiers="Ctrl" Command="{Binding JumpToLatestCommand}"/>
     </Window.InputBindings>
 
     <!-- Main Window Container with rounded corners -->
@@ -169,6 +170,12 @@
                     <Button Content="🔧" 
                             ToolTip="{loc:Localize Key=MainWindow_RawLog}"
                             Command="{Binding ShowRawIrcLogCommand}"
+                            Style="{StaticResource IconButtonStyle}"
+                            FontSize="18"
+                            Margin="0,0,4,0"/>
+                    <Button Content="📜" 
+                            ToolTip="{loc:Localize Key=MainWindow_ScriptConsole}"
+                            Command="{Binding ShowScriptConsoleCommand}"
                             Style="{StaticResource IconButtonStyle}"
                             FontSize="18"
                             Margin="0,0,4,0"/>
@@ -891,15 +898,17 @@
                             
                             <!-- Messages ListBox -->
                             <ListBox x:Name="MessagesListBox"
-                                     ItemsSource="{Binding SelectedChannel.Messages}"
+                                     ItemsSource="{Binding SelectedChannel.Messages, NotifyOnTargetUpdated=True}"
                                      VirtualizingPanel.ScrollUnit="Pixel"
                                      ScrollViewer.CanContentScroll="True"
                                      HorizontalContentAlignment="Stretch"
                                      Loaded="MessagesListBox_Loaded"
+                                     TargetUpdated="MessagesListBox_TargetUpdated"
+                                     PreviewKeyDown="MessagesListBox_PreviewKeyDown"
                                      Visibility="{Binding SelectedChannel.HasNoMessages, Converter={StaticResource InverseBoolToVisibilityConverter}, FallbackValue=Visible}">
                                 <ListBox.ItemContainerStyle>
                                     <Style TargetType="ListBoxItem">
-                                        <Setter Property="Padding" Value="20,6"/>
+                                        <Setter Property="Padding" Value="20,2,20,2"/>
                                         <Setter Property="Margin" Value="0"/>
                                         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                                         <Setter Property="RenderTransformOrigin" Value="0,0.5"/>
@@ -908,11 +917,30 @@
                                                 <TranslateTransform X="0" Y="0"/>
                                             </Setter.Value>
                                         </Setter>
+                                        <Setter Property="ContextMenu">
+                                            <Setter.Value>
+                                                <ContextMenu>
+                                                    <MenuItem Header="{loc:Localize Key=ContextMenu_CopyMessage}" 
+                                                              Click="CopyMessage_Click"
+                                                              InputGestureText="Ctrl+C"/>
+                                                    <MenuItem Header="{loc:Localize Key=ContextMenu_CopyNickname}" 
+                                                              Click="CopyNickname_Click"/>
+                                                    <Separator/>
+                                                    <MenuItem Header="{loc:Localize Key=ContextMenu_Whois}" 
+                                                              Click="WhoisUser_Click"/>
+                                                    <MenuItem Header="{loc:Localize Key=ContextMenu_OpenQuery}" 
+                                                              Click="OpenQuery_Click"/>
+                                                    <Separator/>
+                                                    <MenuItem Header="{loc:Localize Key=ContextMenu_IgnoreUser}" 
+                                                              Click="IgnoreUser_Click"/>
+                                                </ContextMenu>
+                                            </Setter.Value>
+                                        </Setter>
                                         <Setter Property="Template">
                                             <Setter.Value>
                                                 <ControlTemplate TargetType="ListBoxItem">
                                             <Border x:Name="border" 
-                                                    Background="Transparent"
+                                                    Background="{Binding RowIndex, Converter={StaticResource RowIndexToBackgroundConverter}}"
                                                     Padding="{TemplateBinding Padding}"
                                                     BorderBrush="Transparent"
                                                     BorderThickness="3,0,0,0">
@@ -928,6 +956,12 @@
                                                             Value="{StaticResource MentionBackgroundBrush}"/>
                                                     <Setter TargetName="border" Property="BorderBrush" 
                                                             Value="{StaticResource MentionBorderBrush}"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsSearchMatch}" Value="True">
+                                                    <Setter TargetName="border" Property="Background" 
+                                                            Value="{StaticResource WarningSubtleBrush}"/>
+                                                    <Setter TargetName="border" Property="BorderBrush" 
+                                                            Value="{StaticResource WarningDimBrush}"/>
                                                 </DataTrigger>
                                             </ControlTemplate.Triggers>
                                         </ControlTemplate>
@@ -954,7 +988,7 @@
                         </ListBox.ItemContainerStyle>
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel>
+                                <StackPanel MouseLeftButtonDown="MessageItem_MouseLeftButtonDown">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="75"/>
@@ -972,30 +1006,46 @@
                                                    VerticalAlignment="Top"
                                                    Margin="0,1,0,0"/>
 
-                                        <!-- Nickname (fixed width, right-aligned) -->
+                                        <!-- Nickname (fixed width, right-aligned) - hidden when grouped -->
                                         <TextBlock Grid.Column="1" 
                                                    Width="150"
                                                    TextAlignment="Right"
                                                    FontFamily="{StaticResource MonospaceFont}"
-                                                   Visibility="{Binding ShowNickname, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                   ToolTip="{Binding Source}">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Visibility" Value="{Binding ShowNickname, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsGrouped}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
                                             <Run Text="&lt;" Foreground="{StaticResource TextMutedBrush}"/>
                                             <Run Text="{Binding PaddedNickname, Mode=OneWay}" 
                                                  Foreground="{Binding NicknameColor}"
                                                  FontWeight="Medium"/>
                                             <Run Text="&gt;" Foreground="{StaticResource TextMutedBrush}"/>
                                         </TextBlock>
+                                        
+                                        <!-- Grouped message spacer (same width as nickname) -->
+                                        <Border Grid.Column="1" 
+                                                Width="150"
+                                                Visibility="{Binding IsGrouped, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
-                                        <!-- Separator -->
-                                        <TextBlock Grid.Column="2" 
-                                                   Text=" │ "
-                                                   Foreground="{StaticResource BorderBrush}"
-                                                   FontFamily="{StaticResource MonospaceFont}"
-                                                   Visibility="{Binding ShowNickname, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                        <!-- Vertical Separator Line -->
+                                        <Border Grid.Column="2" 
+                                                Width="1"
+                                                Margin="8,0,8,0"
+                                                Background="{StaticResource BorderBrush}"
+                                                Visibility="{Binding ShowNickname, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                                         <!-- Message Content -->
                                         <ContentControl Grid.Column="3" 
                                                         Content="{Binding Converter={StaticResource MessageToInlinesConverter}}"
-                                                        VerticalAlignment="Top"/>
+                                                        VerticalAlignment="Top"
+                                                        Margin="0,1,0,1"/>
                                     </Grid>
                                     
                                     <!-- Link Previews -->
@@ -1042,6 +1092,21 @@
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
+                            
+                            <!-- Jump to Latest Button (appears when scrolled up) -->
+                            <Button x:Name="JumpToLatestButton"
+                                    Click="JumpToLatestButton_Click"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Bottom"
+                                    Margin="0,0,0,20"
+                                    Padding="16,8"
+                                    Visibility="Collapsed"
+                                    Style="{StaticResource AccentButtonStyle}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="↓" FontWeight="Bold" Margin="0,0,6,0"/>
+                                    <TextBlock Text="{loc:Localize Key=MainWindow_JumpToLatest}"/>
+                                </StackPanel>
+                            </Button>
                             </Grid>
                         </Grid>
                     </Border>

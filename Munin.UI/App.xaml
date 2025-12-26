@@ -18,6 +18,8 @@
             <converters:IntToVisibilityConverter x:Key="IntToVisibilityConverter"/>
             <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
             <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter"/>
+            <converters:RowIndexToBackgroundConverter x:Key="RowIndexToBackgroundConverter"/>
+            <converters:ZeroToVisibleConverter x:Key="ZeroToVisibleConverter"/>
             <converters:MessageToInlinesConverter x:Key="MessageToInlinesConverter"/>
             <converters:UsersToNicknamesConverter x:Key="UsersToNicknamesConverter"/>
         </ResourceDictionary>

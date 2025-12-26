@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using Munin.Core.Services;
@@ -58,6 +59,11 @@ public partial class App : Application
     /// <param name="e">The startup event arguments.</param>
     protected override void OnStartup(StartupEventArgs e)
     {
+        // Set up global exception handlers
+        DispatcherUnhandledException += App_DispatcherUnhandledException;
+        AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+        TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+        
         try
         {
             // Call base first to initialize WPF properly
@@ -416,5 +422,36 @@ public partial class App : Application
         {
             Log.Warning(ex, "Failed to complete memory wipe on exit");
         }
+    }
+    
+    /// <summary>
+    /// Handles unhandled exceptions on the UI thread.
+    /// </summary>
+    private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+    {
+        Log.Fatal(e.Exception, "Unhandled UI exception");
+        MessageBox.Show($"An unexpected error occurred:\n\n{e.Exception.Message}\n\nCheck logs for details.", 
+            "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        e.Handled = true;
+    }
+    
+    /// <summary>
+    /// Handles unhandled exceptions from non-UI threads.
+    /// </summary>
+    private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+    {
+        if (e.ExceptionObject is Exception ex)
+        {
+            Log.Fatal(ex, "Unhandled domain exception (IsTerminating: {IsTerminating})", e.IsTerminating);
+        }
+    }
+    
+    /// <summary>
+    /// Handles unobserved task exceptions.
+    /// </summary>
+    private void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
+    {
+        Log.Error(e.Exception, "Unobserved task exception");
+        e.SetObserved();
     }
 }

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Lua Syntax Highlighting for AvalonEdit -->
+<SyntaxDefinition name="Lua" extensions=".lua" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+    
+    <!-- Colors -->
+    <Color name="Comment" foreground="#6A9955" fontStyle="italic"/>
+    <Color name="String" foreground="#CE9178"/>
+    <Color name="Keyword" foreground="#569CD6" fontWeight="bold"/>
+    <Color name="ControlKeyword" foreground="#C586C0"/>
+    <Color name="Number" foreground="#B5CEA8"/>
+    <Color name="Operator" foreground="#D4D4D4"/>
+    <Color name="Function" foreground="#DCDCAA"/>
+    <Color name="GlobalFunction" foreground="#4EC9B0"/>
+    <Color name="Boolean" foreground="#569CD6"/>
+    <Color name="Nil" foreground="#569CD6" fontStyle="italic"/>
+    <Color name="Table" foreground="#4EC9B0"/>
+    
+    <RuleSet ignoreCase="false">
+        
+        <!-- Multi-line comments -->
+        <Span color="Comment" multiline="true">
+            <Begin>--\[\[</Begin>
+            <End>\]\]</End>
+        </Span>
+        
+        <!-- Single-line comments -->
+        <Span color="Comment">
+            <Begin>--</Begin>
+        </Span>
+        
+        <!-- Multi-line strings -->
+        <Span color="String" multiline="true">
+            <Begin>\[\[</Begin>
+            <End>\]\]</End>
+        </Span>
+        
+        <!-- Double-quoted strings -->
+        <Span color="String">
+            <Begin>"</Begin>
+            <End>"</End>
+            <RuleSet>
+                <Span begin="\\" end="."/>
+            </RuleSet>
+        </Span>
+        
+        <!-- Single-quoted strings -->
+        <Span color="String">
+            <Begin>'</Begin>
+            <End>'</End>
+            <RuleSet>
+                <Span begin="\\" end="."/>
+            </RuleSet>
+        </Span>
+        
+        <!-- Control flow keywords -->
+        <Keywords color="ControlKeyword">
+            <Word>if</Word>
+            <Word>then</Word>
+            <Word>else</Word>
+            <Word>elseif</Word>
+            <Word>end</Word>
+            <Word>for</Word>
+            <Word>while</Word>
+            <Word>do</Word>
+            <Word>repeat</Word>
+            <Word>until</Word>
+            <Word>break</Word>
+            <Word>return</Word>
+            <Word>goto</Word>
+        </Keywords>
+        
+        <!-- Other keywords -->
+        <Keywords color="Keyword">
+            <Word>and</Word>
+            <Word>function</Word>
+            <Word>in</Word>
+            <Word>local</Word>
+            <Word>not</Word>
+            <Word>or</Word>
+        </Keywords>
+        
+        <!-- Boolean and nil -->
+        <Keywords color="Boolean">
+            <Word>true</Word>
+            <Word>false</Word>
+        </Keywords>
+        
+        <Keywords color="Nil">
+            <Word>nil</Word>
+        </Keywords>
+        
+        <!-- Built-in functions -->
+        <Keywords color="GlobalFunction">
+            <Word>print</Word>
+            <Word>type</Word>
+            <Word>pairs</Word>
+            <Word>ipairs</Word>
+            <Word>next</Word>
+            <Word>tonumber</Word>
+            <Word>tostring</Word>
+            <Word>assert</Word>
+            <Word>error</Word>
+            <Word>pcall</Word>
+            <Word>xpcall</Word>
+            <Word>select</Word>
+            <Word>unpack</Word>
+            <Word>rawget</Word>
+            <Word>rawset</Word>
+            <Word>rawequal</Word>
+            <Word>setmetatable</Word>
+            <Word>getmetatable</Word>
+            <Word>require</Word>
+            <Word>loadstring</Word>
+            <Word>loadfile</Word>
+            <Word>dofile</Word>
+        </Keywords>
+        
+        <!-- Standard library tables -->
+        <Keywords color="Table">
+            <Word>string</Word>
+            <Word>table</Word>
+            <Word>math</Word>
+            <Word>os</Word>
+            <Word>io</Word>
+            <Word>coroutine</Word>
+            <Word>debug</Word>
+            <Word>package</Word>
+            <Word>irc</Word>
+        </Keywords>
+        
+        <!-- Numbers (including hex) -->
+        <Rule color="Number">
+            \b0[xX][0-9a-fA-F]+\b |
+            \b\d+\.?\d*([eE][+-]?\d+)?\b
+        </Rule>
+        
+        <!-- Operators -->
+        <Rule color="Operator">
+            [+\-*/%^#=&lt;&gt;~\[\]{}().,;:]
+        </Rule>
+        
+    </RuleSet>
+</SyntaxDefinition>

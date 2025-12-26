@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Input;
 using Munin.Core.Models;
 
 namespace Munin.UI.Views;
@@ -79,6 +80,26 @@ public partial class AddServerDialog : Window
     /// <param name="sender">The event source.</param>
     /// <param name="e">The routed event arguments.</param>
     private void CancelButton_Click(object sender, RoutedEventArgs e)
+    {
+        DialogResult = false;
+        Close();
+    }
+
+    /// <summary>
+    /// Handles title bar mouse down for window dragging.
+    /// </summary>
+    private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ClickCount == 2)
+            return; // No maximize for dialogs
+        
+        DragMove();
+    }
+
+    /// <summary>
+    /// Handles the close button click.
+    /// </summary>
+    private void CloseButton_Click(object sender, RoutedEventArgs e)
     {
         DialogResult = false;
         Close();

@@ -29,6 +29,7 @@
 
 ### User Interface
 - **Modern dark theme** - Professional polished design with Windows 11-style window chrome
+- **Discord-style layout** - Vertical server rail, channel sidebar, and expandable chat area
 - **Custom title bar** - Borderless window with rounded corners and integrated controls
 - **Multi-language** - English and Norwegian (auto-detects system language)
 - **Tab completion** - For nicknames and commands
@@ -47,8 +48,17 @@
 - **Enhanced user list** - Initials-based avatars, status indicators, collapsible groups
 - **Text emoticon picker** - Quick access to IRC-style emoticons
 - **Character counter** - Shows message length (512 char limit)
-- **Search messages** - Ctrl+F to search with animated slide-down bar
 - **Smooth animations** - Fade-in effects for messages and UI elements
+
+### Chat Experience
+- **Smart auto-scroll** - Pauses when you scroll up, resumes when you reach bottom
+- **Jump to Latest** - Button with unread message count when scrolled up
+- **Message grouping** - Consecutive messages from same user show compact headers
+- **Zebra striping** - Alternating row backgrounds for better readability
+- **Message search** - Ctrl+F to search with visual highlighting of matches
+- **Right-click menu** - Copy message, copy nickname, whois, open query, ignore user
+- **Double-click to copy** - Quickly copy any message to clipboard
+- **Keyboard shortcuts** - Ctrl+End for latest, Page Up/Down for scrolling
 
 ### Advanced
 - **Auto-perform** - Run commands on connection
@@ -56,6 +66,17 @@
 - **Flood protection** - Token bucket algorithm
 - **Portable mode** - Run from USB drive
 - **Encrypted logs** - Secure log storage
+
+### Scripting & Automation
+- **Lua scripting** - Powerful Lua scripts with full IRC API (MoonSharp engine)
+- **JSON triggers** - Simple pattern-based automation without coding
+- **C# plugins** - Compiled plugins for maximum power and extensibility
+- **Script storage** - Persistent storage API for scripts
+- **Timer support** - Schedule one-shot and repeating actions
+- **Custom commands** - Register your own /commands
+- **Full event access** - Messages, joins, parts, kicks, mode changes, and more
+- **Script console** - Test and debug scripts with live output
+- **Auto-load** - Scripts in `%APPDATA%\Munin\scripts\` load automatically on startup
 
 ## 🚀 Getting Started
 
@@ -84,18 +105,25 @@ dotnet publish Munin.UI -c Release -r win-x64 --self-contained
 Munin/
 ├── Munin.Core/               # Core logic and services
 │   ├── Models/               # Data models
+│   ├── Scripting/            # Scripting system
+│   │   ├── Lua/              # MoonSharp Lua engine
+│   │   ├── Triggers/         # JSON trigger automation
+│   │   └── Plugins/          # C# plugin loader
 │   └── Services/             # Business logic
 │       ├── IrcConnection.cs      # IRC protocol
 │       ├── EncryptionService.cs  # AES-256-GCM
 │       ├── SecureStorageService.cs
 │       ├── LoggingService.cs
 │       └── ...
-└── Munin.UI/                 # WPF interface
-    ├── Views/                # XAML windows
-    ├── ViewModels/           # MVVM ViewModels
-    ├── Controls/             # Custom controls
-    ├── Themes/               # Styling and themes
-    └── Converters/           # XAML converters
+├── Munin.UI/                 # WPF interface
+│   ├── Views/                # XAML windows
+│   ├── ViewModels/           # MVVM ViewModels
+│   ├── Controls/             # Custom controls
+│   ├── Themes/               # Styling and themes
+│   └── Converters/           # XAML converters
+├── scripts/                  # User scripts
+│   └── examples/             # Example scripts
+└── docs/                     # Documentation
 ```
 
 ## ⚙️ Configuration
@@ -143,12 +171,132 @@ Data is stored in: `%APPDATA%\Munin\`
 | `/ignore nick` | Ignore a user |
 | `/alias name command` | Create alias |
 
+## 🔧 Scripting System
+
+Munin supports three scripting methods for automation and extensibility.
+
+### Script Location
+Scripts are loaded automatically from: `%APPDATA%\Munin\scripts\`
+
+### Lua Scripts (`.lua`)
+
+Full-featured scripting with the MoonSharp Lua interpreter.
+
+```lua
+-- greet.lua - Auto-greet on join
+irc.on("join", function(e)
+    if e.nick ~= irc.me(e.server) then
+        irc.say(e.server, e.channel, "Welcome, " .. e.nick .. "!")
+    end
+end)
+
+-- Respond to messages
+irc.on("message", function(e)
+    if e.text:match("^!hello") then
+        e:reply("Hello, " .. e.nick .. "!")
+    end
+end)
+
+-- Timer example
+timer.timeout(function()
+    print("5 seconds have passed!")
+end, 5000)
+```
+
+**Available IRC API:**
+- `irc.say(server, target, message)` - Send message
+- `irc.msg(server, target, message)` - Alias for say
+- `irc.action(server, target, message)` - Send /me action
+- `irc.notice(server, target, message)` - Send notice
+- `irc.raw(server, command)` - Send raw IRC command
+- `irc.join(server, channel, [key])` - Join channel
+- `irc.part(server, channel, [reason])` - Leave channel
+- `irc.kick(server, channel, nick, [reason])` - Kick user
+- `irc.mode(server, target, modes)` - Set modes
+- `irc.me(server)` - Get current nickname
+- `irc.on(event, callback)` - Register event handler
+- `timer.timeout(callback, ms)` - One-shot timer
+- `timer.interval(callback, ms)` - Repeating timer
+- `storage.get(key)` / `storage.set(key, value)` - Persistent storage
+- `print(text)` - Print to script console
+
+### JSON Triggers (`.json`)
+
+Simple pattern-based automation without coding.
+
+```json
+{
+  "name": "Auto-Response Bot",
+  "triggers": [
+    {
+      "pattern": "^!help$",
+      "response": "Available commands: !help, !info, !ping",
+      "type": "message"
+    },
+    {
+      "pattern": "^!ping$",
+      "response": "Pong!",
+      "type": "message"
+    },
+    {
+      "pattern": ".*",
+      "response": "Welcome to the channel!",
+      "type": "join",
+      "excludeSelf": true
+    }
+  ]
+}
+```
+
+**Trigger types:** `message`, `join`, `part`, `quit`, `nick`, `topic`
+
+### C# Plugins (`.dll`)
+
+Compiled plugins for maximum power. Implement `IPlugin` interface:
+
+```csharp
+public class MyPlugin : IPlugin
+{
+    public string Name => "My Plugin";
+    public string Version => "1.0.0";
+    
+    public void Initialize(IPluginContext context)
+    {
+        context.RegisterCommand("greet", args => 
+        {
+            context.SendMessage(context.CurrentChannel, $"Hello {args}!");
+        });
+        
+        context.OnMessage += (sender, e) => 
+        {
+            if (e.Content.Contains("hello"))
+                context.SendMessage(e.Channel, $"Hi {e.Nick}!");
+        };
+    }
+    
+    public void Shutdown() { }
+}
+```
+
 ## 🛠️ Technology
 
 - **.NET 8.0** - Platform
 - **WPF** - UI framework
+- **MoonSharp** - Lua scripting engine
 - **Serilog** - Logging
 - **CommunityToolkit.Mvvm** - MVVM framework
+
+## ⌨️ Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+F` | Toggle message search |
+| `Ctrl+End` | Jump to latest message |
+| `Page Up/Down` | Scroll through messages |
+| `Up/Down` | Navigate command history |
+| `Tab` | Auto-complete nicknames/commands |
+| `Escape` | Close search/dialogs |
+| `Enter` | Send message |
 
 ## 📄 License
 

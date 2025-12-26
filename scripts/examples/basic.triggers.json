@@ -1,0 +1,62 @@
+{
+    "name": "Basic Triggers",
+    "description": "Example trigger file for Munin IRC Client",
+    "author": "Munin",
+    "version": "1.0",
+    "triggers": [
+        {
+            "on": "message",
+            "match": "!ping",
+            "action": "reply",
+            "text": "Pong! 🏓"
+        },
+        {
+            "on": "message",
+            "match": "!time",
+            "action": "reply",
+            "text": "Current time: {time} on {date}"
+        },
+        {
+            "on": "message",
+            "match": "!whoami",
+            "action": "reply",
+            "text": "{nick}, you are in {channel} on {server}"
+        },
+        {
+            "on": "message",
+            "match": "!slap",
+            "action": "action",
+            "text": "slaps {1} around with a large trout 🐟"
+        },
+        {
+            "on": "message",
+            "match": "!hug",
+            "action": "action",
+            "text": "hugs {1} warmly 🤗"
+        },
+        {
+            "on": "join",
+            "channel": "#welcome",
+            "action": "reply",
+            "text": "Welcome to the channel, {nick}! Please read the rules."
+        },
+        {
+            "on": "message",
+            "match": "bad word",
+            "action": "kick",
+            "text": "Please watch your language!"
+        },
+        {
+            "on": "invite",
+            "action": "join",
+            "target": "{inviteChannel}"
+        },
+        {
+            "on": "message",
+            "match": "^!echo (.+)$",
+            "isRegex": true,
+            "action": "reply",
+            "text": "{args}"
+        }
+    ]
+}

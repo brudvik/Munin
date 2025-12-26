@@ -287,5 +287,59 @@ namespace Munin.UI.Resources {
         public static string ContextMenu_DeOp => ResourceManager.GetString("ContextMenu_DeOp", resourceCulture) ?? "";
         public static string ContextMenu_Voice => ResourceManager.GetString("ContextMenu_Voice", resourceCulture) ?? "";
         public static string ContextMenu_DeVoice => ResourceManager.GetString("ContextMenu_DeVoice", resourceCulture) ?? "";
+        
+        // Script Manager
+        public static string ScriptManager_Title => ResourceManager.GetString("ScriptManager_Title", resourceCulture) ?? "Script Manager";
+        public static string ScriptManager_OpenFolder => ResourceManager.GetString("ScriptManager_OpenFolder", resourceCulture) ?? "Open Folder";
+        public static string ScriptManager_ReloadAll => ResourceManager.GetString("ScriptManager_ReloadAll", resourceCulture) ?? "Reload All";
+        public static string ScriptManager_EditorTab => ResourceManager.GetString("ScriptManager_EditorTab", resourceCulture) ?? "Editor";
+        public static string ScriptManager_ListTab => ResourceManager.GetString("ScriptManager_ListTab", resourceCulture) ?? "Scripts";
+        public static string ScriptManager_TriggerTab => ResourceManager.GetString("ScriptManager_TriggerTab", resourceCulture) ?? "Triggers";
+        public static string ScriptManager_QuickActionsTab => ResourceManager.GetString("ScriptManager_QuickActionsTab", resourceCulture) ?? "Quick Actions";
+        public static string ScriptManager_Files => ResourceManager.GetString("ScriptManager_Files", resourceCulture) ?? "Files";
+        public static string ScriptManager_NewScript => ResourceManager.GetString("ScriptManager_NewScript", resourceCulture) ?? "New Lua Script";
+        public static string ScriptManager_NewTrigger => ResourceManager.GetString("ScriptManager_NewTrigger", resourceCulture) ?? "New Trigger File";
+        public static string ScriptManager_Delete => ResourceManager.GetString("ScriptManager_Delete", resourceCulture) ?? "Delete";
+        public static string ScriptManager_NoFileSelected => ResourceManager.GetString("ScriptManager_NoFileSelected", resourceCulture) ?? "No file selected";
+        public static string ScriptManager_Save => ResourceManager.GetString("ScriptManager_Save", resourceCulture) ?? "Save";
+        public static string ScriptManager_Run => ResourceManager.GetString("ScriptManager_Run", resourceCulture) ?? "Run";
+        public static string ScriptManager_Output => ResourceManager.GetString("ScriptManager_Output", resourceCulture) ?? "Output";
+        public static string ScriptManager_SearchPlaceholder => ResourceManager.GetString("ScriptManager_SearchPlaceholder", resourceCulture) ?? "Search scripts...";
+        public static string ScriptManager_Reload => ResourceManager.GetString("ScriptManager_Reload", resourceCulture) ?? "Reload";
+        public static string ScriptManager_Edit => ResourceManager.GetString("ScriptManager_Edit", resourceCulture) ?? "Edit";
+        public static string ScriptManager_TriggerBuilderDesc => ResourceManager.GetString("ScriptManager_TriggerBuilderDesc", resourceCulture) ?? "Create automation triggers without writing code.";
+        public static string ScriptManager_AddTrigger => ResourceManager.GetString("ScriptManager_AddTrigger", resourceCulture) ?? "+ Add Trigger";
+        public static string ScriptManager_Ready => ResourceManager.GetString("ScriptManager_Ready", resourceCulture) ?? "Ready";
+        public static string ScriptManager_UnsavedChanges => ResourceManager.GetString("ScriptManager_UnsavedChanges", resourceCulture) ?? "You have unsaved changes. Do you want to save them?";
+        public static string ScriptManager_FileSaved => ResourceManager.GetString("ScriptManager_FileSaved", resourceCulture) ?? "File saved";
+        public static string ScriptManager_EnterScriptName => ResourceManager.GetString("ScriptManager_EnterScriptName", resourceCulture) ?? "Enter script name:";
+        public static string ScriptManager_EnterTriggerName => ResourceManager.GetString("ScriptManager_EnterTriggerName", resourceCulture) ?? "Enter trigger file name:";
+        public static string ScriptManager_ConfirmDelete => ResourceManager.GetString("ScriptManager_ConfirmDelete", resourceCulture) ?? "Are you sure you want to delete {0}?";
+        public static string ScriptManager_ConfirmDeleteTrigger => ResourceManager.GetString("ScriptManager_ConfirmDeleteTrigger", resourceCulture) ?? "Are you sure you want to delete this trigger?";
+        public static string ScriptManager_AllReloaded => ResourceManager.GetString("ScriptManager_AllReloaded", resourceCulture) ?? "All scripts reloaded";
+        
+        // Trigger Builder
+        public static string TriggerBuilder_Title => ResourceManager.GetString("TriggerBuilder_Title", resourceCulture) ?? "Trigger Builder";
+        public static string TriggerBuilder_Description => ResourceManager.GetString("TriggerBuilder_Description", resourceCulture) ?? "Create automation rules without writing code";
+        public static string TriggerBuilder_WhenEvent => ResourceManager.GetString("TriggerBuilder_WhenEvent", resourceCulture) ?? "When this happens:";
+        public static string TriggerBuilder_MatchPattern => ResourceManager.GetString("TriggerBuilder_MatchPattern", resourceCulture) ?? "Match text (optional):";
+        public static string TriggerBuilder_MatchPatternHint => ResourceManager.GetString("TriggerBuilder_MatchPatternHint", resourceCulture) ?? "Leave empty to trigger on all events of this type";
+        public static string TriggerBuilder_MatchType => ResourceManager.GetString("TriggerBuilder_MatchType", resourceCulture) ?? "Match type:";
+        public static string TriggerBuilder_ChannelFilter => ResourceManager.GetString("TriggerBuilder_ChannelFilter", resourceCulture) ?? "Channel filter (optional):";
+        public static string TriggerBuilder_ChannelFilterHint => ResourceManager.GetString("TriggerBuilder_ChannelFilterHint", resourceCulture) ?? "Limit to specific channels. Use * for wildcard.";
+        public static string TriggerBuilder_ThenAction => ResourceManager.GetString("TriggerBuilder_ThenAction", resourceCulture) ?? "Then do this:";
+        public static string TriggerBuilder_Message => ResourceManager.GetString("TriggerBuilder_Message", resourceCulture) ?? "Message:";
+        public static string TriggerBuilder_MessageHint => ResourceManager.GetString("TriggerBuilder_MessageHint", resourceCulture) ?? "Variables: {nick}, {channel}, {message}, {server}";
+        public static string TriggerBuilder_TargetChannel => ResourceManager.GetString("TriggerBuilder_TargetChannel", resourceCulture) ?? "Target channel/user:";
+        public static string TriggerBuilder_Command => ResourceManager.GetString("TriggerBuilder_Command", resourceCulture) ?? "Command to run:";
+        public static string TriggerBuilder_CommandHint => ResourceManager.GetString("TriggerBuilder_CommandHint", resourceCulture) ?? "Example: /mode {channel} +o {nick}";
+        public static string TriggerBuilder_Sound => ResourceManager.GetString("TriggerBuilder_Sound", resourceCulture) ?? "Sound:";
+        public static string TriggerBuilder_Create => ResourceManager.GetString("TriggerBuilder_Create", resourceCulture) ?? "Create Trigger";
+        public static string TriggerBuilder_Save => ResourceManager.GetString("TriggerBuilder_Save", resourceCulture) ?? "Save";
+        
+        // Common
+        public static string Common_OK => ResourceManager.GetString("Common_OK", resourceCulture) ?? "OK";
+        public static string Common_Cancel => ResourceManager.GetString("Common_Cancel", resourceCulture) ?? "Cancel";
+        public static string Common_Close => ResourceManager.GetString("Common_Close", resourceCulture) ?? "Close";
     }
 }

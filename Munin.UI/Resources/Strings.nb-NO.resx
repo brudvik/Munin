@@ -387,6 +387,9 @@ Er du helt sikker?</value>
   <data name="MainWindow_RawLog" xml:space="preserve">
     <value>Rå IRC-logg (Debug)</value>
   </data>
+  <data name="MainWindow_ScriptConsole" xml:space="preserve">
+    <value>Skriptkonsoll</value>
+  </data>
   <data name="MainWindow_Connecting" xml:space="preserve">
     <value>Kobler til...</value>
   </data>
@@ -769,5 +772,160 @@ Perfekt for USB-minnepinne.</value>
   <data name="NoChannel_Hint" xml:space="preserve">
     <value>Velg en kanal eller privat samtale fra sidepanelet</value>
   </data>
-  
+  <data name="MainWindow_JumpToLatest" xml:space="preserve">
+    <value>Hopp til siste</value>
+  </data>
+  <data name="ContextMenu_CopyMessage" xml:space="preserve">
+    <value>Kopier melding</value>
+  </data>
+  <data name="ContextMenu_CopyNickname" xml:space="preserve">
+    <value>Kopier kallenavn</value>
+  </data>
+  <data name="ContextMenu_OpenQuery" xml:space="preserve">
+    <value>Åpne privat samtale</value>
+  </data>
+  <data name="ContextMenu_IgnoreUser" xml:space="preserve">
+    <value>Ignorer bruker</value>
+  </data>
+  <!-- Script Manager -->
+  <data name="ScriptManager_Title" xml:space="preserve">
+    <value>Skriptbehandler</value>
+  </data>
+  <data name="ScriptManager_OpenFolder" xml:space="preserve">
+    <value>Åpne mappe</value>
+  </data>
+  <data name="ScriptManager_ReloadAll" xml:space="preserve">
+    <value>Last alle på nytt</value>
+  </data>
+  <data name="ScriptManager_EditorTab" xml:space="preserve">
+    <value>Redigering</value>
+  </data>
+  <data name="ScriptManager_ListTab" xml:space="preserve">
+    <value>Skript</value>
+  </data>
+  <data name="ScriptManager_TriggerTab" xml:space="preserve">
+    <value>Triggere</value>
+  </data>
+  <data name="ScriptManager_QuickActionsTab" xml:space="preserve">
+    <value>Hurtighandlinger</value>
+  </data>
+  <data name="ScriptManager_Files" xml:space="preserve">
+    <value>Filer</value>
+  </data>
+  <data name="ScriptManager_NewScript" xml:space="preserve">
+    <value>Nytt Lua-skript</value>
+  </data>
+  <data name="ScriptManager_NewTrigger" xml:space="preserve">
+    <value>Ny triggerfil</value>
+  </data>
+  <data name="ScriptManager_Delete" xml:space="preserve">
+    <value>Slett</value>
+  </data>
+  <data name="ScriptManager_NoFileSelected" xml:space="preserve">
+    <value>Ingen fil valgt</value>
+  </data>
+  <data name="ScriptManager_Save" xml:space="preserve">
+    <value>Lagre</value>
+  </data>
+  <data name="ScriptManager_Run" xml:space="preserve">
+    <value>Kjør</value>
+  </data>
+  <data name="ScriptManager_Output" xml:space="preserve">
+    <value>Utdata</value>
+  </data>
+  <data name="ScriptManager_SearchPlaceholder" xml:space="preserve">
+    <value>Søk etter skript...</value>
+  </data>
+  <data name="ScriptManager_Reload" xml:space="preserve">
+    <value>Last på nytt</value>
+  </data>
+  <data name="ScriptManager_Edit" xml:space="preserve">
+    <value>Rediger</value>
+  </data>
+  <data name="ScriptManager_TriggerBuilderDesc" xml:space="preserve">
+    <value>Lag automatiseringstriggere uten å skrive kode. Velg en hendelse og handling for å komme i gang.</value>
+  </data>
+  <data name="ScriptManager_AddTrigger" xml:space="preserve">
+    <value>+ Legg til trigger</value>
+  </data>
+  <data name="ScriptManager_Ready" xml:space="preserve">
+    <value>Klar</value>
+  </data>
+  <data name="ScriptManager_UnsavedChanges" xml:space="preserve">
+    <value>Du har ulagrede endringer. Vil du lagre dem?</value>
+  </data>
+  <data name="ScriptManager_FileSaved" xml:space="preserve">
+    <value>Fil lagret</value>
+  </data>
+  <data name="ScriptManager_EnterScriptName" xml:space="preserve">
+    <value>Skriv inn skriptnavn:</value>
+  </data>
+  <data name="ScriptManager_EnterTriggerName" xml:space="preserve">
+    <value>Skriv inn triggerfilnavn:</value>
+  </data>
+  <data name="ScriptManager_ConfirmDelete" xml:space="preserve">
+    <value>Er du sikker på at du vil slette {0}?</value>
+  </data>
+  <data name="ScriptManager_ConfirmDeleteTrigger" xml:space="preserve">
+    <value>Er du sikker på at du vil slette denne triggeren?</value>
+  </data>
+  <data name="ScriptManager_AllReloaded" xml:space="preserve">
+    <value>Alle skript lastet på nytt</value>
+  </data>
+  <!-- Trigger Builder -->
+  <data name="TriggerBuilder_Title" xml:space="preserve">
+    <value>Triggerbygger</value>
+  </data>
+  <data name="TriggerBuilder_Description" xml:space="preserve">
+    <value>Lag automatiseringsregler uten å skrive kode</value>
+  </data>
+  <data name="TriggerBuilder_WhenEvent" xml:space="preserve">
+    <value>Når dette skjer:</value>
+  </data>
+  <data name="TriggerBuilder_MatchPattern" xml:space="preserve">
+    <value>Match tekst (valgfritt):</value>
+  </data>
+  <data name="TriggerBuilder_MatchPatternHint" xml:space="preserve">
+    <value>La stå tom for å utløse på alle hendelser av denne typen</value>
+  </data>
+  <data name="TriggerBuilder_MatchType" xml:space="preserve">
+    <value>Matchtype:</value>
+  </data>
+  <data name="TriggerBuilder_ChannelFilter" xml:space="preserve">
+    <value>Kanalfilter (valgfritt):</value>
+  </data>
+  <data name="TriggerBuilder_ChannelFilterHint" xml:space="preserve">
+    <value>Begrens til bestemte kanaler. Bruk * som jokertegn.</value>
+  </data>
+  <data name="TriggerBuilder_ThenAction" xml:space="preserve">
+    <value>Gjør så dette:</value>
+  </data>
+  <data name="TriggerBuilder_Message" xml:space="preserve">
+    <value>Melding:</value>
+  </data>
+  <data name="TriggerBuilder_MessageHint" xml:space="preserve">
+    <value>Variabler: {nick}, {channel}, {message}, {server}</value>
+  </data>
+  <data name="TriggerBuilder_TargetChannel" xml:space="preserve">
+    <value>Målkanal/bruker:</value>
+  </data>
+  <data name="TriggerBuilder_Command" xml:space="preserve">
+    <value>Kommando å kjøre:</value>
+  </data>
+  <data name="TriggerBuilder_CommandHint" xml:space="preserve">
+    <value>Eksempel: /mode {channel} +o {nick}</value>
+  </data>
+  <data name="TriggerBuilder_Sound" xml:space="preserve">
+    <value>Lyd:</value>
+  </data>
+  <data name="TriggerBuilder_Create" xml:space="preserve">
+    <value>Opprett trigger</value>
+  </data>
+  <data name="TriggerBuilder_Save" xml:space="preserve">
+    <value>Lagre</value>
+  </data>
+  <!-- Common (OK already exists earlier in file) -->
+  <data name="Common_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
 </root>

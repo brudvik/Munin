@@ -387,6 +387,9 @@ Are you absolutely sure?</value>
   <data name="MainWindow_RawLog" xml:space="preserve">
     <value>Raw IRC Log (Debug)</value>
   </data>
+  <data name="MainWindow_ScriptConsole" xml:space="preserve">
+    <value>Script Console</value>
+  </data>
   <data name="MainWindow_Connecting" xml:space="preserve">
     <value>Connecting...</value>
   </data>
@@ -769,5 +772,160 @@ Perfect for USB drives.</value>
   <data name="NoChannel_Hint" xml:space="preserve">
     <value>Choose a channel or private message from the sidebar</value>
   </data>
-  
+  <data name="MainWindow_JumpToLatest" xml:space="preserve">
+    <value>Jump to Latest</value>
+  </data>
+  <data name="ContextMenu_CopyMessage" xml:space="preserve">
+    <value>Copy Message</value>
+  </data>
+  <data name="ContextMenu_CopyNickname" xml:space="preserve">
+    <value>Copy Nickname</value>
+  </data>
+  <data name="ContextMenu_OpenQuery" xml:space="preserve">
+    <value>Open Private Chat</value>
+  </data>
+  <data name="ContextMenu_IgnoreUser" xml:space="preserve">
+    <value>Ignore User</value>
+  </data>
+  <!-- Script Manager -->
+  <data name="ScriptManager_Title" xml:space="preserve">
+    <value>Script Manager</value>
+  </data>
+  <data name="ScriptManager_OpenFolder" xml:space="preserve">
+    <value>Open Folder</value>
+  </data>
+  <data name="ScriptManager_ReloadAll" xml:space="preserve">
+    <value>Reload All</value>
+  </data>
+  <data name="ScriptManager_EditorTab" xml:space="preserve">
+    <value>Editor</value>
+  </data>
+  <data name="ScriptManager_ListTab" xml:space="preserve">
+    <value>Scripts</value>
+  </data>
+  <data name="ScriptManager_TriggerTab" xml:space="preserve">
+    <value>Triggers</value>
+  </data>
+  <data name="ScriptManager_QuickActionsTab" xml:space="preserve">
+    <value>Quick Actions</value>
+  </data>
+  <data name="ScriptManager_Files" xml:space="preserve">
+    <value>Files</value>
+  </data>
+  <data name="ScriptManager_NewScript" xml:space="preserve">
+    <value>New Lua Script</value>
+  </data>
+  <data name="ScriptManager_NewTrigger" xml:space="preserve">
+    <value>New Trigger File</value>
+  </data>
+  <data name="ScriptManager_Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="ScriptManager_NoFileSelected" xml:space="preserve">
+    <value>No file selected</value>
+  </data>
+  <data name="ScriptManager_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="ScriptManager_Run" xml:space="preserve">
+    <value>Run</value>
+  </data>
+  <data name="ScriptManager_Output" xml:space="preserve">
+    <value>Output</value>
+  </data>
+  <data name="ScriptManager_SearchPlaceholder" xml:space="preserve">
+    <value>Search scripts...</value>
+  </data>
+  <data name="ScriptManager_Reload" xml:space="preserve">
+    <value>Reload</value>
+  </data>
+  <data name="ScriptManager_Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="ScriptManager_TriggerBuilderDesc" xml:space="preserve">
+    <value>Create automation triggers without writing code. Select an event and action to get started.</value>
+  </data>
+  <data name="ScriptManager_AddTrigger" xml:space="preserve">
+    <value>+ Add Trigger</value>
+  </data>
+  <data name="ScriptManager_Ready" xml:space="preserve">
+    <value>Ready</value>
+  </data>
+  <data name="ScriptManager_UnsavedChanges" xml:space="preserve">
+    <value>You have unsaved changes. Do you want to save them?</value>
+  </data>
+  <data name="ScriptManager_FileSaved" xml:space="preserve">
+    <value>File saved</value>
+  </data>
+  <data name="ScriptManager_EnterScriptName" xml:space="preserve">
+    <value>Enter script name:</value>
+  </data>
+  <data name="ScriptManager_EnterTriggerName" xml:space="preserve">
+    <value>Enter trigger file name:</value>
+  </data>
+  <data name="ScriptManager_ConfirmDelete" xml:space="preserve">
+    <value>Are you sure you want to delete {0}?</value>
+  </data>
+  <data name="ScriptManager_ConfirmDeleteTrigger" xml:space="preserve">
+    <value>Are you sure you want to delete this trigger?</value>
+  </data>
+  <data name="ScriptManager_AllReloaded" xml:space="preserve">
+    <value>All scripts reloaded</value>
+  </data>
+  <!-- Trigger Builder -->
+  <data name="TriggerBuilder_Title" xml:space="preserve">
+    <value>Trigger Builder</value>
+  </data>
+  <data name="TriggerBuilder_Description" xml:space="preserve">
+    <value>Create automation rules without writing code</value>
+  </data>
+  <data name="TriggerBuilder_WhenEvent" xml:space="preserve">
+    <value>When this happens:</value>
+  </data>
+  <data name="TriggerBuilder_MatchPattern" xml:space="preserve">
+    <value>Match text (optional):</value>
+  </data>
+  <data name="TriggerBuilder_MatchPatternHint" xml:space="preserve">
+    <value>Leave empty to trigger on all events of this type</value>
+  </data>
+  <data name="TriggerBuilder_MatchType" xml:space="preserve">
+    <value>Match type:</value>
+  </data>
+  <data name="TriggerBuilder_ChannelFilter" xml:space="preserve">
+    <value>Channel filter (optional):</value>
+  </data>
+  <data name="TriggerBuilder_ChannelFilterHint" xml:space="preserve">
+    <value>Limit to specific channels. Use * for wildcard.</value>
+  </data>
+  <data name="TriggerBuilder_ThenAction" xml:space="preserve">
+    <value>Then do this:</value>
+  </data>
+  <data name="TriggerBuilder_Message" xml:space="preserve">
+    <value>Message:</value>
+  </data>
+  <data name="TriggerBuilder_MessageHint" xml:space="preserve">
+    <value>Variables: {nick}, {channel}, {message}, {server}</value>
+  </data>
+  <data name="TriggerBuilder_TargetChannel" xml:space="preserve">
+    <value>Target channel/user:</value>
+  </data>
+  <data name="TriggerBuilder_Command" xml:space="preserve">
+    <value>Command to run:</value>
+  </data>
+  <data name="TriggerBuilder_CommandHint" xml:space="preserve">
+    <value>Example: /mode {channel} +o {nick}</value>
+  </data>
+  <data name="TriggerBuilder_Sound" xml:space="preserve">
+    <value>Sound:</value>
+  </data>
+  <data name="TriggerBuilder_Create" xml:space="preserve">
+    <value>Create Trigger</value>
+  </data>
+  <data name="TriggerBuilder_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <!-- Common (OK already exists earlier in file) -->
+  <data name="Common_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
 </root>

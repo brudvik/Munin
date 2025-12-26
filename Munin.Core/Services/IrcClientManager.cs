@@ -122,7 +122,20 @@ public class IrcClientManager : IDisposable
     /// <returns>The connection if found; otherwise, null.</returns>
     public IrcConnection? GetConnection(string serverId)
     {
-        return _connections.TryGetValue(serverId, out var connection) ? connection : null;
+        // First try by ID, then by name
+        if (_connections.TryGetValue(serverId, out var connection))
+            return connection;
+            
+        return _connections.Values.FirstOrDefault(c => 
+            c.Server.Name.Equals(serverId, StringComparison.OrdinalIgnoreCase));
+    }
+    
+    /// <summary>
+    /// Gets all servers.
+    /// </summary>
+    public IEnumerable<IrcServer> GetServers()
+    {
+        return _connections.Values.Select(c => c.Server);
     }
 
     /// <summary>

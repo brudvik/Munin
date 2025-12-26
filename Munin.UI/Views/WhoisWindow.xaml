@@ -7,52 +7,95 @@
         Width="440"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
-        Background="{StaticResource BackgroundDarkBrush}"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
         Foreground="{StaticResource TextPrimaryBrush}"
         FontFamily="{StaticResource UIFont}">
     
-    <Grid Margin="24">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <Border Background="{StaticResource BackgroundDarkBrush}"
+            CornerRadius="8"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <!-- Header -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
-            <Border Background="{StaticResource AccentSubtleBrush}"
-                    CornerRadius="8"
-                    Padding="12,10"
-                    Margin="0,0,14,0">
-                <TextBlock Text="👤" FontSize="22"/>
+            <!-- Custom Title Bar -->
+            <Border Grid.Row="0" 
+                    Background="{StaticResource BackgroundMediumBrush}"
+                    CornerRadius="8,8,0,0"
+                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid Height="38">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="12,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="👤" FontSize="14" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBlock Text="{loc:Localize Key=UserInfo_Title}" 
+                                   FontSize="13" 
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <Button Grid.Column="1" 
+                            Click="CloseButton_Click"
+                            Style="{StaticResource WindowCloseButtonStyle}"
+                            ToolTip="{loc:Localize Key=MainWindow_Close}">
+                        <Path Data="M0,0 L10,10 M10,0 L0,10" 
+                              Stroke="{StaticResource TextSecondaryBrush}" 
+                              StrokeThickness="1"
+                              Width="10" Height="10"
+                              VerticalAlignment="Center"
+                              HorizontalAlignment="Center"/>
+                    </Button>
+                </Grid>
             </Border>
-            <TextBlock x:Name="NicknameText" 
-                       FontSize="20" 
-                       FontWeight="SemiBold"
-                       VerticalAlignment="Center"/>
-        </StackPanel>
 
-        <!-- Info -->
-        <Border Grid.Row="1" 
-                Background="{StaticResource BackgroundMediumBrush}"
-                CornerRadius="8"
-                Padding="16">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <TextBlock x:Name="InfoText"
-                           TextWrapping="Wrap"
-                           FontFamily="{StaticResource MonospaceFont}"
-                           LineHeight="22"
-                           Foreground="{StaticResource TextSecondaryBrush}"/>
-            </ScrollViewer>
-        </Border>
+            <!-- Header -->
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="24,20,24,20">
+                <Border Background="{StaticResource AccentSubtleBrush}"
+                        CornerRadius="8"
+                        Padding="12,10"
+                        Margin="0,0,14,0">
+                    <TextBlock Text="👤" FontSize="22"/>
+                </Border>
+                <TextBlock x:Name="NicknameText" 
+                           FontSize="20" 
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
 
-        <!-- Close button -->
-        <Button Grid.Row="2" 
-                Content="{loc:Localize Key=Common_Close}" 
-                HorizontalAlignment="Right"
-                Margin="0,20,0,0"
-                Padding="24,10"
-                Style="{StaticResource AccentButtonStyle}"
-                Click="CloseButton_Click"/>
-    </Grid>
+            <!-- Info -->
+            <Border Grid.Row="2" 
+                    Background="{StaticResource BackgroundMediumBrush}"
+                    CornerRadius="8"
+                    Padding="16"
+                    Margin="24,0,24,0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <TextBlock x:Name="InfoText"
+                               TextWrapping="Wrap"
+                               FontFamily="{StaticResource MonospaceFont}"
+                               LineHeight="22"
+                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                </ScrollViewer>
+            </Border>
+
+            <!-- Close button -->
+            <Button Grid.Row="3" 
+                    Content="{loc:Localize Key=Common_Close}" 
+                    HorizontalAlignment="Right"
+                    Margin="24,20,24,24"
+                    Padding="24,10"
+                    Style="{StaticResource AccentButtonStyle}"
+                    Click="CloseButton_Click"/>
+        </Grid>
+    </Border>
 </Window>

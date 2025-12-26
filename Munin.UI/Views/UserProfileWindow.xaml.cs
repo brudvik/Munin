@@ -3,6 +3,7 @@ using Munin.Core.Models;
 using Munin.Core.Services;
 using Munin.UI.Services;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media.Imaging;
 
 namespace Munin.UI.Views;
@@ -126,6 +127,25 @@ public partial class UserProfileWindow : Window
     }
 
     private void Close_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
+
+    /// <summary>
+    /// Handles mouse drag on the custom title bar to move the window.
+    /// </summary>
+    private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ClickCount == 2)
+            return; // No maximize for dialogs
+        
+        DragMove();
+    }
+
+    /// <summary>
+    /// Handles the close button click in the custom title bar.
+    /// </summary>
+    private void CloseButton_Click(object sender, RoutedEventArgs e)
     {
         Close();
     }

@@ -176,6 +176,38 @@ public partial class ChannelViewModel : ObservableObject
         // Subscribe to collection changes to update HasNoMessages
         Messages.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasNoMessages));
     }
+    
+    /// <summary>
+    /// Adds a message to the channel with proper grouping logic.
+    /// </summary>
+    /// <param name="message">The message ViewModel to add.</param>
+    /// <param name="trackStats">Whether to track statistics for this message.</param>
+    public void AddMessage(MessageViewModel message, bool trackStats = true)
+    {
+        // Set row index for zebra striping
+        message.RowIndex = Messages.Count % 2;
+        
+        // Check if this message should be grouped with the previous one
+        if (Messages.Count > 0)
+        {
+            var lastMessage = Messages[^1];
+            // Group if same sender, within 5 minutes, and both are normal messages with nicknames
+            var shouldGroup = message.ShowNickname && 
+                              lastMessage.ShowNickname &&
+                              !string.IsNullOrEmpty(message.Source) &&
+                              string.Equals(message.Source, lastMessage.Source, StringComparison.OrdinalIgnoreCase) &&
+                              (message.Message.Timestamp - lastMessage.Message.Timestamp).TotalMinutes <= 5;
+            
+            message.IsGrouped = shouldGroup;
+        }
+        
+        Messages.Add(message);
+        
+        if (trackStats)
+        {
+            TrackMessage(message.Source);
+        }
+    }
 
     public void RefreshUsers()
     {

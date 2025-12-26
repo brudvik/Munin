@@ -5,25 +5,66 @@
         Title="{loc:Localize Key=ChannelStats_Title}" 
         Width="420" Height="500"
         WindowStartupLocation="CenterOwner"
-        Background="{DynamicResource BackgroundDarkBrush}"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
         FontFamily="{StaticResource UIFont}"
         FontSize="13"
         ResizeMode="NoResize">
     
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        
-        <!-- Header -->
-        <Border Grid.Row="0" 
-                Background="{DynamicResource BackgroundMediumBrush}"
-                BorderBrush="{DynamicResource BorderSubtleBrush}"
-                BorderThickness="0,0,0,1"
-                Padding="20,16">
+    <Border Background="{DynamicResource BackgroundDarkBrush}"
+            CornerRadius="8"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            
+            <!-- Custom Title Bar -->
+            <Border Grid.Row="0" 
+                    Background="{StaticResource BackgroundMediumBrush}"
+                    CornerRadius="8,8,0,0"
+                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid Height="38">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="12,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="📊" FontSize="14" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBlock Text="{loc:Localize Key=ChannelStats_Title}" 
+                                   FontSize="13" 
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <Button Grid.Column="1" 
+                            Click="CloseButton_Click"
+                            Style="{StaticResource WindowCloseButtonStyle}"
+                            ToolTip="{loc:Localize Key=MainWindow_Close}">
+                        <Path Data="M0,0 L10,10 M10,0 L0,10" 
+                              Stroke="{StaticResource TextSecondaryBrush}" 
+                              StrokeThickness="1"
+                              Width="10" Height="10"
+                              VerticalAlignment="Center"
+                              HorizontalAlignment="Center"/>
+                    </Button>
+                </Grid>
+            </Border>
+            
+            <!-- Header -->
+            <Border Grid.Row="1" 
+                    Background="{DynamicResource BackgroundMediumBrush}"
+                    BorderBrush="{DynamicResource BorderSubtleBrush}"
+                    BorderThickness="0,0,0,1"
+                    Padding="20,16">
             <StackPanel Orientation="Horizontal">
                 <Border Width="36" Height="36" 
                         CornerRadius="8"
@@ -44,9 +85,9 @@
                 </StackPanel>
             </StackPanel>
         </Border>
-        
-        <!-- Stats Grid -->
-        <Grid Grid.Row="1" Margin="20,16,20,0">
+            
+            <!-- Stats Grid -->
+            <Grid Grid.Row="2" Margin="20,16,20,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -106,14 +147,14 @@
                                Foreground="{DynamicResource TextMutedBrush}"/>
                 </StackPanel>
             </Border>
-        </Grid>
-        
-        <!-- Top Chatters -->
-        <Border Grid.Row="2" 
-                Background="{DynamicResource BackgroundElevatedBrush}"
-                CornerRadius="8"
-                Padding="16"
-                Margin="20,16,20,0">
+            </Grid>
+            
+            <!-- Top Chatters -->
+            <Border Grid.Row="3" 
+                    Background="{DynamicResource BackgroundElevatedBrush}"
+                    CornerRadius="8"
+                    Padding="16"
+                    Margin="20,16,20,0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -159,19 +200,20 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </Grid>
-        </Border>
-        
-        <!-- Close Button -->
-        <Border Grid.Row="3"
-                BorderBrush="{DynamicResource BorderSubtleBrush}"
-                BorderThickness="0,1,0,0"
-                Margin="0,16,0,0"
-                Padding="20,16">
-            <Button Content="{loc:Localize Key=Common_Close}" 
-                    Padding="24,10"
-                    HorizontalAlignment="Center"
-                    Style="{StaticResource AccentButtonStyle}"
-                    Click="CloseButton_Click"/>
-        </Border>
-    </Grid>
+            </Border>
+            
+            <!-- Close Button -->
+            <Border Grid.Row="4"
+                    BorderBrush="{DynamicResource BorderSubtleBrush}"
+                    BorderThickness="0,1,0,0"
+                    Margin="0,16,0,0"
+                    Padding="20,16">
+                <Button Content="{loc:Localize Key=Common_Close}" 
+                        Padding="24,10"
+                        HorizontalAlignment="Center"
+                        Style="{StaticResource AccentButtonStyle}"
+                        Click="CloseButton_Click"/>
+            </Border>
+        </Grid>
+    </Border>
 </Window>

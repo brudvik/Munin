@@ -1,5 +1,6 @@
 using Munin.UI.ViewModels;
 using System.Windows;
+using System.Windows.Input;
 
 namespace Munin.UI.Views;
 
@@ -20,7 +21,21 @@ public partial class ChannelStatsWindow : Window
             .ToList();
         TopChattersItems.ItemsSource = rankedChatters;
     }
-    
+
+    /// <summary>
+    /// Handles mouse drag on the custom title bar to move the window.
+    /// </summary>
+    private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ClickCount == 2)
+            return; // No maximize for dialogs
+        
+        DragMove();
+    }
+
+    /// <summary>
+    /// Handles the close button click.
+    /// </summary>
     private void CloseButton_Click(object sender, RoutedEventArgs e)
     {
         Close();
