@@ -4,7 +4,7 @@
 
 *Named after Odin's raven who flies across the world to bring back news and information.*
 
-![Munin IRC Client](https://raw.githubusercontent.com/brudvik/Munin/main/munin.png)
+![Munin IRC Client](https://raw.githubusercontent.com/brudvik/Munin/refs/heads/main/munin.png)
 
 ![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4)
 ![Windows](https://img.shields.io/badge/Platform-Windows-0078D6)
