@@ -24,6 +24,8 @@ namespace Munin.Core.Services;
 [JsonSerializable(typeof(List<string>))]
 [JsonSerializable(typeof(Dictionary<string, List<string>>))]
 [JsonSerializable(typeof(Dictionary<string, Dictionary<string, List<string>>>))]
+[JsonSerializable(typeof(CertificatePin))]
+[JsonSerializable(typeof(List<CertificatePin>))]
 internal partial class JsonSourceGenerationContext : JsonSerializerContext
 {
 }

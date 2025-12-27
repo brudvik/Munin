@@ -45,6 +45,11 @@ public class IrcMessage
     public bool IsHighlight { get; set; }
     
     /// <summary>
+    /// Whether this message was encrypted with FiSH.
+    /// </summary>
+    public bool IsEncrypted { get; set; }
+    
+    /// <summary>
     /// The original raw IRC message, if available.
     /// </summary>
     public string? RawMessage { get; set; }

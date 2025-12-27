@@ -245,6 +245,47 @@ Er du helt sikker?</value>
   <data name="MainWindow_CloseConversation" xml:space="preserve">
     <value>Lukk samtale</value>
   </data>
+  <data name="FiSH_SetKey" xml:space="preserve">
+    <value>Sett krypteringsnøkkel...</value>
+  </data>
+  <data name="FiSH_RemoveKey" xml:space="preserve">
+    <value>Fjern krypteringsnøkkel</value>
+  </data>
+  <data name="FiSH_ShowKey" xml:space="preserve">
+    <value>Vis krypteringsnøkkel</value>
+  </data>
+  <data name="FiSH_KeyExchange" xml:space="preserve">
+    <value>Nøkkelutveksling (DH1080)</value>
+  </data>
+  <data name="FiSH_SetKeyTitle" xml:space="preserve">
+    <value>Sett FiSH-krypteringsnøkkel</value>
+  </data>
+  <data name="FiSH_SetKeyPrompt" xml:space="preserve">
+    <value>Skriv inn krypteringsnøkkel for {0}:</value>
+  </data>
+  <data name="FiSH_Encryption" xml:space="preserve">
+    <value>Kryptering</value>
+  </data>
+  
+  <!-- Topic Editor Dialog -->
+  <data name="TopicEditor_Title" xml:space="preserve">
+    <value>Rediger kanalemne</value>
+  </data>
+  <data name="TopicEditor_Topic" xml:space="preserve">
+    <value>Emne:</value>
+  </data>
+  <data name="TopicEditor_EncryptTopic" xml:space="preserve">
+    <value>Krypter emne med FiSH</value>
+  </data>
+  <data name="TopicEditor_SetTopic" xml:space="preserve">
+    <value>Sett emne</value>
+  </data>
+  <data name="TopicEditor_Cancel" xml:space="preserve">
+    <value>Avbryt</value>
+  </data>
+  <data name="TopicEditor_EncryptionNote" xml:space="preserve">
+    <value>Merk: Krypterte emner kan bare leses av brukere med samme nøkkel.</value>
+  </data>
   
   <!-- Add Server Dialog -->
   <data name="AddServer_Title" xml:space="preserve">
@@ -463,6 +504,15 @@ Er du helt sikker?</value>
   </data>
   <data name="AddServer_AcceptInvalidCertsTooltip" xml:space="preserve">
     <value>Aktiver dette for selvsignerte sertifikater</value>
+  </data>
+  <data name="AddServer_PreferIPv6" xml:space="preserve">
+    <value>Foretrekk IPv6</value>
+  </data>
+  <data name="AddServer_PreferIPv6Tooltip" xml:space="preserve">
+    <value>Prøv IPv6-tilkobling først, fall tilbake til IPv4 hvis utilgjengelig</value>
+  </data>
+  <data name="Message_Encrypted" xml:space="preserve">
+    <value>Denne meldingen ble kryptert med FiSH</value>
   </data>
   <data name="AddServer_SaslHeader" xml:space="preserve">
     <value>SASL-autentisering (IRCv3)</value>
@@ -927,5 +977,74 @@ Perfekt for USB-minnepinne.</value>
   <!-- Common (OK already exists earlier in file) -->
   <data name="Common_OK" xml:space="preserve">
     <value>OK</value>
+  </data>
+  <!-- Quote/Reply -->
+  <data name="ContextMenu_QuoteReply" xml:space="preserve">
+    <value>Siter/svar</value>
+  </data>
+  <!-- Message formatting -->
+  <data name="MainWindow_FormatBold" xml:space="preserve">
+    <value>Fet (Ctrl+B)</value>
+  </data>
+  <data name="MainWindow_FormatItalic" xml:space="preserve">
+    <value>Kursiv (Ctrl+I)</value>
+  </data>
+  <data name="MainWindow_FormatUnderline" xml:space="preserve">
+    <value>Understreking (Ctrl+U)</value>
+  </data>
+  <!-- Away status -->
+  <data name="MainWindow_Away" xml:space="preserve">
+    <value>Borte</value>
+  </data>
+  <data name="MainWindow_SetAway" xml:space="preserve">
+    <value>Sett borte</value>
+  </data>
+  <data name="MainWindow_SetBack" xml:space="preserve">
+    <value>Sett tilbake</value>
+  </data>
+  <data name="MainWindow_AwayMessage" xml:space="preserve">
+    <value>Bortemelding:</value>
+  </data>
+  <data name="MainWindow_DefaultAwayMessage" xml:space="preserve">
+    <value>Jeg er for øyeblikket borte</value>
+  </data>
+  <!-- Favorites -->
+  <data name="MainWindow_AddToFavorites" xml:space="preserve">
+    <value>Legg til favoritter</value>
+  </data>
+  <data name="MainWindow_RemoveFromFavorites" xml:space="preserve">
+    <value>Fjern fra favoritter</value>
+  </data>
+  <data name="MainWindow_Favorites" xml:space="preserve">
+    <value>Favoritter</value>
+  </data>
+  <!-- Notify list -->
+  <data name="MainWindow_NotifyList" xml:space="preserve">
+    <value>Varslingsliste</value>
+  </data>
+  <data name="MainWindow_AddToNotify" xml:space="preserve">
+    <value>Legg til varslingsliste</value>
+  </data>
+  <data name="MainWindow_RemoveFromNotify" xml:space="preserve">
+    <value>Fjern fra varslingsliste</value>
+  </data>
+  <data name="MainWindow_UserOnline" xml:space="preserve">
+    <value>{0} er nå tilkoblet</value>
+  </data>
+  <data name="MainWindow_UserOffline" xml:space="preserve">
+    <value>{0} er nå frakoblet</value>
+  </data>
+  <!-- Certificate pinning -->
+  <data name="MainWindow_CertificateChanged" xml:space="preserve">
+    <value>Serversertifikatet har endret seg!</value>
+  </data>
+  <data name="MainWindow_CertificateChangedMessage" xml:space="preserve">
+    <value>SSL-sertifikatet for {0} har endret seg siden forrige tilkobling. Dette kan indikere et sikkerhetsproblem. Vil du fortsette?</value>
+  </data>
+  <data name="MainWindow_CertificateNew" xml:space="preserve">
+    <value>Nytt sertifikatfingeravtrykk: {0}</value>
+  </data>
+  <data name="MainWindow_CertificateOld" xml:space="preserve">
+    <value>Tidligere sertifikatfingeravtrykk: {0}</value>
   </data>
 </root>

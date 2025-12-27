@@ -49,6 +49,7 @@ public class IrcClientManager : IDisposable
     public event EventHandler<IrcReconnectEventArgs>? Reconnecting;
     public event EventHandler<IrcWhoisEventArgs>? WhoisReceived;
     public event EventHandler<(IrcServer Server, int LatencyMs)>? LatencyUpdated;
+    public event EventHandler<Dh1080CompleteEventArgs>? Dh1080KeyExchangeComplete;
 
     public IrcClientManager()
     {
@@ -91,6 +92,7 @@ public class IrcClientManager : IDisposable
         connection.Reconnecting += (s, e) => Reconnecting?.Invoke(this, e);
         connection.WhoisReceived += (s, e) => WhoisReceived?.Invoke(this, e);
         connection.LatencyUpdated += (s, latency) => LatencyUpdated?.Invoke(this, (server, latency));
+        connection.Dh1080KeyExchangeComplete += (s, e) => Dh1080KeyExchangeComplete?.Invoke(this, e);
 
         _connections[server.Id] = connection;
         _logger.Information("Added server {Name} ({Host})", server.Name, server.Hostname);

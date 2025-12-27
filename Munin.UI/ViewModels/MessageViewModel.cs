@@ -59,6 +59,11 @@ public partial class MessageViewModel : ObservableObject
     public string Content => Message.Content;
     public MessageType Type => Message.Type;
     public bool IsHighlight => Message.IsHighlight;
+    
+    /// <summary>
+    /// True if this message was encrypted with FiSH.
+    /// </summary>
+    public bool IsEncrypted => Message.IsEncrypted;
 
     [ObservableProperty]
     private bool _isSearchMatch;

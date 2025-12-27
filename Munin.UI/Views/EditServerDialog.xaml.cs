@@ -37,6 +37,7 @@ public partial class EditServerDialog : Window
         PortTextBox.Text = Server.Port.ToString();
         UseSslCheckBox.IsChecked = Server.UseSsl;
         AcceptInvalidCertsCheckBox.IsChecked = Server.AcceptInvalidCertificates;
+        PreferIPv6CheckBox.IsChecked = Server.PreferIPv6;
         NicknameTextBox.Text = Server.Nickname;
         UsernameTextBox.Text = Server.Username;
         RealNameTextBox.Text = Server.RealName;
@@ -75,6 +76,7 @@ public partial class EditServerDialog : Window
         Server.Port = port;
         Server.UseSsl = UseSslCheckBox.IsChecked == true;
         Server.AcceptInvalidCertificates = AcceptInvalidCertsCheckBox.IsChecked == true;
+        Server.PreferIPv6 = PreferIPv6CheckBox.IsChecked == true;
         Server.Nickname = NicknameTextBox.Text.Trim();
         Server.Username = string.IsNullOrWhiteSpace(UsernameTextBox.Text) 
             ? NicknameTextBox.Text.Trim() 

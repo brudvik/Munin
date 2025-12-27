@@ -1,4 +1,5 @@
 using Munin.Core.Services;
+using Munin.UI.Resources;
 using Munin.UI.Services;
 using Munin.UI.ViewModels;
 using Serilog;
@@ -477,6 +478,40 @@ public partial class MainWindow : Window
     }
     
     /// <summary>
+    /// Quotes the message and sets up a reply.
+    /// </summary>
+    private void QuoteReply_Click(object sender, RoutedEventArgs e)
+    {
+        if (GetMessageFromContextMenu(sender) is { } msg && DataContext is MainViewModel vm)
+        {
+            // Format: <nick> message (first 50 chars if long)
+            var quotedContent = msg.Content.Length > 50 
+                ? msg.Content[..50] + "..." 
+                : msg.Content;
+            var quote = $"<{msg.Source}> {quotedContent}";
+            
+            // Set the input with reply prefix
+            vm.MessageInput = $"{msg.Source}: ";
+            MessageInputTextBox.Focus();
+            MessageInputTextBox.CaretIndex = vm.MessageInput.Length;
+            
+            // Show the quoted message in a tooltip-style way by inserting in chat
+            // Actually, just prepare the reply - the user sees the quote context
+        }
+    }
+    
+    /// <summary>
+    /// Adds the user to the notify list.
+    /// </summary>
+    private void AddToNotify_Click(object sender, RoutedEventArgs e)
+    {
+        if (GetMessageFromContextMenu(sender) is { Source: not null } msg && DataContext is MainViewModel vm)
+        {
+            vm.AddToNotifyList(msg.Source);
+        }
+    }
+    
+    /// <summary>
     /// Gets the MessageViewModel from a context menu item.
     /// </summary>
     private static MessageViewModel? GetMessageFromContextMenu(object sender)
@@ -569,6 +604,133 @@ public partial class MainWindow : Window
             MessageInputTextBox.Focus();
             
             EmojiPopup.IsOpen = false;
+        }
+    }
+    
+    #endregion
+    
+    #region Message Formatting
+    
+    // IRC formatting control characters
+    private const char CtrlBold = '\x02';
+    private const char CtrlItalic = '\x1D';
+    private const char CtrlUnderline = '\x1F';
+    
+    /// <summary>
+    /// Wraps the selected text with bold formatting, or inserts bold toggle.
+    /// </summary>
+    private void FormatBold_Click(object sender, RoutedEventArgs e)
+    {
+        InsertFormatting(CtrlBold);
+    }
+    
+    /// <summary>
+    /// Wraps the selected text with italic formatting, or inserts italic toggle.
+    /// </summary>
+    private void FormatItalic_Click(object sender, RoutedEventArgs e)
+    {
+        InsertFormatting(CtrlItalic);
+    }
+    
+    /// <summary>
+    /// Wraps the selected text with underline formatting, or inserts underline toggle.
+    /// </summary>
+    private void FormatUnderline_Click(object sender, RoutedEventArgs e)
+    {
+        InsertFormatting(CtrlUnderline);
+    }
+    
+    /// <summary>
+    /// Inserts formatting around selected text or at cursor position.
+    /// </summary>
+    /// <param name="formatChar">The IRC format control character.</param>
+    private void InsertFormatting(char formatChar)
+    {
+        var selectedText = MessageInputTextBox.SelectedText;
+        var selectionStart = MessageInputTextBox.SelectionStart;
+        var selectionLength = MessageInputTextBox.SelectionLength;
+        var currentText = MessageInputTextBox.Text ?? "";
+        
+        if (selectionLength > 0)
+        {
+            // Wrap selected text with format characters
+            var formattedText = $"{formatChar}{selectedText}{formatChar}";
+            MessageInputTextBox.Text = currentText.Remove(selectionStart, selectionLength)
+                                                  .Insert(selectionStart, formattedText);
+            MessageInputTextBox.CaretIndex = selectionStart + formattedText.Length;
+        }
+        else
+        {
+            // Insert toggle character at cursor
+            MessageInputTextBox.Text = currentText.Insert(selectionStart, formatChar.ToString());
+            MessageInputTextBox.CaretIndex = selectionStart + 1;
+        }
+        
+        MessageInputTextBox.Focus();
+    }
+    
+    #endregion
+    
+    #region Away Status
+    
+    /// <summary>
+    /// Toggles away status with a popup for entering away message.
+    /// </summary>
+    private void AwayToggle_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm || vm.SelectedServer == null) return;
+        
+        var server = vm.SelectedServer;
+        
+        if (server.IsAway)
+        {
+            // Return from away
+            vm.MessageInput = "/back";
+            vm.SendMessageCommand.Execute(null);
+        }
+        else
+        {
+            // Show input dialog for away message
+            var defaultMessage = Strings.ResourceManager.GetString("MainWindow_DefaultAwayMessage") ?? "I'm currently away";
+            var setAwayTitle = Strings.ResourceManager.GetString("MainWindow_SetAway") ?? "Set Away";
+            var awayMessagePrompt = Strings.ResourceManager.GetString("MainWindow_AwayMessage") ?? "Away message:";
+            var dialog = new InputDialog(
+                setAwayTitle,
+                awayMessagePrompt,
+                defaultMessage)
+            {
+                Owner = this
+            };
+            
+            if (dialog.ShowDialog() == true && !string.IsNullOrWhiteSpace(dialog.InputText))
+            {
+                vm.MessageInput = $"/away {dialog.InputText}";
+                vm.SendMessageCommand.Execute(null);
+            }
+        }
+    }
+    
+    #endregion
+    
+    #region Favorites
+    
+    /// <summary>
+    /// Toggles the favorite status of a channel.
+    /// </summary>
+    private void ToggleFavorite_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem menuItem && 
+            menuItem.Parent is ContextMenu contextMenu &&
+            contextMenu.PlacementTarget is FrameworkElement element &&
+            element.DataContext is ChannelViewModel channel)
+        {
+            channel.IsFavorite = !channel.IsFavorite;
+            
+            // Re-sort the channels to put favorites at top
+            if (DataContext is MainViewModel vm && vm.SelectedServer != null)
+            {
+                vm.SortChannels(vm.SelectedServer);
+            }
         }
     }
     

@@ -138,6 +138,12 @@
                                   ToolTip="{loc:Localize Key=AddServer_AcceptInvalidCertsTooltip}"
                                   Margin="0,6,0,0"
                                   IsEnabled="{Binding IsChecked, ElementName=UseSslCheckBox}"/>
+                        <CheckBox x:Name="PreferIPv6CheckBox" 
+                                  Content="{loc:Localize Key=AddServer_PreferIPv6}" 
+                                  Foreground="{StaticResource TextSecondaryBrush}"
+                                  VerticalAlignment="Center"
+                                  ToolTip="{loc:Localize Key=AddServer_PreferIPv6Tooltip}"
+                                  Margin="0,6,0,0"/>
                     </StackPanel>
                 </Grid>
 

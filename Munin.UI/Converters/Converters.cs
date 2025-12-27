@@ -200,3 +200,41 @@ public class ZeroToVisibleConverter : IValueConverter
         throw new NotImplementedException();
     }
 }
+
+/// <summary>
+/// Converts away status boolean to tooltip text.
+/// </summary>
+public class AwayStatusTooltipConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        var isAway = value is bool b && b;
+        // Using English as fallback - localization handled through resources
+        return isAway ? "Click to return from away" : "Click to set away";
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+/// <summary>
+/// Converts width and height to a Rect for clipping rounded borders.
+/// </summary>
+public class SizeToRectConverter : IMultiValueConverter
+{
+    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (values.Length == 2 && values[0] is double width && values[1] is double height)
+        {
+            return new Rect(0, 0, width, height);
+        }
+        return new Rect(0, 0, 0, 0);
+    }
+
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}

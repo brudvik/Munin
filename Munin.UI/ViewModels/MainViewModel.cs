@@ -6,6 +6,7 @@ using Munin.Core.Scripting.Lua;
 using Munin.Core.Scripting.Plugins;
 using Munin.Core.Scripting.Triggers;
 using Munin.Core.Services;
+using Munin.UI.Resources;
 using Munin.UI.Services;
 using Munin.UI.Views;
 using Serilog;
@@ -36,6 +37,7 @@ public partial class MainViewModel : ObservableObject
     private readonly ConfigurationService _configService;
     private readonly DispatcherTimer _latencyTimer;
     private readonly ScriptManager _scriptManager;
+    private readonly FishCryptService _fishCrypt;
     private ScriptConsoleWindow? _scriptConsoleWindow;
     private ScriptManagerWindow? _scriptManagerWindow;
 
@@ -266,6 +268,40 @@ public partial class MainViewModel : ObservableObject
         var scriptContext = new ScriptContext(_clientManager, scriptsDir);
         _scriptManager = new ScriptManager(scriptContext);
         
+        // Initialize FiSH encryption
+        _fishCrypt = new FishCryptService();
+        _fishCrypt.KeyChanged += async (s, e) =>
+        {
+            var status = e.HasKey ? "Key set for" : "Key removed from";
+            _logger.Information("FiSH: {Status} {Target}", status, e.Target);
+            
+            // Save keys to configuration
+            _configService.Configuration.FishKeys = _fishCrypt.GetAllKeys();
+            await _configService.SaveAsync();
+            
+            // If a key was set, try to decrypt the topic for that channel
+            if (e.HasKey)
+            {
+                await App.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    var server = Servers.FirstOrDefault(srv => srv.Server.Id == e.ServerId);
+                    var channel = server?.Channels.FirstOrDefault(ch => 
+                        ch.Channel.Name.Equals(e.Target, StringComparison.OrdinalIgnoreCase));
+                    
+                    if (channel?.Topic != null && FishCryptService.IsEncrypted(channel.Topic))
+                    {
+                        var decrypted = _fishCrypt.Decrypt(e.ServerId, e.Target, channel.Topic);
+                        if (decrypted != null)
+                        {
+                            channel.Topic = $"🔐 {decrypted}";
+                            channel.Channel.Topic = channel.Topic;
+                            _logger.Debug("FiSH: Decrypted topic for {Channel}", e.Target);
+                        }
+                    }
+                });
+            }
+        };
+        
         // Register script engines
         _scriptManager.RegisterEngine(new LuaScriptEngine());
         _scriptManager.RegisterEngine(new TriggerEngine());
@@ -361,6 +397,14 @@ public partial class MainViewModel : ObservableObject
         await _configService.LoadAsync();
         _logger.Information("LoadConfigurationAsync: Configuration loaded");
         
+        // Load FiSH keys from configuration
+        var fishKeys = _configService.Configuration.FishKeys;
+        if (fishKeys != null && fishKeys.Count > 0)
+        {
+            _fishCrypt.LoadKeys(fishKeys);
+            _logger.Information("LoadConfigurationAsync: Loaded {Count} FiSH key(s)", fishKeys.Count);
+        }
+        
         // Must run UI operations on the dispatcher thread
         await App.Current.Dispatcher.InvokeAsync(() =>
         {
@@ -401,6 +445,9 @@ public partial class MainViewModel : ObservableObject
         var serverVm = new ServerViewModel(server);
         var connection = _clientManager.AddServer(server);
         serverVm.Connection = connection;
+        
+        // Apply FiSH encryption service
+        connection.FishCrypt = _fishCrypt;
         
         // Apply highlight words from settings
         connection.HighlightWords = _configService.Configuration.Settings.HighlightWords;
@@ -855,6 +902,27 @@ public partial class MainViewModel : ObservableObject
                 }
             });
         };
+        
+        _clientManager.Dh1080KeyExchangeComplete += (s, e) =>
+        {
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                var server = Servers.FirstOrDefault(sv => sv.Server.Id == e.ServerId);
+                if (server != null)
+                {
+                    var dmChannel = GetOrCreatePrivateMessageChannel(server, e.Nick);
+                    var modeText = e.IsCbc ? "CBC" : "ECB";
+                    dmChannel.AddSystemMessage($"🔐 DH1080 key exchange complete! Encryption enabled ({modeText} mode).");
+                    
+                    // Also add to server console
+                    var serverConsole = server.Channels.FirstOrDefault();
+                    if (serverConsole != null && serverConsole != dmChannel)
+                    {
+                        serverConsole.AddSystemMessage($"🔐 DH1080 key exchange complete with {e.Nick}. FiSH encryption enabled ({modeText}).");
+                    }
+                }
+            });
+        };
     }
 
     /// <summary>
@@ -1055,13 +1123,17 @@ public partial class MainViewModel : ObservableObject
 
         await messageConnection.SendMessageAsync(target, message);
 
+        // Check if message was encrypted
+        var wasEncrypted = _fishCrypt?.HasKey(messageConnection.Server.Id, target) ?? false;
+
         // Add our own message to the channel
         var ircMessage = new IrcMessage
         {
             Type = MessageType.Normal,
             Source = messageConnection.CurrentNickname,
             Target = target,
-            Content = message
+            Content = message,
+            IsEncrypted = wasEncrypted
         };
         SelectedChannel.AddMessage(new MessageViewModel(ircMessage));
 
@@ -1145,12 +1217,14 @@ public partial class MainViewModel : ObservableObject
                         if (server != null)
                         {
                             var dmChannel = GetOrCreatePrivateMessageChannel(server, targetNick);
+                            var wasEncrypted = _fishCrypt?.HasKey(connection.Server.Id, targetNick) ?? false;
                             var ircMessage = new IrcMessage
                             {
                                 Type = MessageType.Normal,
                                 Source = connection.CurrentNickname,
                                 Target = targetNick,
-                                Content = msgContent
+                                Content = msgContent,
+                                IsEncrypted = wasEncrypted
                             };
                             dmChannel.AddMessage(new MessageViewModel(ircMessage));
                             LoggingService.Instance.LogMessage(server.Server.Name, $"PM-{targetNick}", ircMessage);
@@ -1177,12 +1251,14 @@ public partial class MainViewModel : ObservableObject
                         {
                             var queryMsg = queryParts[1];
                             await connection.SendMessageAsync(targetUser, queryMsg);
+                            var wasEncrypted = _fishCrypt?.HasKey(connection.Server.Id, targetUser) ?? false;
                             var ircMessage = new IrcMessage
                             {
                                 Type = MessageType.Normal,
                                 Source = connection.CurrentNickname,
                                 Target = targetUser,
-                                Content = queryMsg
+                                Content = queryMsg,
+                                IsEncrypted = wasEncrypted
                             };
                             dmChannel.AddMessage(new MessageViewModel(ircMessage));
                             LoggingService.Instance.LogMessage(server.Server.Name, $"PM-{targetUser}", ircMessage);
@@ -1278,11 +1354,369 @@ public partial class MainViewModel : ObservableObject
                     StatusText = $"Reloaded {_scriptManager.GetLoadedScripts().Count()} scripts";
                 }
                 break;
+                
+            case "SETKEY":
+                HandleSetKeyCommand(connection, args);
+                break;
+                
+            case "DELKEY":
+                HandleDelKeyCommand(connection, args);
+                break;
+                
+            case "KEYX":
+            case "KEYEXCHANGE":
+                await HandleKeyExchangeCommandAsync(connection, args);
+                break;
+                
+            case "SHOWKEY":
+                HandleShowKeyCommand(connection, args);
+                break;
 
             default:
                 // Send as raw command
                 await connection.SendRawAsync($"{command} {args}".Trim());
                 break;
+        }
+    }
+    
+    /// <summary>
+    /// Handles /setkey [target] key - Sets a FiSH encryption key.
+    /// </summary>
+    private void HandleSetKeyCommand(IrcConnection connection, string args)
+    {
+        var parts = args.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+        string target;
+        string key;
+
+        if (parts.Length == 1)
+        {
+            // /setkey key - use current channel/PM target
+            if (SelectedChannel == null)
+            {
+                StatusText = "Usage: /setkey [#channel|nick] <key>";
+                return;
+            }
+            target = SelectedChannel.IsPrivateMessage 
+                ? SelectedChannel.PrivateMessageTarget ?? "" 
+                : SelectedChannel.Channel.Name;
+            key = parts[0];
+        }
+        else if (parts.Length >= 2)
+        {
+            target = parts[0];
+            key = parts[1];
+        }
+        else
+        {
+            StatusText = "Usage: /setkey [#channel|nick] <key>";
+            return;
+        }
+
+        if (string.IsNullOrEmpty(target) || string.IsNullOrEmpty(key))
+        {
+            StatusText = "Usage: /setkey [#channel|nick] <key>";
+            return;
+        }
+
+        _fishCrypt.SetKey(connection.Server.Id, target, key);
+        StatusText = $"🔐 FiSH key set for {target}";
+        SelectedChannel?.AddSystemMessage($"🔐 FiSH encryption key set for {target}");
+    }
+
+    /// <summary>
+    /// Handles /delkey [target] - Removes a FiSH encryption key.
+    /// </summary>
+    private void HandleDelKeyCommand(IrcConnection connection, string args)
+    {
+        string target;
+
+        if (string.IsNullOrWhiteSpace(args))
+        {
+            // Use current channel/PM target
+            if (SelectedChannel == null)
+            {
+                StatusText = "Usage: /delkey [#channel|nick]";
+                return;
+            }
+            target = SelectedChannel.IsPrivateMessage 
+                ? SelectedChannel.PrivateMessageTarget ?? "" 
+                : SelectedChannel.Channel.Name;
+        }
+        else
+        {
+            target = args.Trim();
+        }
+
+        if (string.IsNullOrEmpty(target))
+        {
+            StatusText = "Usage: /delkey [#channel|nick]";
+            return;
+        }
+
+        _fishCrypt.SetKey(connection.Server.Id, target, null);
+        StatusText = $"🔓 FiSH key removed for {target}";
+        SelectedChannel?.AddSystemMessage($"🔓 FiSH encryption key removed for {target}");
+    }
+
+    /// <summary>
+    /// Handles /keyx [nick] - Initiates DH1080 key exchange.
+    /// </summary>
+    private async Task HandleKeyExchangeCommandAsync(IrcConnection connection, string args)
+    {
+        string targetNick;
+
+        if (string.IsNullOrWhiteSpace(args))
+        {
+            // Use current PM target
+            if (SelectedChannel?.IsPrivateMessage != true || string.IsNullOrEmpty(SelectedChannel.PrivateMessageTarget))
+            {
+                StatusText = "Usage: /keyx <nick>";
+                return;
+            }
+            targetNick = SelectedChannel.PrivateMessageTarget;
+        }
+        else
+        {
+            targetNick = args.Split(' ')[0];
+        }
+
+        if (connection.Dh1080Manager == null)
+        {
+            StatusText = "FiSH encryption not available";
+            return;
+        }
+
+        var initMessage = connection.Dh1080Manager.InitiateKeyExchange(connection.Server.Id, targetNick);
+        await connection.SendNoticeAsync(targetNick, initMessage);
+        
+        StatusText = $"🔑 Key exchange initiated with {targetNick}";
+        SelectedChannel?.AddSystemMessage($"🔑 Initiating DH1080 key exchange with {targetNick}...");
+    }
+
+    /// <summary>
+    /// Handles /showkey [target] - Shows the current FiSH key.
+    /// </summary>
+    private void HandleShowKeyCommand(IrcConnection connection, string args)
+    {
+        string target;
+
+        if (string.IsNullOrWhiteSpace(args))
+        {
+            // Use current channel/PM target
+            if (SelectedChannel == null)
+            {
+                StatusText = "Usage: /showkey [#channel|nick]";
+                return;
+            }
+            target = SelectedChannel.IsPrivateMessage 
+                ? SelectedChannel.PrivateMessageTarget ?? "" 
+                : SelectedChannel.Channel.Name;
+        }
+        else
+        {
+            target = args.Trim();
+        }
+
+        var key = _fishCrypt.GetKey(connection.Server.Id, target);
+        if (key != null)
+        {
+            // Show first and last 4 chars with asterisks in between for security
+            var maskedKey = key.Length > 8 
+                ? $"{key[..4]}****{key[^4..]}" 
+                : "****";
+            SelectedChannel?.AddSystemMessage($"🔐 FiSH key for {target}: {maskedKey}");
+        }
+        else
+        {
+            SelectedChannel?.AddSystemMessage($"🔓 No FiSH key set for {target}");
+        }
+    }
+
+    /// <summary>
+    /// Sets a FiSH encryption key for a channel via context menu.
+    /// </summary>
+    [RelayCommand]
+    private void SetFishKeyForChannel(ChannelViewModel? channel)
+    {
+        var targetChannel = channel ?? SelectedChannel;
+        if (SelectedServer?.Connection == null || targetChannel == null) return;
+        
+        var target = targetChannel.IsPrivateMessage 
+            ? targetChannel.PrivateMessageTarget ?? "" 
+            : targetChannel.Channel.Name;
+        
+        if (string.IsNullOrEmpty(target)) return;
+        
+        var prompt = string.Format(Strings.FiSH_SetKeyPrompt, target);
+        var dialog = new Views.InputDialog(Strings.FiSH_SetKeyTitle, prompt);
+        dialog.Owner = App.Current.MainWindow;
+        
+        if (dialog.ShowDialog() == true && !string.IsNullOrWhiteSpace(dialog.InputText))
+        {
+            _fishCrypt.SetKey(SelectedServer.Connection.Server.Id, target, dialog.InputText);
+            StatusText = $"🔐 FiSH key set for {target}";
+            targetChannel.AddSystemMessage($"🔐 FiSH encryption enabled for {target}");
+        }
+    }
+
+    /// <summary>
+    /// Removes the FiSH encryption key for a channel via context menu.
+    /// </summary>
+    [RelayCommand]
+    private void RemoveFishKeyForChannel(ChannelViewModel? channel)
+    {
+        var targetChannel = channel ?? SelectedChannel;
+        if (SelectedServer?.Connection == null || targetChannel == null) return;
+        
+        var target = targetChannel.IsPrivateMessage 
+            ? targetChannel.PrivateMessageTarget ?? "" 
+            : targetChannel.Channel.Name;
+        
+        if (string.IsNullOrEmpty(target)) return;
+        
+        _fishCrypt.SetKey(SelectedServer.Connection.Server.Id, target, null);
+        StatusText = $"🔓 FiSH key removed for {target}";
+        targetChannel.AddSystemMessage($"🔓 FiSH encryption key removed for {target}");
+    }
+
+    /// <summary>
+    /// Shows the FiSH encryption key for a channel via context menu.
+    /// </summary>
+    [RelayCommand]
+    private void ShowFishKeyForChannel(ChannelViewModel? channel)
+    {
+        var targetChannel = channel ?? SelectedChannel;
+        if (SelectedServer?.Connection == null || targetChannel == null) return;
+        
+        var target = targetChannel.IsPrivateMessage 
+            ? targetChannel.PrivateMessageTarget ?? "" 
+            : targetChannel.Channel.Name;
+        
+        if (string.IsNullOrEmpty(target)) return;
+        
+        var key = _fishCrypt.GetKey(SelectedServer.Connection.Server.Id, target);
+        if (key != null)
+        {
+            var maskedKey = key.Length > 8 
+                ? $"{key[..4]}****{key[^4..]}" 
+                : "****";
+            targetChannel.AddSystemMessage($"🔐 FiSH key for {target}: {maskedKey}");
+        }
+        else
+        {
+            targetChannel.AddSystemMessage($"🔓 No FiSH key set for {target}");
+        }
+    }
+
+    /// <summary>
+    /// Initiates DH1080 key exchange for a PM via context menu.
+    /// </summary>
+    [RelayCommand]
+    private async Task InitiateFishKeyExchangeAsync(ChannelViewModel? channel)
+    {
+        var targetChannel = channel ?? SelectedChannel;
+        if (SelectedServer?.Connection == null || targetChannel == null) return;
+        
+        if (!targetChannel.IsPrivateMessage || string.IsNullOrEmpty(targetChannel.PrivateMessageTarget))
+        {
+            StatusText = "Key exchange is only available for private messages";
+            return;
+        }
+        
+        var targetNick = targetChannel.PrivateMessageTarget;
+        var connection = SelectedServer.Connection;
+        
+        if (connection.Dh1080Manager == null)
+        {
+            StatusText = "FiSH encryption not available";
+            return;
+        }
+        
+        var initMessage = connection.Dh1080Manager.InitiateKeyExchange(connection.Server.Id, targetNick);
+        await connection.SendNoticeAsync(targetNick, initMessage);
+        
+        StatusText = $"🔑 Key exchange initiated with {targetNick}";
+        targetChannel.AddSystemMessage($"🔑 Initiating DH1080 key exchange with {targetNick}...");
+    }
+
+    /// <summary>
+    /// Sets a FiSH key for a specific user (from user list context menu).
+    /// </summary>
+    [RelayCommand]
+    private void SetFishKeyForUser(IrcUser? user)
+    {
+        if (SelectedServer?.Connection == null || user == null) return;
+        
+        var prompt = string.Format(Strings.FiSH_SetKeyPrompt, user.Nickname);
+        var dialog = new Views.InputDialog(Strings.FiSH_SetKeyTitle, prompt);
+        dialog.Owner = App.Current.MainWindow;
+        
+        if (dialog.ShowDialog() == true && !string.IsNullOrWhiteSpace(dialog.InputText))
+        {
+            _fishCrypt.SetKey(SelectedServer.Connection.Server.Id, user.Nickname, dialog.InputText);
+            StatusText = $"🔐 FiSH key set for {user.Nickname}";
+            SelectedChannel?.AddSystemMessage($"🔐 FiSH encryption enabled for {user.Nickname}");
+        }
+    }
+
+    /// <summary>
+    /// Initiates DH1080 key exchange with a specific user (from user list context menu).
+    /// </summary>
+    [RelayCommand]
+    private async Task InitiateFishKeyExchangeForUserAsync(IrcUser? user)
+    {
+        if (SelectedServer?.Connection == null || user == null) return;
+        
+        var connection = SelectedServer.Connection;
+        
+        if (connection.Dh1080Manager == null)
+        {
+            StatusText = "FiSH encryption not available";
+            return;
+        }
+        
+        var initMessage = connection.Dh1080Manager.InitiateKeyExchange(connection.Server.Id, user.Nickname);
+        await connection.SendNoticeAsync(user.Nickname, initMessage);
+        
+        StatusText = $"🔑 Key exchange initiated with {user.Nickname}";
+        SelectedChannel?.AddSystemMessage($"🔑 Initiating DH1080 key exchange with {user.Nickname}...");
+    }
+
+    /// <summary>
+    /// Opens the topic editor dialog for the current channel.
+    /// </summary>
+    [RelayCommand]
+    private async Task EditTopicAsync()
+    {
+        if (SelectedServer?.Connection == null || SelectedChannel == null) return;
+        if (!SelectedChannel.CanEditTopic) return;
+        
+        var channelName = SelectedChannel.Channel.Name;
+        var currentTopic = SelectedChannel.Topic;
+        var hasEncryptionKey = SelectedChannel.HasEncryptionKey;
+        
+        var dialog = new Views.TopicEditorDialog(currentTopic, hasEncryptionKey);
+        dialog.Owner = App.Current.MainWindow;
+        
+        if (dialog.ShowDialog() == true)
+        {
+            var newTopic = dialog.TopicText;
+            
+            // Encrypt topic if requested
+            if (dialog.EncryptTopic && hasEncryptionKey)
+            {
+                var encrypted = _fishCrypt.Encrypt(
+                    SelectedServer.Connection.Server.Id, 
+                    channelName, 
+                    newTopic);
+                    
+                if (encrypted != null)
+                {
+                    newTopic = encrypted;
+                }
+            }
+            
+            await SelectedServer.Connection.SendRawAsync($"TOPIC {channelName} :{newTopic}");
         }
     }
     
@@ -1719,6 +2153,75 @@ public partial class MainViewModel : ObservableObject
         if (server.Channels.Count > 0 && SelectedChannel?.ServerViewModel != server)
         {
             SelectedChannel = server.Channels[0];
+        }
+    }
+    
+    /// <summary>
+    /// Adds a nickname to the notify list for the current server.
+    /// </summary>
+    /// <param name="nickname">The nickname to add.</param>
+    public void AddToNotifyList(string nickname)
+    {
+        if (SelectedServer == null || SelectedChannel == null) return;
+        
+        var serverName = SelectedServer.Server.Name;
+        var added = NotifyListService.Instance.AddToNotifyList(serverName, nickname);
+        
+        if (added)
+        {
+            SelectedChannel.AddSystemMessage($"Added {nickname} to notify list");
+        }
+        else
+        {
+            SelectedChannel.AddSystemMessage($"{nickname} is already on notify list");
+        }
+    }
+    
+    /// <summary>
+    /// Removes a nickname from the notify list for the current server.
+    /// </summary>
+    /// <param name="nickname">The nickname to remove.</param>
+    public void RemoveFromNotifyList(string nickname)
+    {
+        if (SelectedServer == null || SelectedChannel == null) return;
+        
+        var serverName = SelectedServer.Server.Name;
+        var removed = NotifyListService.Instance.RemoveFromNotifyList(serverName, nickname);
+        
+        if (removed)
+        {
+            SelectedChannel.AddSystemMessage($"Removed {nickname} from notify list");
+        }
+        else
+        {
+            SelectedChannel.AddSystemMessage($"{nickname} is not on notify list");
+        }
+    }
+    
+    /// <summary>
+    /// Sorts channels with favorites first, then by name.
+    /// Server console is always first.
+    /// </summary>
+    /// <param name="server">The server whose channels to sort.</param>
+    public void SortChannels(ServerViewModel server)
+    {
+        if (server?.Channels == null || server.Channels.Count <= 1) return;
+        
+        // Get sorted list
+        var sorted = server.Channels
+            .OrderByDescending(c => c.IsServerConsole) // Server console first
+            .ThenByDescending(c => c.IsFavorite)        // Then favorites
+            .ThenBy(c => c.DisplayName)                  // Then alphabetically
+            .ToList();
+        
+        // Update collection in place
+        for (int i = 0; i < sorted.Count; i++)
+        {
+            var currentIndex = server.Channels.IndexOf(sorted[i]);
+            if (currentIndex != i)
+            {
+                server.Channels.Move(currentIndex, i);
+            }
         }
     }
 }

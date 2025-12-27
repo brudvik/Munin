@@ -101,10 +101,58 @@ public partial class ChannelViewModel : ObservableObject
     private string? _topic;
     
     /// <summary>
+    /// Whether the current user can edit the channel topic.
+    /// </summary>
+    /// <remarks>
+    /// Returns true if:
+    /// - This is not a server console or private message
+    /// - Topic is not protected (+t), OR user is an operator
+    /// </remarks>
+    public bool CanEditTopic
+    {
+        get
+        {
+            if (IsServerConsole || IsPrivateMessage) return false;
+            
+            // Find our user in the channel
+            var myNick = ServerViewModel.CurrentNickname;
+            var myUser = Channel.Users.FirstOrDefault(u => 
+                u.Nickname.Equals(myNick, StringComparison.OrdinalIgnoreCase));
+            
+            // If topic is not protected, anyone can edit
+            if (!Channel.Modes.TopicProtected) return true;
+            
+            // If topic is protected, only ops/halfops can edit
+            return myUser != null && myUser.Mode >= UserMode.HalfOperator;
+        }
+    }
+    
+    /// <summary>
+    /// Whether this channel has FiSH encryption enabled.
+    /// </summary>
+    public bool HasEncryptionKey => ServerViewModel.HasEncryptionKey(Channel.Name);
+    
+    /// <summary>
+    /// Refreshes the CanEditTopic property (e.g., after mode change).
+    /// </summary>
+    public void RefreshCanEditTopic()
+    {
+        OnPropertyChanged(nameof(CanEditTopic));
+        OnPropertyChanged(nameof(HasEncryptionKey));
+    }
+    
+    /// <summary>
     /// Whether this channel is currently selected/active.
     /// </summary>
     [ObservableProperty]
     private bool _isSelected;
+    
+    /// <summary>
+    /// Whether this channel is marked as a favorite.
+    /// Favorites are sorted to the top of the channel list.
+    /// </summary>
+    [ObservableProperty]
+    private bool _isFavorite;
     
     /// <summary>
     /// Message count per user (nickname -> count).

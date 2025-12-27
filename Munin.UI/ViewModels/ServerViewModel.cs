@@ -60,11 +60,36 @@ public partial class ServerViewModel : ObservableObject
     /// </summary>
     [ObservableProperty]
     private int _latencyMs;
+    
+    /// <summary>
+    /// Whether the user is currently set as away on this server.
+    /// </summary>
+    [ObservableProperty]
+    private bool _isAway;
+    
+    /// <summary>
+    /// The current away message, if set.
+    /// </summary>
+    [ObservableProperty]
+    private string _awayMessage = string.Empty;
 
     /// <summary>
     /// The active connection to this server.
     /// </summary>
     public IrcConnection? Connection { get; set; }
+    
+    /// <summary>
+    /// The current nickname on this server.
+    /// </summary>
+    public string CurrentNickname => Connection?.CurrentNickname ?? Server.Nickname;
+    
+    /// <summary>
+    /// Checks if a target (channel or nick) has a FiSH encryption key.
+    /// </summary>
+    public bool HasEncryptionKey(string target)
+    {
+        return Connection?.FishCrypt?.HasKey(Server.Id, target) == true;
+    }
 
     /// <summary>
     /// Display name for the UI.

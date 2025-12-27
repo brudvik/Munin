@@ -88,6 +88,7 @@ public class IrcConnection : IDisposable
     public event EventHandler<IrcWhowasEventArgs>? WhowasReceived;
     public event EventHandler<IrcChannelModeListEventArgs>? ChannelModeListReceived;
     public event EventHandler<IrcBatchEventArgs>? BatchComplete;
+    public event EventHandler<Dh1080CompleteEventArgs>? Dh1080KeyExchangeComplete;
     public event EventHandler<IrcMonitorEventArgs>? MonitorStatusChanged;
     public event EventHandler<IrcTypingEventArgs>? TypingNotification;
     public event EventHandler<IrcReactionEventArgs>? ReactionReceived;
@@ -116,6 +117,60 @@ public class IrcConnection : IDisposable
     // Typing indicators tracking (nick -> last typing timestamp)
     private readonly Dictionary<string, DateTime> _typingIndicators = new();
     
+    // FiSH encryption service
+    private FishCryptService? _fishCrypt;
+    private Dh1080Manager? _dh1080Manager;
+    
+    /// <summary>
+    /// Gets or sets the FiSH encryption service for message encryption.
+    /// </summary>
+    public FishCryptService? FishCrypt
+    {
+        get => _fishCrypt;
+        set
+        {
+            _fishCrypt = value;
+            if (_fishCrypt != null)
+            {
+                _dh1080Manager = new Dh1080Manager(_fishCrypt);
+                _dh1080Manager.KeyExchangeComplete += OnDh1080KeyExchangeComplete;
+                _dh1080Manager.KeyExchangeFailed += OnDh1080KeyExchangeFailed;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Handles successful DH1080 key exchange.
+    /// </summary>
+    private void OnDh1080KeyExchangeComplete(object? sender, Dh1080CompleteEventArgs e)
+    {
+        _logger.Information("FiSH key exchange complete with {Nick}", e.Nick);
+        
+        // Raise the public event for UI to handle
+        Dh1080KeyExchangeComplete?.Invoke(this, e);
+    }
+
+    /// <summary>
+    /// Handles failed DH1080 key exchange.
+    /// </summary>
+    private void OnDh1080KeyExchangeFailed(object? sender, Dh1080FailEventArgs e)
+    {
+        _logger.Warning("FiSH key exchange failed with {Nick}: {Reason}", e.Nick, e.Reason);
+        
+        var serverConsole = Server.Channels.FirstOrDefault();
+        serverConsole?.Messages.Add(new IrcMessage
+        {
+            Timestamp = DateTime.Now,
+            Type = MessageType.Error,
+            Content = $"🔓 DH1080 key exchange failed with {e.Nick}: {e.Reason}"
+        });
+    }
+    
+    /// <summary>
+    /// Gets the DH1080 key exchange manager.
+    /// </summary>
+    public Dh1080Manager? Dh1080Manager => _dh1080Manager;
+
     /// <summary>
     /// Gets or sets the flood protector for rate limiting.
     /// </summary>
@@ -163,8 +218,7 @@ public class IrcConnection : IDisposable
             Server.Capabilities.Reset();
             _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-            _tcpClient = new TcpClient();
-            await _tcpClient.ConnectAsync(Server.Hostname, Server.Port, _cts.Token);
+            _tcpClient = await ConnectWithIPv6FallbackAsync(Server.Hostname, Server.Port, _cts.Token);
 
             _stream = _tcpClient.GetStream();
 
@@ -202,15 +256,64 @@ public class IrcConnection : IDisposable
             await SendRawAsync($"NICK {Server.Nickname}");
             await SendRawAsync($"USER {Server.Username} 0 * :{Server.RealName}");
 
-            _logger.Information("Connecting to {Server}:{Port}", Server.Hostname, Server.Port);
+            _logger.Information("Connecting to {Server}:{Port} (IPv6: {IsIPv6})", Server.Hostname, Server.Port, Server.IsIPv6Connected);
         }
         catch (Exception ex)
         {
             Server.State = ConnectionState.Disconnected;
+            Server.IsIPv6Connected = false;
             _logger.Error(ex, "Failed to connect to {Server}", Server.Hostname);
             Error?.Invoke(this, new IrcErrorEventArgs(Server, $"Connection failed: {ex.Message}", ex));
             throw;
         }
+    }
+
+    /// <summary>
+    /// Connects to a host with IPv6/IPv4 dual-stack support.
+    /// If PreferIPv6 is enabled, tries IPv6 first with fallback to IPv4.
+    /// </summary>
+    private async Task<TcpClient> ConnectWithIPv6FallbackAsync(string hostname, int port, CancellationToken cancellationToken)
+    {
+        var addresses = await System.Net.Dns.GetHostAddressesAsync(hostname, cancellationToken);
+        
+        // Separate IPv4 and IPv6 addresses
+        var ipv6Addresses = addresses.Where(a => a.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6).ToList();
+        var ipv4Addresses = addresses.Where(a => a.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).ToList();
+        
+        _logger.Debug("DNS resolved {Host}: IPv6={IPv6Count}, IPv4={IPv4Count}", hostname, ipv6Addresses.Count, ipv4Addresses.Count);
+        
+        // Order addresses based on preference
+        var orderedAddresses = Server.PreferIPv6 
+            ? ipv6Addresses.Concat(ipv4Addresses).ToList()
+            : ipv4Addresses.Concat(ipv6Addresses).ToList();
+        
+        if (orderedAddresses.Count == 0)
+        {
+            throw new System.Net.Sockets.SocketException((int)System.Net.Sockets.SocketError.HostNotFound);
+        }
+        
+        Exception? lastException = null;
+        
+        foreach (var address in orderedAddresses)
+        {
+            try
+            {
+                var client = new TcpClient(address.AddressFamily);
+                await client.ConnectAsync(address, port, cancellationToken);
+                
+                Server.IsIPv6Connected = address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6;
+                _logger.Information("Connected to {Address}:{Port} ({Family})", address, port, address.AddressFamily);
+                
+                return client;
+            }
+            catch (Exception ex)
+            {
+                lastException = ex;
+                _logger.Debug("Failed to connect to {Address}: {Error}", address, ex.Message);
+            }
+        }
+        
+        throw lastException ?? new System.Net.Sockets.SocketException((int)System.Net.Sockets.SocketError.ConnectionRefused);
     }
 
     public async Task DisconnectAsync(string? quitMessage = null)
@@ -281,10 +384,21 @@ public class IrcConnection : IDisposable
     }
 
     /// <summary>
-    /// Sends a message with optional echo-message tracking.
+    /// Sends a message with optional echo-message tracking and FiSH encryption.
     /// </summary>
     public async Task SendMessageAsync(string target, string message)
     {
+        // Encrypt with FiSH if a key is set for this target
+        var messageToSend = message;
+        if (_fishCrypt != null && _fishCrypt.HasKey(Server.Id, target))
+        {
+            var encrypted = _fishCrypt.Encrypt(Server.Id, target, message);
+            if (encrypted != null)
+            {
+                messageToSend = encrypted;
+            }
+        }
+        
         // If echo-message is enabled, track sent messages for deduplication
         if (Server.Capabilities.HasCapability("echo-message"))
         {
@@ -307,16 +421,16 @@ public class IrcConnection : IDisposable
             // Use labeled-response if available
             if (Server.Capabilities.HasCapability("labeled-response"))
             {
-                await SendRawAsync($"@label={msgId} PRIVMSG {target} :{message}");
+                await SendRawAsync($"@label={msgId} PRIVMSG {target} :{messageToSend}");
             }
             else
             {
-                await SendRawAsync($"PRIVMSG {target} :{message}");
+                await SendRawAsync($"PRIVMSG {target} :{messageToSend}");
             }
         }
         else
         {
-            await SendRawAsync($"PRIVMSG {target} :{message}");
+            await SendRawAsync($"PRIVMSG {target} :{messageToSend}");
         }
     }
 
@@ -824,6 +938,17 @@ public class IrcConnection : IDisposable
                 if (int.TryParse(message.GetParameter(2), out var userCount))
                 {
                     var topic = message.Trailing ?? "";
+                    
+                    // FiSH decryption for encrypted topics in channel list
+                    if (_fishCrypt != null && channelName != null && FishCryptService.IsEncrypted(topic))
+                    {
+                        var decrypted = _fishCrypt.Decrypt(Server.Id, channelName, topic);
+                        if (decrypted != null)
+                        {
+                            topic = decrypted;
+                        }
+                    }
+                    
                     var entry = new ChannelListEntry
                     {
                         Name = channelName ?? "",
@@ -1412,7 +1537,21 @@ public class IrcConnection : IDisposable
             return;
         }
 
+        // FiSH decryption - check if message is encrypted
+        bool wasEncrypted = false;
         var isChannel = Server.ISupport.IsChannel(target);
+        var fishTarget = isChannel ? target : message.Nick;
+        
+        if (_fishCrypt != null && FishCryptService.IsEncrypted(content))
+        {
+            var decrypted = _fishCrypt.Decrypt(Server.Id, fishTarget, content);
+            if (decrypted != null)
+            {
+                content = decrypted;
+                wasEncrypted = true;
+            }
+        }
+
         var isHighlight = CheckHighlight(content);
 
         var ircMessage = new IrcMessage
@@ -1423,6 +1562,7 @@ public class IrcConnection : IDisposable
             Target = target,
             Content = content,
             IsHighlight = isHighlight,
+            IsEncrypted = wasEncrypted,
             RawMessage = message.RawMessage
         };
 
@@ -1448,6 +1588,20 @@ public class IrcConnection : IDisposable
         var content = message.Trailing ?? "";
         if (target == null) return;
 
+        // Check for DH1080 key exchange (FiSH uses plain text, not CTCP)
+        if (content.StartsWith("DH1080_", StringComparison.Ordinal))
+        {
+            HandleDh1080Notice(message, content);
+            return;
+        }
+
+        // Check for CTCP inside NOTICE (CTCP replies)
+        if (content.StartsWith('\x01') && content.EndsWith('\x01'))
+        {
+            HandleNoticeCTCP(message);
+            return;
+        }
+
         var ircMessage = IrcMessage.CreateNotice(message.Nick ?? message.Prefix ?? "Server", content);
 
         var isChannel = Server.ISupport.IsChannel(target);
@@ -1456,6 +1610,35 @@ public class IrcConnection : IDisposable
             var channel = Server.Channels.FirstOrDefault(c => c.Name.Equals(target, StringComparison.OrdinalIgnoreCase));
             channel?.Messages.Add(ircMessage);
         }
+    }
+
+    /// <summary>
+    /// Handles DH1080 key exchange messages received via NOTICE.
+    /// FiSH sends these as plain text, not CTCP format.
+    /// Format: "DH1080_INIT [pubkey]" or "DH1080_INIT [pubkey] CBC"
+    /// </summary>
+    private void HandleDh1080Notice(ParsedIrcMessage message, string content)
+    {
+        if (message.Nick == null) return;
+
+        // Parse the message using Dh1080KeyExchange
+        var parsed = Dh1080KeyExchange.ParseMessage(content);
+        if (parsed == null) return;
+
+        HandleDh1080(message.Nick, content);
+    }
+
+    /// <summary>
+    /// Handles CTCP messages received via NOTICE (CTCP replies).
+    /// </summary>
+    private void HandleNoticeCTCP(ParsedIrcMessage message)
+    {
+        var content = message.Trailing ?? "";
+        var (command, param) = IrcMessageParser.ParseCTCP(content);
+
+        // Handle CTCP replies here if needed (e.g., VERSION reply, PING reply)
+        _ = command;
+        _ = param;
     }
 
     private void HandleCTCP(ParsedIrcMessage message)
@@ -1501,7 +1684,7 @@ public class IrcConnection : IDisposable
                 break;
                 
             case "CLIENTINFO":
-                _ = SendNoticeAsync(message.Nick!, $"\x01CLIENTINFO ACTION PING VERSION TIME CLIENTINFO USERINFO SOURCE\x01");
+                _ = SendNoticeAsync(message.Nick!, $"\x01CLIENTINFO ACTION PING VERSION TIME CLIENTINFO USERINFO SOURCE DH1080_INIT DH1080_FINISH\x01");
                 break;
                 
             case "USERINFO":
@@ -1511,6 +1694,34 @@ public class IrcConnection : IDisposable
             case "SOURCE":
                 _ = SendNoticeAsync(message.Nick!, $"\x01SOURCE https://github.com/IrcClient\x01");
                 break;
+                
+            case "DH1080_INIT":
+            case "DH1080_FINISH":
+                // Reconstruct the message for the handler
+                HandleDh1080(message.Nick!, $"{command} {param ?? ""}");
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Handles DH1080 key exchange messages.
+    /// </summary>
+    /// <param name="nick">The nick who sent the message.</param>
+    /// <param name="message">The full DH1080 message (e.g., "DH1080_INIT &lt;key&gt; CBC").</param>
+    private void HandleDh1080(string nick, string message)
+    {
+        if (_dh1080Manager == null || string.IsNullOrEmpty(nick)) return;
+
+        _logger.Debug("HandleDh1080 called: nick={Nick}, message={Message}", nick, message);
+
+        var response = _dh1080Manager.HandleMessage(Server.Id, nick, message);
+
+        _logger.Debug("HandleDh1080 response: {Response}", response ?? "(null)");
+
+        if (response != null)
+        {
+            // Send the response as a plain NOTICE
+            _ = SendNoticeAsync(nick, response);
         }
     }
 
@@ -1520,18 +1731,32 @@ public class IrcConnection : IDisposable
         var topic = message.Trailing;
         if (channelName == null) return;
 
+        // FiSH decryption for encrypted topics
+        bool wasEncrypted = false;
+        if (_fishCrypt != null && topic != null && FishCryptService.IsEncrypted(topic))
+        {
+            var decrypted = _fishCrypt.Decrypt(Server.Id, channelName, topic);
+            if (decrypted != null)
+            {
+                topic = decrypted;
+                wasEncrypted = true;
+            }
+        }
+
         var channel = Server.Channels.FirstOrDefault(c => c.Name.Equals(channelName, StringComparison.OrdinalIgnoreCase));
         if (channel != null)
         {
             channel.Topic = topic;
             channel.TopicSetBy = message.Nick;
             channel.TopicSetAt = message.GetTimestamp();
+            var topicDisplay = wasEncrypted ? $"{topic} 🔐" : topic;
             channel.Messages.Add(new IrcMessage
             {
                 Timestamp = message.GetTimestamp(),
                 Type = MessageType.Topic,
                 Source = message.Nick,
-                Content = $"{message.Nick} changed the topic to: {topic}"
+                Content = $"{message.Nick} changed the topic to: {topicDisplay}",
+                IsEncrypted = wasEncrypted
             });
             TopicChanged?.Invoke(this, new IrcChannelEventArgs(Server, channel));
         }
@@ -1542,6 +1767,16 @@ public class IrcConnection : IDisposable
         var channelName = message.GetParameter(1);
         var topic = message.Trailing;
         if (channelName == null) return;
+
+        // FiSH decryption for encrypted topics
+        if (_fishCrypt != null && topic != null && FishCryptService.IsEncrypted(topic))
+        {
+            var decrypted = _fishCrypt.Decrypt(Server.Id, channelName, topic);
+            if (decrypted != null)
+            {
+                topic = decrypted;
+            }
+        }
 
         var channel = Server.Channels.FirstOrDefault(c => c.Name.Equals(channelName, StringComparison.OrdinalIgnoreCase));
         if (channel != null)

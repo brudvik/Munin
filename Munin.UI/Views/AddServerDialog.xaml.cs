@@ -67,7 +67,8 @@ public partial class AddServerDialog : Window
                 .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .Where(c => c.StartsWith('#') || c.StartsWith('&'))
                 .ToList(),
-            AutoConnect = AutoConnectCheckBox.IsChecked == true
+            AutoConnect = AutoConnectCheckBox.IsChecked == true,
+            PreferIPv6 = PreferIPv6CheckBox.IsChecked == true
         };
 
         DialogResult = true;

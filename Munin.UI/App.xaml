@@ -20,8 +20,10 @@
             <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter"/>
             <converters:RowIndexToBackgroundConverter x:Key="RowIndexToBackgroundConverter"/>
             <converters:ZeroToVisibleConverter x:Key="ZeroToVisibleConverter"/>
+            <converters:AwayStatusTooltipConverter x:Key="AwayStatusTooltipConverter"/>
             <converters:MessageToInlinesConverter x:Key="MessageToInlinesConverter"/>
             <converters:UsersToNicknamesConverter x:Key="UsersToNicknamesConverter"/>
+            <converters:SizeToRectConverter x:Key="SizeToRectConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

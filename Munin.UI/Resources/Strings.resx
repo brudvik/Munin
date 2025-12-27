@@ -245,6 +245,47 @@ Are you absolutely sure?</value>
   <data name="MainWindow_CloseConversation" xml:space="preserve">
     <value>Close conversation</value>
   </data>
+  <data name="FiSH_SetKey" xml:space="preserve">
+    <value>Set encryption key...</value>
+  </data>
+  <data name="FiSH_RemoveKey" xml:space="preserve">
+    <value>Remove encryption key</value>
+  </data>
+  <data name="FiSH_ShowKey" xml:space="preserve">
+    <value>Show encryption key</value>
+  </data>
+  <data name="FiSH_KeyExchange" xml:space="preserve">
+    <value>Key exchange (DH1080)</value>
+  </data>
+  <data name="FiSH_SetKeyTitle" xml:space="preserve">
+    <value>Set FiSH Encryption Key</value>
+  </data>
+  <data name="FiSH_SetKeyPrompt" xml:space="preserve">
+    <value>Enter encryption key for {0}:</value>
+  </data>
+  <data name="FiSH_Encryption" xml:space="preserve">
+    <value>Encryption</value>
+  </data>
+  
+  <!-- Topic Editor Dialog -->
+  <data name="TopicEditor_Title" xml:space="preserve">
+    <value>Edit Channel Topic</value>
+  </data>
+  <data name="TopicEditor_Topic" xml:space="preserve">
+    <value>Topic:</value>
+  </data>
+  <data name="TopicEditor_EncryptTopic" xml:space="preserve">
+    <value>Encrypt topic with FiSH</value>
+  </data>
+  <data name="TopicEditor_SetTopic" xml:space="preserve">
+    <value>Set Topic</value>
+  </data>
+  <data name="TopicEditor_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="TopicEditor_EncryptionNote" xml:space="preserve">
+    <value>Note: Encrypted topics can only be read by users with the same key.</value>
+  </data>
   
   <!-- Add Server Dialog -->
   <data name="AddServer_Title" xml:space="preserve">
@@ -463,6 +504,15 @@ Are you absolutely sure?</value>
   </data>
   <data name="AddServer_AcceptInvalidCertsTooltip" xml:space="preserve">
     <value>Enable this for self-signed certificates</value>
+  </data>
+  <data name="AddServer_PreferIPv6" xml:space="preserve">
+    <value>Prefer IPv6</value>
+  </data>
+  <data name="AddServer_PreferIPv6Tooltip" xml:space="preserve">
+    <value>Try IPv6 connection first, fallback to IPv4 if unavailable</value>
+  </data>
+  <data name="Message_Encrypted" xml:space="preserve">
+    <value>This message was encrypted with FiSH</value>
   </data>
   <data name="AddServer_SaslHeader" xml:space="preserve">
     <value>SASL Authentication (IRCv3)</value>
@@ -927,5 +977,74 @@ Perfect for USB drives.</value>
   <!-- Common (OK already exists earlier in file) -->
   <data name="Common_OK" xml:space="preserve">
     <value>OK</value>
+  </data>
+  <!-- Quote/Reply -->
+  <data name="ContextMenu_QuoteReply" xml:space="preserve">
+    <value>Quote Reply</value>
+  </data>
+  <!-- Message formatting -->
+  <data name="MainWindow_FormatBold" xml:space="preserve">
+    <value>Bold (Ctrl+B)</value>
+  </data>
+  <data name="MainWindow_FormatItalic" xml:space="preserve">
+    <value>Italic (Ctrl+I)</value>
+  </data>
+  <data name="MainWindow_FormatUnderline" xml:space="preserve">
+    <value>Underline (Ctrl+U)</value>
+  </data>
+  <!-- Away status -->
+  <data name="MainWindow_Away" xml:space="preserve">
+    <value>Away</value>
+  </data>
+  <data name="MainWindow_SetAway" xml:space="preserve">
+    <value>Set Away</value>
+  </data>
+  <data name="MainWindow_SetBack" xml:space="preserve">
+    <value>Set Back</value>
+  </data>
+  <data name="MainWindow_AwayMessage" xml:space="preserve">
+    <value>Away message:</value>
+  </data>
+  <data name="MainWindow_DefaultAwayMessage" xml:space="preserve">
+    <value>I'm currently away</value>
+  </data>
+  <!-- Favorites -->
+  <data name="MainWindow_AddToFavorites" xml:space="preserve">
+    <value>Add to Favorites</value>
+  </data>
+  <data name="MainWindow_RemoveFromFavorites" xml:space="preserve">
+    <value>Remove from Favorites</value>
+  </data>
+  <data name="MainWindow_Favorites" xml:space="preserve">
+    <value>Favorites</value>
+  </data>
+  <!-- Notify list -->
+  <data name="MainWindow_NotifyList" xml:space="preserve">
+    <value>Notify List</value>
+  </data>
+  <data name="MainWindow_AddToNotify" xml:space="preserve">
+    <value>Add to Notify List</value>
+  </data>
+  <data name="MainWindow_RemoveFromNotify" xml:space="preserve">
+    <value>Remove from Notify List</value>
+  </data>
+  <data name="MainWindow_UserOnline" xml:space="preserve">
+    <value>{0} is now online</value>
+  </data>
+  <data name="MainWindow_UserOffline" xml:space="preserve">
+    <value>{0} is now offline</value>
+  </data>
+  <!-- Certificate pinning -->
+  <data name="MainWindow_CertificateChanged" xml:space="preserve">
+    <value>Server certificate has changed!</value>
+  </data>
+  <data name="MainWindow_CertificateChangedMessage" xml:space="preserve">
+    <value>The SSL certificate for {0} has changed since your last connection. This could indicate a security issue. Do you want to continue?</value>
+  </data>
+  <data name="MainWindow_CertificateNew" xml:space="preserve">
+    <value>New certificate fingerprint: {0}</value>
+  </data>
+  <data name="MainWindow_CertificateOld" xml:space="preserve">
+    <value>Previous certificate fingerprint: {0}</value>
   </data>
 </root>

@@ -139,6 +139,17 @@ public class IrcServer
     /// Proxy settings for the connection.
     /// </summary>
     public ProxySettings? Proxy { get; set; }
+    
+    /// <summary>
+    /// Whether to prefer IPv6 connections over IPv4.
+    /// When enabled, the client will try IPv6 first and fall back to IPv4.
+    /// </summary>
+    public bool PreferIPv6 { get; set; } = false;
+    
+    /// <summary>
+    /// Indicates whether the current connection is using IPv6 (runtime only).
+    /// </summary>
+    public bool IsIPv6Connected { get; set; } = false;
 }
 
 /// <summary>

@@ -256,6 +256,11 @@ public class ClientConfiguration
     /// Gets or sets the general application settings.
     /// </summary>
     public GeneralSettings Settings { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets the FiSH encryption keys (serverId:target -> key).
+    /// </summary>
+    public Dictionary<string, string>? FishKeys { get; set; }
 }
 
 /// <summary>

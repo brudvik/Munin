@@ -341,5 +341,15 @@ namespace Munin.UI.Resources {
         public static string Common_OK => ResourceManager.GetString("Common_OK", resourceCulture) ?? "OK";
         public static string Common_Cancel => ResourceManager.GetString("Common_Cancel", resourceCulture) ?? "Cancel";
         public static string Common_Close => ResourceManager.GetString("Common_Close", resourceCulture) ?? "Close";
+        
+        // FiSH Encryption
+        public static string FiSH_SetKey => ResourceManager.GetString("FiSH_SetKey", resourceCulture) ?? "Set encryption key...";
+        public static string FiSH_RemoveKey => ResourceManager.GetString("FiSH_RemoveKey", resourceCulture) ?? "Remove encryption key";
+        public static string FiSH_ShowKey => ResourceManager.GetString("FiSH_ShowKey", resourceCulture) ?? "Show encryption key";
+        public static string FiSH_KeyExchange => ResourceManager.GetString("FiSH_KeyExchange", resourceCulture) ?? "Key exchange (DH1080)";
+        public static string FiSH_SetKeyTitle => ResourceManager.GetString("FiSH_SetKeyTitle", resourceCulture) ?? "Set FiSH Encryption Key";
+        public static string FiSH_SetKeyPrompt => ResourceManager.GetString("FiSH_SetKeyPrompt", resourceCulture) ?? "Enter encryption key for {0}:";
+        public static string FiSH_Encryption => ResourceManager.GetString("FiSH_Encryption", resourceCulture) ?? "Encryption";
+        public static string Message_Encrypted => ResourceManager.GetString("Message_Encrypted", resourceCulture) ?? "This message was encrypted with FiSH";
     }
 }

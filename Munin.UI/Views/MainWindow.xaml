@@ -34,11 +34,21 @@
     </Window.InputBindings>
 
     <!-- Main Window Container with rounded corners -->
-    <Border Background="{StaticResource BackgroundDarkBrush}"
+    <Border x:Name="MainBorder"
+            Background="{StaticResource BackgroundDarkBrush}"
             CornerRadius="10"
             BorderBrush="{StaticResource BorderBrush}"
-            BorderThickness="1"
-            ClipToBounds="True">
+            BorderThickness="1">
+        <Border.Clip>
+            <RectangleGeometry RadiusX="10" RadiusY="10">
+                <RectangleGeometry.Rect>
+                    <MultiBinding Converter="{StaticResource SizeToRectConverter}">
+                        <Binding Path="ActualWidth" ElementName="MainBorder"/>
+                        <Binding Path="ActualHeight" ElementName="MainBorder"/>
+                    </MultiBinding>
+                </RectangleGeometry.Rect>
+            </RectangleGeometry>
+        </Border.Clip>
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -179,6 +189,29 @@
                             Style="{StaticResource IconButtonStyle}"
                             FontSize="18"
                             Margin="0,0,4,0"/>
+                    <!-- Away Status Toggle Button -->
+                    <Button x:Name="AwayToggleButton"
+                            Click="AwayToggle_Click"
+                            Style="{StaticResource IconButtonStyle}"
+                            FontSize="16"
+                            Margin="0,0,4,0"
+                            Visibility="{Binding SelectedServer, Converter={StaticResource NullToVisibilityConverter}, FallbackValue=Collapsed}">
+                        <Button.ToolTip>
+                            <ToolTip>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding SelectedServer.IsAway, Converter={StaticResource AwayStatusTooltipConverter}}"
+                                               FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding SelectedServer.AwayMessage}"
+                                               Foreground="{StaticResource TextMutedBrush}"
+                                               Visibility="{Binding SelectedServer.IsAway, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                </StackPanel>
+                            </ToolTip>
+                        </Button.ToolTip>
+                        <Grid>
+                            <TextBlock Text="🌙" Visibility="{Binding SelectedServer.IsAway, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                            <TextBlock Text="☀️" Visibility="{Binding SelectedServer.IsAway, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                        </Grid>
+                    </Button>
                     <!-- User List Toggle Button -->
                     <Button x:Name="UserListToggleButton"
                             ToolTip="{loc:Localize Key=MainWindow_ToggleUserList}"
@@ -454,19 +487,29 @@
                                         </Border.InputBindings>
                                         <Grid>
                                             <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
                                                 <ColumnDefinition Width="22"/>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="Auto"/>
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
                                             
+                                            <!-- Favorite Star -->
                                             <TextBlock Grid.Column="0" 
+                                                       Text="★" 
+                                                       Foreground="{StaticResource WarningBrush}"
+                                                       FontSize="12"
+                                                       VerticalAlignment="Center"
+                                                       Margin="0,0,4,0"
+                                                       Visibility="{Binding IsFavorite, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                            
+                                            <TextBlock Grid.Column="1" 
                                                        Text="{Binding ChannelIcon}" 
                                                        Foreground="{StaticResource TextMutedBrush}"
                                                        FontSize="14"
                                                        HorizontalAlignment="Center"
                                                        VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="1" 
+                                            <TextBlock Grid.Column="2" 
                                                        Text="{Binding DisplayName}" 
                                                        Foreground="{StaticResource TextSecondaryBrush}"
                                                        FontSize="13"
@@ -474,7 +517,7 @@
                                                        TextTrimming="CharacterEllipsis"/>
                                             
                                             <!-- Mention Indicator (Red) -->
-                                            <Border Grid.Column="2" 
+                                            <Border Grid.Column="3" 
                                                     x:Name="mentionBadge"
                                                     Background="{StaticResource ErrorDimBrush}"
                                                     CornerRadius="10"
@@ -490,7 +533,7 @@
                                             </Border>
                                             
                                             <!-- Unread Badge (Blue - when no mention) -->
-                                            <Border Grid.Column="2" 
+                                            <Border Grid.Column="3" 
                                                     x:Name="unreadBadge"
                                                     Background="{StaticResource AccentDimBrush}"
                                                     CornerRadius="10"
@@ -507,7 +550,7 @@
                                             
                                             <!-- Close/Leave Button -->
                                             <Button x:Name="closeButton"
-                                                    Grid.Column="3" 
+                                                    Grid.Column="4" 
                                                     Content="✕" 
                                                     ToolTip="{loc:Localize Key=MainWindow_LeaveChannel}"
                                                     Style="{StaticResource IconButtonStyle}"
@@ -517,6 +560,53 @@
                                                     Visibility="Hidden"
                                                     Command="{Binding DataContext.PartChannelCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                     CommandParameter="{Binding}"/>
+                                            
+                                            <!-- Context Menu for Channel -->
+                                            <Grid.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="{loc:Localize Key=MainWindow_AddToFavorites}" 
+                                                              Click="ToggleFavorite_Click"
+                                                              Visibility="{Binding IsFavorite, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                                                    <MenuItem Header="{loc:Localize Key=MainWindow_RemoveFromFavorites}" 
+                                                              Click="ToggleFavorite_Click"
+                                                              Visibility="{Binding IsFavorite, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                                    <Separator/>
+                                                    <!-- FiSH Encryption -->
+                                                    <MenuItem Header="{loc:Localize Key=FiSH_SetKey}" 
+                                                              Command="{Binding DataContext.SetFishKeyForChannelCommand, Source={x:Reference Name=MainWindowRoot}}"
+                                                              CommandParameter="{Binding}">
+                                                        <MenuItem.Icon>
+                                                            <TextBlock Text="🔑" FontSize="12"/>
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                    <MenuItem Header="{loc:Localize Key=FiSH_KeyExchange}" 
+                                                              Command="{Binding DataContext.InitiateFishKeyExchangeCommand, Source={x:Reference Name=MainWindowRoot}}"
+                                                              CommandParameter="{Binding}"
+                                                              Visibility="{Binding IsPrivateMessage, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                        <MenuItem.Icon>
+                                                            <TextBlock Text="🔄" FontSize="12"/>
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                    <MenuItem Header="{loc:Localize Key=FiSH_RemoveKey}" 
+                                                              Command="{Binding DataContext.RemoveFishKeyForChannelCommand, Source={x:Reference Name=MainWindowRoot}}"
+                                                              CommandParameter="{Binding}">
+                                                        <MenuItem.Icon>
+                                                            <TextBlock Text="🔓" FontSize="12"/>
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                    <MenuItem Header="{loc:Localize Key=FiSH_ShowKey}" 
+                                                              Command="{Binding DataContext.ShowFishKeyForChannelCommand, Source={x:Reference Name=MainWindowRoot}}"
+                                                              CommandParameter="{Binding}">
+                                                        <MenuItem.Icon>
+                                                            <TextBlock Text="👁" FontSize="12"/>
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                    <Separator/>
+                                                    <MenuItem Header="{loc:Localize Key=MainWindow_LeaveChannel}" 
+                                                              Command="{Binding DataContext.PartChannelCommand, Source={x:Reference Name=MainWindowRoot}}"
+                                                              CommandParameter="{Binding}"/>
+                                                </ContextMenu>
+                                            </Grid.ContextMenu>
                                         </Grid>
                                     </Border>
                                     <DataTemplate.Triggers>
@@ -815,38 +905,54 @@
                                     BorderBrush="{StaticResource BorderSubtleBrush}"
                                     BorderThickness="0,0,0,1"
                                     Visibility="{Binding SelectedChannel.Topic, Converter={StaticResource NullToVisibilityConverter}, FallbackValue=Collapsed}">
-                                <Expander x:Name="TopicExpander"
-                                          IsExpanded="False"
-                                          BorderThickness="0"
-                                          Background="Transparent">
-                                    <Expander.Header>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Grid.Column="0" 
-                                                       Text="📌" 
-                                                       FontSize="12" 
-                                                       Margin="8,6,8,6"
-                                                       VerticalAlignment="Center"/>
-                                            <TextBlock Grid.Column="1" 
-                                                       Text="{Binding SelectedChannel.Topic}" 
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <Expander x:Name="TopicExpander"
+                                              Grid.Column="0"
+                                              IsExpanded="False"
+                                              BorderThickness="0"
+                                              Background="Transparent">
+                                        <Expander.Header>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="📌" 
+                                                           FontSize="12" 
+                                                           Margin="8,6,8,6"
+                                                           VerticalAlignment="Center"/>
+                                                <TextBlock Text="{Binding SelectedChannel.Topic}" 
+                                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                                           FontSize="12"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           MaxWidth="600"
+                                                           Margin="0,6,16,6"
+                                                           VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Expander.Header>
+                                        <Border Padding="36,8,16,12">
+                                            <TextBlock Text="{Binding SelectedChannel.Topic}" 
                                                        Foreground="{StaticResource TextSecondaryBrush}"
-                                                       FontSize="12"
-                                                       TextTrimming="CharacterEllipsis"
-                                                       MaxWidth="600"
-                                                       Margin="0,6,16,6"
-                                                       VerticalAlignment="Center"/>
-                                        </Grid>
-                                    </Expander.Header>
-                                    <Border Padding="36,8,16,12">
-                                                                                <TextBlock Text="{Binding SelectedChannel.Topic}" 
-                                                   Foreground="{StaticResource TextSecondaryBrush}"
-                                                   FontSize="13"
-                                                   TextWrapping="Wrap"/>
-                                    </Border>
-                                </Expander>
+                                                       FontSize="13"
+                                                       TextWrapping="Wrap"/>
+                                        </Border>
+                                    </Expander>
+                                    
+                                    <!-- Edit Topic Button - after expander -->
+                                    <Button Grid.Column="1"
+                                            Command="{Binding EditTopicCommand}"
+                                            ToolTip="Edit Topic"
+                                            IsEnabled="{Binding SelectedChannel.CanEditTopic, FallbackValue=False}"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            Padding="8,4"
+                                            Margin="0,0,8,0"
+                                            VerticalAlignment="Center"
+                                            Cursor="Hand">
+                                        <TextBlock Text="✏️" FontSize="12"/>
+                                    </Button>
+                                </Grid>
                             </Border>
                             
                             <!-- Messages Content Area -->
@@ -925,12 +1031,17 @@
                                                               InputGestureText="Ctrl+C"/>
                                                     <MenuItem Header="{loc:Localize Key=ContextMenu_CopyNickname}" 
                                                               Click="CopyNickname_Click"/>
+                                                    <MenuItem Header="{loc:Localize Key=ContextMenu_QuoteReply}" 
+                                                              Click="QuoteReply_Click"
+                                                              InputGestureText="Ctrl+Q"/>
                                                     <Separator/>
                                                     <MenuItem Header="{loc:Localize Key=ContextMenu_Whois}" 
                                                               Click="WhoisUser_Click"/>
                                                     <MenuItem Header="{loc:Localize Key=ContextMenu_OpenQuery}" 
                                                               Click="OpenQuery_Click"/>
                                                     <Separator/>
+                                                    <MenuItem Header="{loc:Localize Key=MainWindow_AddToNotify}" 
+                                                              Click="AddToNotify_Click"/>
                                                     <MenuItem Header="{loc:Localize Key=ContextMenu_IgnoreUser}" 
                                                               Click="IgnoreUser_Click"/>
                                                 </ContextMenu>
@@ -994,6 +1105,7 @@
                                             <ColumnDefinition Width="75"/>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
 
@@ -1034,15 +1146,24 @@
                                                 Width="150"
                                                 Visibility="{Binding IsGrouped, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
+                                        <!-- FiSH Encryption Indicator -->
+                                        <TextBlock Grid.Column="2"
+                                                   Text="🔒"
+                                                   FontSize="12"
+                                                   VerticalAlignment="Top"
+                                                   Margin="4,1,0,0"
+                                                   ToolTip="{loc:Localize Key=Message_Encrypted}"
+                                                   Visibility="{Binding IsEncrypted, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
                                         <!-- Vertical Separator Line -->
-                                        <Border Grid.Column="2" 
+                                        <Border Grid.Column="3" 
                                                 Width="1"
                                                 Margin="8,0,8,0"
                                                 Background="{StaticResource BorderBrush}"
                                                 Visibility="{Binding ShowNickname, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                                         <!-- Message Content -->
-                                        <ContentControl Grid.Column="3" 
+                                        <ContentControl Grid.Column="4" 
                                                         Content="{Binding Converter={StaticResource MessageToInlinesConverter}}"
                                                         VerticalAlignment="Top"
                                                         Margin="0,1,0,1"/>
@@ -1129,16 +1250,41 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- Emoji Picker Button -->
-                        <Button Grid.Row="0" Grid.Column="0"
-                                x:Name="EmojiButton"
-                                Style="{StaticResource IconButtonStyle}"
-                                ToolTip="{loc:Localize Key=MainWindow_InsertEmoji}"
-                                Margin="0,0,8,0"
-                                Click="EmojiButton_Click"
-                                IsEnabled="{Binding SelectedChannel, Converter={StaticResource NullToBoolConverter}}">
-                            <TextBlock Text="😊" FontSize="18"/>
-                        </Button>
+                        <!-- Format and Emoji Buttons -->
+                        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="0,0,8,0">
+                            <Button x:Name="EmojiButton"
+                                    Style="{StaticResource IconButtonStyle}"
+                                    ToolTip="{loc:Localize Key=MainWindow_InsertEmoji}"
+                                    Margin="0,0,4,0"
+                                    Click="EmojiButton_Click"
+                                    IsEnabled="{Binding SelectedChannel, Converter={StaticResource NullToBoolConverter}}">
+                                <TextBlock Text="😊" FontSize="18"/>
+                            </Button>
+                            <Button Style="{StaticResource IconButtonStyle}"
+                                    ToolTip="{loc:Localize Key=MainWindow_FormatBold}"
+                                    Click="FormatBold_Click"
+                                    Width="32" Height="32"
+                                    FontWeight="Bold"
+                                    FontSize="14"
+                                    Content="B"
+                                    IsEnabled="{Binding SelectedChannel, Converter={StaticResource NullToBoolConverter}}"/>
+                            <Button Style="{StaticResource IconButtonStyle}"
+                                    ToolTip="{loc:Localize Key=MainWindow_FormatItalic}"
+                                    Click="FormatItalic_Click"
+                                    Width="32" Height="32"
+                                    FontStyle="Italic"
+                                    FontSize="14"
+                                    Content="I"
+                                    IsEnabled="{Binding SelectedChannel, Converter={StaticResource NullToBoolConverter}}"/>
+                            <Button Style="{StaticResource IconButtonStyle}"
+                                    ToolTip="{loc:Localize Key=MainWindow_FormatUnderline}"
+                                    Click="FormatUnderline_Click"
+                                    Width="32" Height="32"
+                                    FontSize="14"
+                                    IsEnabled="{Binding SelectedChannel, Converter={StaticResource NullToBoolConverter}}">
+                                <TextBlock Text="U" TextDecorations="Underline"/>
+                            </Button>
+                        </StackPanel>
                         
                         <!-- Emoji Popup -->
                         <Popup x:Name="EmojiPopup"
@@ -1370,6 +1516,22 @@
                                                       CommandParameter="{Binding}">
                                                 <MenuItem.Icon>
                                                     <TextBlock Text="👤" FontSize="12"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <Separator/>
+                                            <!-- FiSH Encryption for users -->
+                                            <MenuItem Header="{loc:Localize Key=FiSH_SetKey}" 
+                                                      Command="{Binding DataContext.SetFishKeyForUserCommand, Source={x:Reference Name=MainWindowRoot}}"
+                                                      CommandParameter="{Binding}">
+                                                <MenuItem.Icon>
+                                                    <TextBlock Text="🔑" FontSize="12"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="{loc:Localize Key=FiSH_KeyExchange}" 
+                                                      Command="{Binding DataContext.InitiateFishKeyExchangeForUserCommand, Source={x:Reference Name=MainWindowRoot}}"
+                                                      CommandParameter="{Binding}">
+                                                <MenuItem.Icon>
+                                                    <TextBlock Text="🔄" FontSize="12"/>
                                                 </MenuItem.Icon>
                                             </MenuItem>
                                             <Separator/>

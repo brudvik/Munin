@@ -18,14 +18,18 @@
 - **SASL authentication** - PLAIN and SCRAM-SHA-256 support
 - **Client certificates** - Authentication with PFX/P12 certificates
 - **Proxy support** - SOCKS4, SOCKS5, and HTTP proxy
+- **IPv6 support** - Native IPv6 with configurable preference and IPv4 fallback
 
 ### Security & Privacy
 - **AES-256-GCM encryption** - All local data can be encrypted
 - **PBKDF2 key derivation** - 150,000 iterations
+- **FiSH encryption** - End-to-end message encryption compatible with mIRC/HexChat
+- **DH1080 key exchange** - Automatic secure key negotiation
 - **Anonymous filenames** - Hides server/channel names in log files
 - **Auto-lock** - Lock after configurable inactivity period
 - **Secure deletion** - Overwrite files before deletion
 - **Security log** - Track unlock attempts
+- **Certificate pinning** - Detect SSL certificate changes
 
 ### User Interface
 - **Modern dark theme** - Professional polished design with Windows 11-style window chrome
@@ -146,15 +150,27 @@ Data is stored in: `%APPDATA%\Munin\`
 
 ## 🔐 Security
 
-### Encryption
+### Local Encryption
 - **Algorithm:** AES-256-GCM (authenticated encryption)
 - **Key derivation:** PBKDF2-SHA256, 150,000 iterations
 - **Salt:** 32 bytes, unique per installation
 - **Nonce:** 12 bytes, unique per encryption operation
 
+### FiSH Message Encryption
+- **Algorithm:** Blowfish (custom implementation, no external dependencies)
+- **Modes:** ECB (+OK prefix) and CBC (*OK prefix)
+- **Compatibility:** Works with mIRC FiSH, HexChat FiSH, and other FiSH clients
+- **Key Exchange:** DH1080 for automatic secure key negotiation
+- **Usage:** `/setkey #channel secret` or `/keyx nick` for automatic key exchange
+
 ### Privacy
 - Filenames are anonymized with HMAC-SHA256 when encryption is enabled
 - No telemetry or network requests outside of IRC
+
+### Certificate Pinning
+- Stores SHA-256 fingerprints for each server's SSL certificate
+- Alerts when server certificate changes unexpectedly
+- Helps detect MITM attacks
 
 ## 📝 IRC Commands
 
@@ -170,6 +186,10 @@ Data is stored in: `%APPDATA%\Munin\`
 | `/whois nick` | View user info |
 | `/ignore nick` | Ignore a user |
 | `/alias name command` | Create alias |
+| `/setkey [target] key` | Set FiSH encryption key |
+| `/delkey [target]` | Remove FiSH encryption key |
+| `/keyx nick` | Initiate DH1080 key exchange |
+| `/showkey [target]` | Show current FiSH key (masked) |
 
 ## 🔧 Scripting System
 

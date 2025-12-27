@@ -38,6 +38,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - History timestamp separator showing date range of loaded messages
 - Copilot instructions file for development guidelines
 - Close button (X) on sidebar channels and DMs for easy leave/close
+- Topic editor dialog with FiSH encryption support
+- Topic decryption for FiSH-encrypted channel topics
+- Edit topic button (✏️) in topic bar for users with edit permissions
 - **Discord-style layout**: New vertical server rail with round server icons on the left side
 - Server icons with auto-generated initials and color-coded backgrounds based on server name
 - Connection status indicators on server icons (green=connected, yellow=connecting, gray=disconnected)
@@ -48,6 +51,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Lua Scripting** (MoonSharp): Primary scripting with sandboxed execution
   - **JSON Triggers**: Simple automation without coding for common tasks
   - **C# Plugins**: Advanced users can create compiled DLL plugins
+- **Quote/Reply**: Right-click context menu to quote and reply to messages
+- **Message Formatting Buttons**: Bold (Ctrl+B), Italic (Ctrl+I), Underline (Ctrl+U) buttons in message input
+- **Away Status Toggle**: Moon/sun icon button to easily set/clear away status with custom message
+- **Notify List**: Track when friends come online/offline
+  - Add users from message context menu
+  - NotifyListService with ISON support
+  - Online/offline notification events
+- **Favorite Channels**: Star-mark channels to sort them to the top of the list
+  - Visual star indicator on favorite channels
+  - Right-click context menu to toggle favorite status
+  - Automatic sorting with favorites first
+- **Certificate Pinning**: Security feature to detect SSL certificate changes
+  - Stores SHA-256 fingerprints for each server
+  - Alerts when server certificate changes unexpectedly
+  - Persistent storage in certificate_pins.json
+- **IPv6 Support**: Native IPv6 networking with dual-stack fallback
+  - Per-server IPv6 preference setting in Add/Edit Server dialogs
+  - DNS A/AAAA record resolution with configurable preference
+  - Automatic fallback to IPv4 when IPv6 is unavailable
+  - Connection status shows current IP version
+- **FiSH Encryption**: End-to-end message encryption compatible with mIRC/HexChat
+  - Custom Blowfish cipher implementation (no external dependencies)
+  - ECB and CBC encryption modes (+OK and *OK prefixes)
+  - FiSH-compatible Base64 encoding
+  - **DH1080 Key Exchange**: Automatic secure key negotiation with `/keyx` command
+  - Commands: `/setkey`, `/delkey`, `/keyx`, `/showkey`
+  - Visual lock icon (🔒) on encrypted messages
+  - Per-channel and per-user key management
+  - **Context menu integration**: Right-click on channels/DMs for encryption options
+  - Input dialog for setting encryption keys
 
 ### Changed
 - **Chromeless window style**: All dialog windows now use custom windowless title bar matching MainWindow

@@ -86,6 +86,12 @@ public class ChatInputTextBox : TextBox
         new("/scripts", "", "Open Script Manager window"),
         new("/reload", "[script]", "Reload script(s)"),
         
+        // FiSH encryption commands
+        new("/setkey", "[target] key", "Set FiSH encryption key"),
+        new("/delkey", "[target]", "Remove FiSH encryption key"),
+        new("/keyx", "nick", "Initiate DH1080 key exchange"),
+        new("/showkey", "[target]", "Show FiSH key (masked)"),
+        
         // Window commands
         new("/clear", "", "Clear message window"),
         new("/close", "", "Close current PM window"),
