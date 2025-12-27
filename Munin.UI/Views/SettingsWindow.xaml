@@ -298,6 +298,82 @@
                     </StackPanel>
                 </Border>
                 
+                <!-- Ident Server Section (RFC 1413) -->
+                <Border Background="{StaticResource BackgroundMediumBrush}"
+                        CornerRadius="8"
+                        Padding="16"
+                        Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="{loc:Localize Key=Settings_IdentServerHeader}" 
+                                   FontSize="12" 
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,0,0,14"/>
+                        
+                        <CheckBox x:Name="IdentServerEnabledCheckBox"
+                                  Content="{loc:Localize Key=Settings_IdentServerEnabled}"
+                                  Margin="0,0,0,12"/>
+                        
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" 
+                                       Text="{loc:Localize Key=Settings_IdentServerPort}" 
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center"/>
+                            <TextBox x:Name="IdentServerPortTextBox"
+                                     Grid.Column="1"
+                                     Text="113"
+                                     Padding="8,6"/>
+                        </Grid>
+                        
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" 
+                                       Text="{loc:Localize Key=Settings_IdentUsername}" 
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center"/>
+                            <TextBox x:Name="IdentUsernameTextBox"
+                                     Grid.Column="1"
+                                     Padding="8,6"/>
+                        </Grid>
+                        
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" 
+                                       Text="{loc:Localize Key=Settings_IdentOperatingSystem}" 
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center"/>
+                            <ComboBox x:Name="IdentOperatingSystemComboBox"
+                                      Grid.Column="1"
+                                      SelectedIndex="1"
+                                      MinWidth="120">
+                                <ComboBoxItem Content="UNIX"/>
+                                <ComboBoxItem Content="WIN32"/>
+                                <ComboBoxItem Content="OTHER"/>
+                            </ComboBox>
+                        </Grid>
+                        
+                        <CheckBox x:Name="IdentHideUserCheckBox"
+                                  Content="{loc:Localize Key=Settings_IdentHideUser}"
+                                  Margin="0,0,0,8"/>
+                        
+                        <TextBlock Text="{loc:Localize Key=Settings_IdentDescription}"
+                                   Foreground="{StaticResource TextMutedBrush}"
+                                   FontSize="11"
+                                   TextWrapping="Wrap"
+                                   Margin="0,8,0,0"/>
+                    </StackPanel>
+                </Border>
+                
                 <!-- Security Audit Section -->
                 <Border Background="{StaticResource BackgroundMediumBrush}"
                         CornerRadius="8"

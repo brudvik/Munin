@@ -32,6 +32,38 @@ public partial class MainWindow : Window
         
         // Update maximize icon when window state changes
         StateChanged += MainWindow_StateChanged;
+        
+        // Subscribe to focus request event from ViewModel
+        if (DataContext is MainViewModel vm)
+        {
+            vm.FocusMessageInputRequested += ViewModel_FocusMessageInputRequested;
+        }
+        
+        // Also handle DataContext changes (in case it's set later)
+        DataContextChanged += (s, e) =>
+        {
+            if (e.OldValue is MainViewModel oldVm)
+            {
+                oldVm.FocusMessageInputRequested -= ViewModel_FocusMessageInputRequested;
+            }
+            if (e.NewValue is MainViewModel newVm)
+            {
+                newVm.FocusMessageInputRequested += ViewModel_FocusMessageInputRequested;
+            }
+        };
+    }
+    
+    /// <summary>
+    /// Handles the focus request from the ViewModel by focusing the message input textbox.
+    /// </summary>
+    private void ViewModel_FocusMessageInputRequested(object? sender, EventArgs e)
+    {
+        // Use Dispatcher.BeginInvoke to ensure the UI is ready before focusing
+        Dispatcher.BeginInvoke(new Action(() =>
+        {
+            MessageInputTextBox.Focus();
+            Keyboard.Focus(MessageInputTextBox);
+        }), System.Windows.Threading.DispatcherPriority.Input);
     }
     
     /// <summary>
@@ -732,6 +764,106 @@ public partial class MainWindow : Window
                 vm.SortChannels(vm.SelectedServer);
             }
         }
+    }
+    
+    #endregion
+    
+    #region Channel Drag and Drop
+    
+    private ChannelViewModel? _draggedChannel;
+    private Point _dragStartPoint;
+    
+    /// <summary>
+    /// Handles the PreviewMouseLeftButtonDown event for channel drag initiation.
+    /// </summary>
+    private void Channel_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is FrameworkElement element && element.DataContext is ChannelViewModel channel)
+        {
+            _dragStartPoint = e.GetPosition(null);
+            _draggedChannel = channel;
+        }
+    }
+    
+    /// <summary>
+    /// Handles the PreviewMouseMove event to detect drag threshold.
+    /// </summary>
+    private void Channel_PreviewMouseMove(object sender, MouseEventArgs e)
+    {
+        if (e.LeftButton != MouseButtonState.Pressed || _draggedChannel == null)
+            return;
+            
+        // Check if we've moved enough to start a drag
+        var currentPosition = e.GetPosition(null);
+        var diff = _dragStartPoint - currentPosition;
+        
+        if (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance ||
+            Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)
+        {
+            // Start the drag operation
+            var data = new DataObject("ChannelViewModel", _draggedChannel);
+            DragDrop.DoDragDrop((DependencyObject)sender, data, DragDropEffects.Move);
+            
+            _draggedChannel = null;
+        }
+    }
+    
+    /// <summary>
+    /// Handles the DragOver event for visual feedback.
+    /// </summary>
+    private void Channel_DragOver(object sender, DragEventArgs e)
+    {
+        if (!e.Data.GetDataPresent("ChannelViewModel"))
+        {
+            e.Effects = DragDropEffects.None;
+            e.Handled = true;
+            return;
+        }
+        
+        e.Effects = DragDropEffects.Move;
+        e.Handled = true;
+    }
+    
+    /// <summary>
+    /// Handles the Drop event to reorder channels.
+    /// </summary>
+    private void Channel_Drop(object sender, DragEventArgs e)
+    {
+        if (!e.Data.GetDataPresent("ChannelViewModel"))
+            return;
+            
+        var droppedChannel = e.Data.GetData("ChannelViewModel") as ChannelViewModel;
+        if (droppedChannel == null)
+            return;
+            
+        if (sender is FrameworkElement element && element.DataContext is ChannelViewModel targetChannel)
+        {
+            if (droppedChannel == targetChannel)
+                return;
+                
+            if (DataContext is MainViewModel vm && vm.SelectedServer != null)
+            {
+                var channels = vm.SelectedServer.Channels;
+                var oldIndex = channels.IndexOf(droppedChannel);
+                var newIndex = channels.IndexOf(targetChannel);
+                
+                if (oldIndex >= 0 && newIndex >= 0 && oldIndex != newIndex)
+                {
+                    channels.Move(oldIndex, newIndex);
+                    
+                    // Update sort orders
+                    for (int i = 0; i < channels.Count; i++)
+                    {
+                        channels[i].SortOrder = i;
+                    }
+                    
+                    // Save the channel order
+                    _ = vm.SaveConfigurationAsync();
+                }
+            }
+        }
+        
+        e.Handled = true;
     }
     
     #endregion

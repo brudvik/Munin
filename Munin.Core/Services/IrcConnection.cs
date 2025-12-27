@@ -1554,6 +1554,19 @@ public class IrcConnection : IDisposable
 
         var isHighlight = CheckHighlight(content);
 
+        // Check if this message is from bouncer playback
+        var isFromPlayback = Server.IsReceivingPlayback;
+        
+        // Also check if message is part of a batch (for chathistory)
+        if (!isFromPlayback && message.Tags.TryGetValue("batch", out var batchRef))
+        {
+            if (_activeBatches.TryGetValue(batchRef, out var batch))
+            {
+                isFromPlayback = batch.Type.Equals("znc.in/playback", StringComparison.OrdinalIgnoreCase) ||
+                                batch.Type.Equals("chathistory", StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
         var ircMessage = new IrcMessage
         {
             Timestamp = message.GetTimestamp(),
@@ -1563,6 +1576,7 @@ public class IrcConnection : IDisposable
             Content = content,
             IsHighlight = isHighlight,
             IsEncrypted = wasEncrypted,
+            IsFromPlayback = isFromPlayback,
             RawMessage = message.RawMessage
         };
 
@@ -2132,6 +2146,15 @@ public class IrcConnection : IDisposable
             }
 
             _activeBatches[reference] = batch;
+
+            // Handle ZNC playback start
+            if (batchType.Equals("znc.in/playback", StringComparison.OrdinalIgnoreCase) ||
+                batchType.Equals("chathistory", StringComparison.OrdinalIgnoreCase))
+            {
+                Server.IsReceivingPlayback = true;
+                Server.IsBouncerDetected = true;
+                _logger.Information("ZNC playback batch started: {Reference}", reference);
+            }
         }
         else if (batchRef.StartsWith('-'))
         {
@@ -2139,6 +2162,15 @@ public class IrcConnection : IDisposable
             var reference = batchRef[1..];
             if (_activeBatches.TryGetValue(reference, out var batch))
             {
+                // Handle ZNC playback end
+                if (batch.Type.Equals("znc.in/playback", StringComparison.OrdinalIgnoreCase) ||
+                    batch.Type.Equals("chathistory", StringComparison.OrdinalIgnoreCase))
+                {
+                    Server.IsReceivingPlayback = false;
+                    _logger.Information("ZNC playback batch complete: {Reference}, {Count} messages", 
+                        reference, batch.Messages.Count);
+                }
+
                 batch.IsComplete = true;
                 _activeBatches.Remove(reference);
                 BatchComplete?.Invoke(this, new IrcBatchEventArgs(Server, batch));

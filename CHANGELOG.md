@@ -8,6 +8,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Ident Server (RFC 1413)**: Built-in identd server like mIRC
+  - Full RFC 1413 compliant implementation
+  - Configurable port (default 113)
+  - Custom username or use system username
+  - Configurable OS type (UNIX/WIN32/OTHER)
+  - HIDDEN-USER privacy option
+  - Automatic connection tracking for IRC sessions
+  - Settings UI in Settings window
+- **Server Groups/Folders**: Organize servers into collapsible groups for better management
+  - Create, rename, and delete server groups
+  - Move servers between groups via context menu
+  - Collapse/expand groups to save space in server rail
+  - Groups persist across sessions in configuration
+- **Server context menu**: Right-click on server icons for quick actions (Connect, Disconnect, Edit, Remove)
+- **Bouncer/ZNC Support**: Better handling of IRC bouncers
+  - Auto-detect ZNC/bouncer via CAP `znc.in/playback` and `draft/chathistory`
+  - Suppress notifications during playback buffer replay
+  - Mark messages as historical (IsFromPlayback flag)
+  - IsBouncer and SuppressPlaybackNotifications server settings
+- **Channel Mode Editor**: Visual dialog for editing channel modes
+  - Toggle simple modes (+n, +t, +s, +m, +i, +p)
+  - Set/remove channel key (+k) and user limit (+l)
+  - Shows current modes and only sends changes
+  - Access via channel context menu "Edit channel modes..."
+- **Ban List Manager**: Manage channel bans, exceptions, and invite lists
+  - View all bans (+b), exceptions (+e), and invite masks (+I)
+  - Add new entries with hostmask input
+  - Remove entries via right-click context menu
+  - Shows who set each entry and when
+  - Access via channel context menu "Manage bans/exceptions..."
+- **Keyboard Focus**: Automatic focus to message input after JOIN or channel switch
+  - FocusMessageInputRequested event for ViewModel-to-View communication
+  - Dispatcher-based focus with Input priority for reliability
+- **Loading States**: Visual indicators for async operations
+  - History loading spinner when switching channels
+  - IsLoadingHistory property on ChannelViewModel
+- **Channel Drag & Drop**: Reorder channels by dragging
+  - SortOrder property for channel positioning
+  - Drag threshold detection for reliable interaction
+  - Order persists in configuration
+- **Unread Badge Limit**: Shows "99+" instead of large numbers in unread badges
+  - UnreadCountConverter for display formatting
 - Initial release of Munin IRC Client for Windows
 - Multi-server support with tabbed interface
 - SSL/TLS encrypted connections
@@ -26,6 +68,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Tab completion for nicknames and commands
 - Command history (up/down arrows)
 - Custom highlight words
+
+### Fixed
+- Localized hardcoded strings in ScriptConsoleWindow and RawIrcLogWindow
+- Added missing Norwegian translations for new UI elements
 - Ignore list for users
 - Auto-perform commands on connect
 - Custom command aliases

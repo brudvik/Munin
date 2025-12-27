@@ -50,6 +50,21 @@ public partial class SettingsWindow : Window
         
         // History settings
         HistoryLinesToLoadTextBox.Text = settings.HistoryLinesToLoad.ToString();
+        
+        // Ident server settings
+        IdentServerEnabledCheckBox.IsChecked = settings.IdentServerEnabled;
+        IdentServerPortTextBox.Text = settings.IdentServerPort.ToString();
+        IdentUsernameTextBox.Text = settings.IdentUsername;
+        IdentHideUserCheckBox.IsChecked = settings.IdentHideUser;
+        
+        // Set operating system combo box
+        switch (settings.IdentOperatingSystem.ToUpperInvariant())
+        {
+            case "UNIX": IdentOperatingSystemComboBox.SelectedIndex = 0; break;
+            case "WIN32": IdentOperatingSystemComboBox.SelectedIndex = 1; break;
+            case "OTHER": IdentOperatingSystemComboBox.SelectedIndex = 2; break;
+            default: IdentOperatingSystemComboBox.SelectedIndex = 1; break;
+        }
     }
     
     /// <summary>
@@ -287,6 +302,22 @@ public partial class SettingsWindow : Window
         {
             settings.HistoryLinesToLoad = historyLines;
         }
+        
+        // Ident server settings
+        settings.IdentServerEnabled = IdentServerEnabledCheckBox.IsChecked == true;
+        if (int.TryParse(IdentServerPortTextBox.Text, out var identPort) && identPort >= 1 && identPort <= 65535)
+        {
+            settings.IdentServerPort = identPort;
+        }
+        settings.IdentUsername = IdentUsernameTextBox.Text.Trim();
+        settings.IdentHideUser = IdentHideUserCheckBox.IsChecked == true;
+        settings.IdentOperatingSystem = IdentOperatingSystemComboBox.SelectedIndex switch
+        {
+            0 => "UNIX",
+            1 => "WIN32",
+            2 => "OTHER",
+            _ => "WIN32"
+        };
         
         // Update auto-lock configuration
         if (Application.Current is App app)

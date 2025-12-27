@@ -238,3 +238,24 @@ public class SizeToRectConverter : IMultiValueConverter
         throw new NotImplementedException();
     }
 }
+
+/// <summary>
+/// Converts an integer to a display string with a maximum limit.
+/// If the value exceeds 99, returns "99+" instead of the actual number.
+/// </summary>
+public class UnreadCountConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is int count)
+        {
+            return count > 99 ? "99+" : count.ToString();
+        }
+        return "0";
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}

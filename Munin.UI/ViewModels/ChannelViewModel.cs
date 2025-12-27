@@ -89,6 +89,18 @@ public partial class ChannelViewModel : ObservableObject
     private bool _isPrivateMessage;
 
     /// <summary>
+    /// Whether history is currently being loaded for this channel.
+    /// </summary>
+    [ObservableProperty]
+    private bool _isLoadingHistory;
+
+    /// <summary>
+    /// Sort order for channel positioning in the list.
+    /// </summary>
+    [ObservableProperty]
+    private int _sortOrder;
+
+    /// <summary>
     /// For private messages, this holds the other user's nickname.
     /// </summary>
     [ObservableProperty]

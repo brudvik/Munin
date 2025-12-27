@@ -38,11 +38,21 @@ public partial class MainViewModel : ObservableObject
     private readonly DispatcherTimer _latencyTimer;
     private readonly ScriptManager _scriptManager;
     private readonly FishCryptService _fishCrypt;
+    private readonly IdentServer _identServer;
     private ScriptConsoleWindow? _scriptConsoleWindow;
     private ScriptManagerWindow? _scriptManagerWindow;
 
     [ObservableProperty]
     private ObservableCollection<ServerViewModel> _servers = new();
+
+    [ObservableProperty]
+    private ObservableCollection<ServerGroupViewModel> _serverGroups = new();
+
+    /// <summary>
+    /// Combined collection of servers and groups for the server rail, sorted by SortOrder.
+    /// </summary>
+    [ObservableProperty]
+    private ObservableCollection<IServerRailItem> _serverRailItems = new();
 
     [ObservableProperty]
     private ServerViewModel? _selectedServer;
@@ -93,6 +103,20 @@ public partial class MainViewModel : ObservableObject
     private readonly HashSet<string> _loadedHistoryChannels = new();
     private RawIrcLogWindow? _rawIrcLogWindow;
 
+    /// <summary>
+    /// Event raised when focus should be set to the message input field.
+    /// Used to communicate from ViewModel to View for focus management.
+    /// </summary>
+    public event EventHandler? FocusMessageInputRequested;
+
+    /// <summary>
+    /// Requests the View to set focus to the message input field.
+    /// </summary>
+    private void RequestFocusMessageInput()
+    {
+        FocusMessageInputRequested?.Invoke(this, EventArgs.Empty);
+    }
+
     partial void OnServersChanged(ObservableCollection<ServerViewModel> value)
     {
         OnPropertyChanged(nameof(HasNoServers));
@@ -121,6 +145,9 @@ public partial class MainViewModel : ObservableObject
             // Load history if not already loaded
             LoadChannelHistory(newValue);
             _logger.Information("OnSelectedChannelChanged: Channel history loaded");
+            
+            // Request focus to message input after channel selection
+            RequestFocusMessageInput();
         }
     }
 
@@ -138,51 +165,62 @@ public partial class MainViewModel : ObservableObject
         
         _loadedHistoryChannels.Add(historyKey);
         
-        _logger.Information("LoadChannelHistory: Reading last lines from log");
-        // Load messages from log based on configuration
-        var linesToLoad = _configService.Configuration.Settings.HistoryLinesToLoad;
-        var historyLines = LoggingService.Instance.ReadLastLines(
-            SelectedServer.Server.Name,
-            channel.Channel.Name,
-            linesToLoad);
-
-        _logger.Information("LoadChannelHistory: Got history lines, parsing");
-        var historyMessages = new List<MessageViewModel>();
-        foreach (var line in historyLines)
+        // Show loading indicator
+        channel.IsLoadingHistory = true;
+        
+        try
         {
-            var message = ParseLogLine(line);
-            if (message != null)
-            {
-                historyMessages.Add(new MessageViewModel(message));
-            }
-        }
+            _logger.Information("LoadChannelHistory: Reading last lines from log");
+            // Load messages from log based on configuration
+            var linesToLoad = _configService.Configuration.Settings.HistoryLinesToLoad;
+            var historyLines = LoggingService.Instance.ReadLastLines(
+                SelectedServer.Server.Name,
+                channel.Channel.Name,
+                linesToLoad);
 
-        _logger.Information("LoadChannelHistory: Parsed {Count} messages, inserting", historyMessages.Count);
-        // Insert at the beginning
-        if (historyMessages.Count > 0)
-        {
-            // Find the oldest message's timestamp to show "last updated" info
-            var oldestMessage = historyMessages.FirstOrDefault();
-            var newestMessage = historyMessages.LastOrDefault();
-            
-            for (int i = historyMessages.Count - 1; i >= 0; i--)
+            _logger.Information("LoadChannelHistory: Got history lines, parsing");
+            var historyMessages = new List<MessageViewModel>();
+            foreach (var line in historyLines)
             {
-                channel.Messages.Insert(0, historyMessages[i]);
-            }
-            
-            // Add a separator message showing when this history is from
-            if (oldestMessage?.Message?.Timestamp != null && newestMessage?.Message?.Timestamp != null)
-            {
-                var separatorMessage = new IrcMessage
+                var message = ParseLogLine(line);
+                if (message != null)
                 {
-                    Type = MessageType.System,
-                    Content = $"--- History loaded: {historyMessages.Count} messages from {oldestMessage.Message.Timestamp:g} to {newestMessage.Message.Timestamp:g} ---",
-                    Timestamp = DateTime.Now
-                };
-                channel.Messages.Add(new MessageViewModel(separatorMessage));
+                    historyMessages.Add(new MessageViewModel(message));
+                }
             }
+
+            _logger.Information("LoadChannelHistory: Parsed {Count} messages, inserting", historyMessages.Count);
+            // Insert at the beginning
+            if (historyMessages.Count > 0)
+            {
+                // Find the oldest message's timestamp to show "last updated" info
+                var oldestMessage = historyMessages.FirstOrDefault();
+                var newestMessage = historyMessages.LastOrDefault();
+                
+                for (int i = historyMessages.Count - 1; i >= 0; i--)
+                {
+                    channel.Messages.Insert(0, historyMessages[i]);
+                }
+                
+                // Add a separator message showing when this history is from
+                if (oldestMessage?.Message?.Timestamp != null && newestMessage?.Message?.Timestamp != null)
+                {
+                    var separatorMessage = new IrcMessage
+                    {
+                        Type = MessageType.System,
+                        Content = $"--- History loaded: {historyMessages.Count} messages from {oldestMessage.Message.Timestamp:g} to {newestMessage.Message.Timestamp:g} ---",
+                        Timestamp = DateTime.Now
+                    };
+                    channel.Messages.Add(new MessageViewModel(separatorMessage));
+                }
+            }
+            _logger.Information("LoadChannelHistory: Complete");
         }
-        _logger.Information("LoadChannelHistory: Complete");
+        finally
+        {
+            // Hide loading indicator
+            channel.IsLoadingHistory = false;
+        }
     }
 
     private IrcMessage? ParseLogLine(string line)
@@ -267,6 +305,9 @@ public partial class MainViewModel : ObservableObject
             PortableMode.IsPortable ? "scripts" : "Munin\\scripts");
         var scriptContext = new ScriptContext(_clientManager, scriptsDir);
         _scriptManager = new ScriptManager(scriptContext);
+        
+        // Initialize ident server (RFC 1413)
+        _identServer = new IdentServer();
         
         // Initialize FiSH encryption
         _fishCrypt = new FishCryptService();
@@ -397,6 +438,9 @@ public partial class MainViewModel : ObservableObject
         await _configService.LoadAsync();
         _logger.Information("LoadConfigurationAsync: Configuration loaded");
         
+        // Configure and start ident server if enabled
+        ConfigureIdentServer();
+        
         // Load FiSH keys from configuration
         var fishKeys = _configService.Configuration.FishKeys;
         if (fishKeys != null && fishKeys.Count > 0)
@@ -408,6 +452,15 @@ public partial class MainViewModel : ObservableObject
         // Must run UI operations on the dispatcher thread
         await App.Current.Dispatcher.InvokeAsync(() =>
         {
+            // Load server groups first
+            var groups = _configService.GetServerGroups();
+            foreach (var group in groups)
+            {
+                var groupVm = new ServerGroupViewModel(group);
+                ServerGroups.Add(groupVm);
+            }
+            _logger.Information("LoadConfigurationAsync: Loaded {Count} server group(s)", groups.Count);
+
             foreach (var server in _configService.GetAllServers())
             {
                 _logger.Information("LoadConfigurationAsync: Creating VM for {Name}", server.Name);
@@ -415,6 +468,16 @@ public partial class MainViewModel : ObservableObject
                 _logger.Information("LoadConfigurationAsync: Adding server to collection");
                 Servers.Add(serverVm);
                 _logger.Information("LoadConfigurationAsync: Server added to Servers collection");
+
+                // Add to group if assigned
+                if (!string.IsNullOrEmpty(server.Group))
+                {
+                    var groupVm = ServerGroups.FirstOrDefault(g => g.Group.Id == server.Group);
+                    if (groupVm != null)
+                    {
+                        groupVm.Servers.Add(serverVm);
+                    }
+                }
                 
                 // Auto-connect if configured
                 if (server.AutoConnect)
@@ -423,6 +486,9 @@ public partial class MainViewModel : ObservableObject
                     _ = ConnectToServerAsync(serverVm);
                 }
             }
+
+            // Build the server rail items list
+            RebuildServerRailItems();
             
             _logger.Information("LoadConfigurationAsync: Setting SelectedServer");
             if (Servers.Count > 0)
@@ -438,6 +504,57 @@ public partial class MainViewModel : ObservableObject
             }
             _logger.Information("LoadConfigurationAsync: Complete");
         });
+    }
+
+    /// <summary>
+    /// Rebuilds the ServerRailItems collection based on current servers and groups.
+    /// </summary>
+    private void RebuildServerRailItems()
+    {
+        ServerRailItems.Clear();
+        
+        // Add groups with their servers
+        foreach (var group in ServerGroups.OrderBy(g => g.SortOrder))
+        {
+            ServerRailItems.Add(group);
+        }
+        
+        // Add ungrouped servers
+        var groupedServerIds = ServerGroups.SelectMany(g => g.Servers).Select(s => s.Server.Id).ToHashSet();
+        foreach (var server in Servers.Where(s => !groupedServerIds.Contains(s.Server.Id)).OrderBy(s => s.SortOrder))
+        {
+            ServerRailItems.Add(server);
+        }
+    }
+
+    /// <summary>
+    /// Configures and starts the ident server based on settings.
+    /// </summary>
+    private void ConfigureIdentServer()
+    {
+        var settings = _configService.Configuration.Settings;
+        
+        _identServer.IsEnabled = settings.IdentServerEnabled;
+        _identServer.Port = settings.IdentServerPort;
+        _identServer.OperatingSystem = settings.IdentOperatingSystem;
+        _identServer.HideUser = settings.IdentHideUser;
+        
+        // Use configured username or system username
+        _identServer.DefaultUsername = !string.IsNullOrEmpty(settings.IdentUsername) 
+            ? settings.IdentUsername 
+            : Environment.UserName;
+        
+        if (settings.IdentServerEnabled)
+        {
+            if (_identServer.Start())
+            {
+                _logger.Information("Ident server started on port {Port}", settings.IdentServerPort);
+            }
+            else
+            {
+                _logger.Warning("Failed to start ident server on port {Port}", settings.IdentServerPort);
+            }
+        }
     }
 
     private ServerViewModel CreateServerViewModel(IrcServer server)
@@ -473,7 +590,10 @@ public partial class MainViewModel : ObservableObject
         return serverVm;
     }
 
-    private async Task SaveConfigurationAsync()
+    /// <summary>
+    /// Saves the current configuration asynchronously.
+    /// </summary>
+    public async Task SaveConfigurationAsync()
     {
         await _configService.SaveAsync();
     }
@@ -640,16 +760,24 @@ public partial class MainViewModel : ObservableObject
                     
                     if (channel != SelectedChannel)
                     {
-                        channel.UnreadCount++;
+                        // Don't increment unread for playback messages
+                        if (!e.Message.IsFromPlayback)
+                        {
+                            channel.UnreadCount++;
+                        }
+                        
                         if (e.Message.IsHighlight)
                         {
                             channel.HasMention = true;
-                            // Show notification for mention
-                            NotificationService.Instance.NotifyMention(
-                                e.Server.Name,
-                                e.Channel.Name,
-                                e.Message.Source ?? "Unknown",
-                                e.Message.Content);
+                            // Show notification for mention (skip for playback)
+                            if (!e.Message.IsFromPlayback)
+                            {
+                                NotificationService.Instance.NotifyMention(
+                                    e.Server.Name,
+                                    e.Channel.Name,
+                                    e.Message.Source ?? "Unknown",
+                                    e.Message.Content);
+                            }
                         }
                     }
                     
@@ -837,14 +965,18 @@ public partial class MainViewModel : ObservableObject
                     
                     if (dmChannel != SelectedChannel)
                     {
-                        dmChannel.UnreadCount++;
-                        dmChannel.HasMention = true;
-                        
-                        // Show notification for DM
-                        NotificationService.Instance.NotifyPrivateMessage(
-                            e.Server.Name,
-                            e.From,
-                            e.Message.Content);
+                        // Don't increment unread for playback messages
+                        if (!e.Message.IsFromPlayback)
+                        {
+                            dmChannel.UnreadCount++;
+                            dmChannel.HasMention = true;
+                            
+                            // Show notification for DM
+                            NotificationService.Instance.NotifyPrivateMessage(
+                                e.Server.Name,
+                                e.From,
+                                e.Message.Content);
+                        }
                     }
                     
                     // Dispatch to scripts
@@ -1007,6 +1139,111 @@ public partial class MainViewModel : ObservableObject
         }
 
         StatusText = $"Removed server {server.Server.Name}";
+    }
+
+    /// <summary>
+    /// Creates a new server group.
+    /// </summary>
+    [RelayCommand]
+    private async Task CreateServerGroupAsync()
+    {
+        // Simple input dialog for group name
+        var dialog = new Views.InputDialog(
+            "Opprett servergruppe",
+            "Navn på gruppen:",
+            "")
+        {
+            Owner = App.Current.MainWindow
+        };
+
+        if (dialog.ShowDialog() == true && !string.IsNullOrWhiteSpace(dialog.InputText))
+        {
+            var group = new ServerGroup
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = dialog.InputText.Trim(),
+                SortOrder = ServerGroups.Count
+            };
+
+            var groupVm = new ServerGroupViewModel(group);
+            ServerGroups.Add(groupVm);
+            _configService.AddServerGroup(group);
+            await SaveConfigurationAsync();
+
+            RebuildServerRailItems();
+            StatusText = $"Opprettet gruppe: {group.Name}";
+        }
+    }
+
+    /// <summary>
+    /// Moves a server to a group.
+    /// </summary>
+    [RelayCommand]
+    private async Task MoveServerToGroupAsync((ServerViewModel Server, ServerGroupViewModel? Group) args)
+    {
+        var server = args.Server;
+        var targetGroup = args.Group;
+
+        if (server == null) return;
+
+        // Remove from current group if any
+        foreach (var group in ServerGroups)
+        {
+            group.Servers.Remove(server);
+        }
+
+        // Add to new group if specified
+        if (targetGroup != null)
+        {
+            targetGroup.Servers.Add(server);
+            server.Server.Group = targetGroup.Group.Id;
+        }
+        else
+        {
+            server.Server.Group = null;
+        }
+
+        _configService.SetServerGroup(server.Server.Id, server.Server.Group);
+        await SaveConfigurationAsync();
+
+        RebuildServerRailItems();
+    }
+
+    /// <summary>
+    /// Toggles the collapsed state of a server group.
+    /// </summary>
+    [RelayCommand]
+    private async Task ToggleServerGroupCollapsedAsync(ServerGroupViewModel? group)
+    {
+        if (group == null) return;
+
+        group.IsCollapsed = !group.IsCollapsed;
+        group.Group.IsCollapsed = group.IsCollapsed;
+        
+        _configService.SetServerGroupCollapsed(group.Group.Id, group.IsCollapsed);
+        await SaveConfigurationAsync();
+    }
+
+    /// <summary>
+    /// Deletes a server group (servers are moved to ungrouped).
+    /// </summary>
+    [RelayCommand]
+    private async Task DeleteServerGroupAsync(ServerGroupViewModel? group)
+    {
+        if (group == null) return;
+
+        // Move all servers from this group to ungrouped
+        foreach (var server in group.Servers.ToList())
+        {
+            server.Server.Group = null;
+        }
+
+        ServerGroups.Remove(group);
+        _configService.RemoveServerGroup(group.Group.Id, true);
+        await SaveConfigurationAsync();
+
+        RebuildServerRailItems();
+        StatusText = $"Slettet gruppe: {group.Group.Name}";
     }
 
     [RelayCommand]
@@ -1718,6 +1955,49 @@ public partial class MainViewModel : ObservableObject
             
             await SelectedServer.Connection.SendRawAsync($"TOPIC {channelName} :{newTopic}");
         }
+    }
+
+    /// <summary>
+    /// Opens the channel mode editor dialog.
+    /// </summary>
+    [RelayCommand]
+    private async Task EditChannelModesAsync()
+    {
+        if (SelectedServer?.Connection == null || SelectedChannel == null) return;
+        if (SelectedChannel.IsServerConsole || SelectedChannel.IsPrivateMessage) return;
+        
+        var channelName = SelectedChannel.Channel.Name;
+        var currentModes = SelectedServer.Connection.GetChannelModes(channelName);
+        
+        var dialog = new Views.ChannelModeEditorDialog(channelName, currentModes)
+        {
+            Owner = App.Current.MainWindow
+        };
+        
+        if (dialog.ShowDialog() == true && !string.IsNullOrEmpty(dialog.ModeChanges))
+        {
+            await SelectedServer.Connection.SendRawAsync($"MODE {channelName} {dialog.ModeChanges}");
+            StatusText = $"Mode change sent: {dialog.ModeChanges}";
+        }
+    }
+
+    /// <summary>
+    /// Opens the ban list manager dialog.
+    /// </summary>
+    [RelayCommand]
+    private void OpenBanListManager()
+    {
+        if (SelectedServer?.Connection == null || SelectedChannel == null) return;
+        if (SelectedChannel.IsServerConsole || SelectedChannel.IsPrivateMessage) return;
+        
+        var channelName = SelectedChannel.Channel.Name;
+        
+        var dialog = new Views.BanListManagerDialog(SelectedServer.Connection, channelName)
+        {
+            Owner = App.Current.MainWindow
+        };
+        
+        dialog.ShowDialog();
     }
     
     /// <summary>

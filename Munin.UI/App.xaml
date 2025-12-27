@@ -24,6 +24,7 @@
             <converters:MessageToInlinesConverter x:Key="MessageToInlinesConverter"/>
             <converters:UsersToNicknamesConverter x:Key="UsersToNicknamesConverter"/>
             <converters:SizeToRectConverter x:Key="SizeToRectConverter"/>
+            <converters:UnreadCountConverter x:Key="UnreadCountConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

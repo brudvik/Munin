@@ -242,6 +242,9 @@ Are you absolutely sure?</value>
   <data name="MainWindow_LeaveChannel" xml:space="preserve">
     <value>Leave channel</value>
   </data>
+  <data name="MainWindow_EditChannelModes" xml:space="preserve">
+    <value>Edit channel modes...</value>
+  </data>
   <data name="MainWindow_CloseConversation" xml:space="preserve">
     <value>Close conversation</value>
   </data>
@@ -285,6 +288,96 @@ Are you absolutely sure?</value>
   </data>
   <data name="TopicEditor_EncryptionNote" xml:space="preserve">
     <value>Note: Encrypted topics can only be read by users with the same key.</value>
+  </data>
+
+  <!-- Common Dialog Buttons -->
+  <data name="Dialog_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Dialog_Apply" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="Dialog_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Dialog_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+
+  <!-- Channel Mode Editor -->
+  <data name="ChannelModeEditor_Title" xml:space="preserve">
+    <value>Channel Modes</value>
+  </data>
+  <data name="ChannelModeEditor_CurrentModes" xml:space="preserve">
+    <value>Current modes:</value>
+  </data>
+  <data name="ChannelModeEditor_SimpleModes" xml:space="preserve">
+    <value>Simple Modes</value>
+  </data>
+  <data name="ChannelModeEditor_ParameterModes" xml:space="preserve">
+    <value>Modes with Parameters</value>
+  </data>
+  <data name="ChannelModeEditor_Mode_N" xml:space="preserve">
+    <value>No external messages</value>
+  </data>
+  <data name="ChannelModeEditor_Mode_T" xml:space="preserve">
+    <value>Only ops can change topic</value>
+  </data>
+  <data name="ChannelModeEditor_Mode_S" xml:space="preserve">
+    <value>Secret channel</value>
+  </data>
+  <data name="ChannelModeEditor_Mode_M" xml:space="preserve">
+    <value>Moderated (only voiced can speak)</value>
+  </data>
+  <data name="ChannelModeEditor_Mode_I" xml:space="preserve">
+    <value>Invite only</value>
+  </data>
+  <data name="ChannelModeEditor_Mode_P" xml:space="preserve">
+    <value>Private channel</value>
+  </data>
+  <data name="ChannelModeEditor_Mode_K" xml:space="preserve">
+    <value>Channel key (password)</value>
+  </data>
+  <data name="ChannelModeEditor_Mode_L" xml:space="preserve">
+    <value>User limit</value>
+  </data>
+
+  <!-- Ban List Manager -->
+  <data name="BanListManager_Title" xml:space="preserve">
+    <value>Ban List Manager</value>
+  </data>
+  <data name="BanListManager_Bans" xml:space="preserve">
+    <value>Bans (+b)</value>
+  </data>
+  <data name="BanListManager_Exceptions" xml:space="preserve">
+    <value>Exceptions (+e)</value>
+  </data>
+  <data name="BanListManager_Invites" xml:space="preserve">
+    <value>Invites (+I)</value>
+  </data>
+  <data name="BanListManager_Mask" xml:space="preserve">
+    <value>Mask</value>
+  </data>
+  <data name="BanListManager_SetBy" xml:space="preserve">
+    <value>Set by</value>
+  </data>
+  <data name="BanListManager_SetAt" xml:space="preserve">
+    <value>Set at</value>
+  </data>
+  <data name="BanListManager_Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="BanListManager_Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="BanListManager_Loading" xml:space="preserve">
+    <value>Loading...</value>
+  </data>
+  <data name="BanListManager_Empty" xml:space="preserve">
+    <value>No entries</value>
+  </data>
+  <data name="MainWindow_ManageBanList" xml:space="preserve">
+    <value>Manage bans/exceptions...</value>
   </data>
   
   <!-- Add Server Dialog -->
@@ -448,6 +541,12 @@ Are you absolutely sure?</value>
   </data>
   <data name="MainWindow_RemoveServer" xml:space="preserve">
     <value>Remove server</value>
+  </data>
+  <data name="MainWindow_ConnectServer" xml:space="preserve">
+    <value>Connect</value>
+  </data>
+  <data name="MainWindow_DisconnectServer" xml:space="preserve">
+    <value>Disconnect</value>
   </data>
   <data name="MainWindow_CloseSearch" xml:space="preserve">
     <value>Close search (Esc)</value>
@@ -1046,5 +1145,52 @@ Perfect for USB drives.</value>
   </data>
   <data name="MainWindow_CertificateOld" xml:space="preserve">
     <value>Previous certificate fingerprint: {0}</value>
+  </data>
+  
+  <!-- Script Console -->
+  <data name="ScriptConsole_Run" xml:space="preserve">
+    <value>Run</value>
+  </data>
+  <data name="ScriptConsole_Clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="ScriptConsole_LoadedScripts" xml:space="preserve">
+    <value>Loaded scripts:</value>
+  </data>
+  
+  <!-- Raw IRC Log -->
+  <data name="RawIrcLog_Title" xml:space="preserve">
+    <value>Raw IRC Traffic</value>
+  </data>
+  <data name="RawIrcLog_Description" xml:space="preserve">
+    <value>All incoming and outgoing IRC messages</value>
+  </data>
+  
+  <!-- Input Dialog -->
+  <data name="InputDialog_EnterValue" xml:space="preserve">
+    <value>Enter value:</value>
+  </data>
+  
+  <!-- Ident Server -->
+  <data name="Settings_IdentServerHeader" xml:space="preserve">
+    <value>Ident Server (RFC 1413)</value>
+  </data>
+  <data name="Settings_IdentServerEnabled" xml:space="preserve">
+    <value>Enable Ident Server</value>
+  </data>
+  <data name="Settings_IdentServerPort" xml:space="preserve">
+    <value>Port:</value>
+  </data>
+  <data name="Settings_IdentUsername" xml:space="preserve">
+    <value>Username:</value>
+  </data>
+  <data name="Settings_IdentOperatingSystem" xml:space="preserve">
+    <value>Operating System:</value>
+  </data>
+  <data name="Settings_IdentHideUser" xml:space="preserve">
+    <value>Hide user identity (respond with HIDDEN-USER)</value>
+  </data>
+  <data name="Settings_IdentDescription" xml:space="preserve">
+    <value>The Ident server responds to identity queries from IRC servers. Port 113 may require administrator privileges. Leave username empty to use system username.</value>
   </data>
 </root>

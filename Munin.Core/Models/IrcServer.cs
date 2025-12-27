@@ -150,6 +150,41 @@ public class IrcServer
     /// Indicates whether the current connection is using IPv6 (runtime only).
     /// </summary>
     public bool IsIPv6Connected { get; set; } = false;
+    
+    /// <summary>
+    /// The group/folder this server belongs to.
+    /// Null means ungrouped (shown at top level).
+    /// </summary>
+    public string? Group { get; set; }
+    
+    /// <summary>
+    /// Sort order within the group (or at top level if ungrouped).
+    /// </summary>
+    public int SortOrder { get; set; } = 0;
+
+    #region Bouncer/ZNC Support
+
+    /// <summary>
+    /// Whether this is a bouncer connection (e.g., ZNC, soju).
+    /// </summary>
+    public bool IsBouncer { get; set; } = false;
+
+    /// <summary>
+    /// Whether the server was auto-detected as a bouncer (runtime only).
+    /// </summary>
+    public bool IsBouncerDetected { get; set; } = false;
+
+    /// <summary>
+    /// Whether to suppress notification sounds during playback buffer replay.
+    /// </summary>
+    public bool SuppressPlaybackNotifications { get; set; } = true;
+
+    /// <summary>
+    /// Whether currently receiving playback buffer (runtime only).
+    /// </summary>
+    public bool IsReceivingPlayback { get; set; } = false;
+
+    #endregion
 }
 
 /// <summary>

@@ -17,7 +17,7 @@ namespace Munin.UI.ViewModels;
 ///   <item><description>Server latency/ping</description></item>
 /// </list>
 /// </remarks>
-public partial class ServerViewModel : ObservableObject
+public partial class ServerViewModel : ObservableObject, IServerRailItem
 {
     /// <summary>
     /// The underlying IRC server model.
@@ -95,6 +95,16 @@ public partial class ServerViewModel : ObservableObject
     /// Display name for the UI.
     /// </summary>
     public string DisplayName => Server.Name;
+
+    /// <summary>
+    /// Gets whether this item is a group (always false for servers).
+    /// </summary>
+    public bool IsGroup => false;
+
+    /// <summary>
+    /// Gets the sort order for this item in the server rail.
+    /// </summary>
+    public int SortOrder => Server.SortOrder;
     
     /// <summary>
     /// Gets the first two characters of the server name as initials for the rail icon.

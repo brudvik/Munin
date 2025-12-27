@@ -32,6 +32,11 @@ public class CapabilityManager
         // Authentication
         "sasl",                 // SASL authentication
         
+        // Bouncer/ZNC support
+        "znc.in/playback",      // ZNC playback buffer
+        "znc.in/self-message",  // ZNC self-message echo
+        "draft/chathistory",    // Chat history (IRCv3)
+        
         // Other
         "invite-notify",        // Invite notifications
         "standard-replies",     // Standard reply format

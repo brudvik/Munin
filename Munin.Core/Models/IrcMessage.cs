@@ -48,6 +48,12 @@ public class IrcMessage
     /// Whether this message was encrypted with FiSH.
     /// </summary>
     public bool IsEncrypted { get; set; }
+
+    /// <summary>
+    /// Whether this message is from bouncer playback/history.
+    /// Used to suppress notifications for historical messages.
+    /// </summary>
+    public bool IsFromPlayback { get; set; }
     
     /// <summary>
     /// The original raw IRC message, if available.

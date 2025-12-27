@@ -160,7 +160,11 @@ public class ConfigurationService
             Password = server.Password,
             NickServPassword = server.NickServPassword,
             AutoJoinChannels = new List<string>(server.AutoJoinChannels),
-            AutoConnect = server.AutoConnect
+            AutoConnect = server.AutoConnect,
+            Group = server.Group,
+            SortOrder = server.SortOrder,
+            IsBouncer = server.IsBouncer,
+            SuppressPlaybackNotifications = server.SuppressPlaybackNotifications
         };
         
         _configuration.Servers.Add(serverConfig);
@@ -240,6 +244,87 @@ public class ConfigurationService
     {
         return _configuration.Servers.Select(s => s.ToIrcServer()).ToList();
     }
+
+    #region Server Groups
+
+    /// <summary>
+    /// Gets all server groups.
+    /// </summary>
+    /// <returns>A list of all server groups.</returns>
+    public List<ServerGroup> GetServerGroups()
+    {
+        return _configuration.ServerGroups
+            .Select(g => g.ToServerGroup())
+            .OrderBy(g => g.SortOrder)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Adds or updates a server group.
+    /// </summary>
+    /// <param name="group">The group to add or update.</param>
+    public void AddServerGroup(ServerGroup group)
+    {
+        var existing = _configuration.ServerGroups.FirstOrDefault(g => g.Id == group.Id);
+        if (existing != null)
+        {
+            _configuration.ServerGroups.Remove(existing);
+        }
+        _configuration.ServerGroups.Add(ServerGroupConfiguration.FromServerGroup(group));
+    }
+
+    /// <summary>
+    /// Removes a server group.
+    /// </summary>
+    /// <param name="groupId">The unique identifier of the group to remove.</param>
+    /// <param name="moveServersToUngrouped">If true, servers in this group are moved to ungrouped.</param>
+    public void RemoveServerGroup(string groupId, bool moveServersToUngrouped = true)
+    {
+        var group = _configuration.ServerGroups.FirstOrDefault(g => g.Id == groupId);
+        if (group != null)
+        {
+            _configuration.ServerGroups.Remove(group);
+            
+            if (moveServersToUngrouped)
+            {
+                // Clear group assignment for servers in this group
+                foreach (var server in _configuration.Servers.Where(s => s.Group == groupId))
+                {
+                    server.Group = null;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Updates a server's group assignment.
+    /// </summary>
+    /// <param name="serverId">The server ID to update.</param>
+    /// <param name="groupId">The group ID to assign (null for ungrouped).</param>
+    public void SetServerGroup(string serverId, string? groupId)
+    {
+        var server = _configuration.Servers.FirstOrDefault(s => s.Id == serverId);
+        if (server != null)
+        {
+            server.Group = groupId;
+        }
+    }
+
+    /// <summary>
+    /// Updates the collapsed state of a server group.
+    /// </summary>
+    /// <param name="groupId">The group ID.</param>
+    /// <param name="isCollapsed">Whether the group is collapsed.</param>
+    public void SetServerGroupCollapsed(string groupId, bool isCollapsed)
+    {
+        var group = _configuration.ServerGroups.FirstOrDefault(g => g.Id == groupId);
+        if (group != null)
+        {
+            group.IsCollapsed = isCollapsed;
+        }
+    }
+
+    #endregion
 }
 
 /// <summary>
@@ -251,6 +336,11 @@ public class ClientConfiguration
     /// Gets or sets the list of configured IRC servers.
     /// </summary>
     public List<ServerConfiguration> Servers { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets the server groups/folders for organizing servers.
+    /// </summary>
+    public List<ServerGroupConfiguration> ServerGroups { get; set; } = new();
 
     /// <summary>
     /// Gets or sets the general application settings.
@@ -325,6 +415,18 @@ public class ServerConfiguration
     /// <summary>Proxy configuration for this server.</summary>
     public ProxyConfiguration? Proxy { get; set; }
 
+    /// <summary>Group/folder this server belongs to (null = ungrouped).</summary>
+    public string? Group { get; set; }
+
+    /// <summary>Sort order within the group.</summary>
+    public int SortOrder { get; set; } = 0;
+
+    /// <summary>Whether this is a bouncer connection (e.g., ZNC).</summary>
+    public bool IsBouncer { get; set; } = false;
+
+    /// <summary>Whether to suppress notifications during playback.</summary>
+    public bool SuppressPlaybackNotifications { get; set; } = true;
+
     /// <summary>
     /// Converts this configuration to an IrcServer runtime instance.
     /// </summary>
@@ -349,7 +451,56 @@ public class ServerConfiguration
         UseClientCertificate = UseClientCertificate,
         ClientCertificatePath = ClientCertificatePath,
         ClientCertificatePassword = ClientCertificatePassword,
-        Proxy = Proxy?.ToProxySettings()
+        Proxy = Proxy?.ToProxySettings(),
+        Group = Group,
+        SortOrder = SortOrder,
+        IsBouncer = IsBouncer,
+        SuppressPlaybackNotifications = SuppressPlaybackNotifications
+    };
+}
+
+/// <summary>
+/// Server group/folder configuration for JSON serialization.
+/// </summary>
+public class ServerGroupConfiguration
+{
+    /// <summary>Unique identifier for this group.</summary>
+    public string Id { get; set; } = Guid.NewGuid().ToString();
+
+    /// <summary>Display name of the group.</summary>
+    public string Name { get; set; } = string.Empty;
+
+    /// <summary>Sort order in the server list.</summary>
+    public int SortOrder { get; set; } = 0;
+
+    /// <summary>Whether the group is collapsed in the UI.</summary>
+    public bool IsCollapsed { get; set; } = false;
+
+    /// <summary>Optional icon for the group (emoji or icon name).</summary>
+    public string? Icon { get; set; }
+
+    /// <summary>
+    /// Converts this configuration to a ServerGroup model.
+    /// </summary>
+    public ServerGroup ToServerGroup() => new()
+    {
+        Id = Id,
+        Name = Name,
+        SortOrder = SortOrder,
+        IsCollapsed = IsCollapsed,
+        Icon = Icon
+    };
+
+    /// <summary>
+    /// Creates a configuration from a ServerGroup model.
+    /// </summary>
+    public static ServerGroupConfiguration FromServerGroup(ServerGroup group) => new()
+    {
+        Id = group.Id,
+        Name = group.Name,
+        SortOrder = group.SortOrder,
+        IsCollapsed = group.IsCollapsed,
+        Icon = group.Icon
     };
 }
 
@@ -481,6 +632,33 @@ public class GeneralSettings
     /// Per-channel auto-perform commands (serverId -> channelName -> commands).
     /// </summary>
     public Dictionary<string, Dictionary<string, List<string>>> ChannelAutoPerform { get; set; } = new();
+    
+    // === IDENT SERVER SETTINGS ===
+    
+    /// <summary>
+    /// Enable the built-in ident server (RFC 1413).
+    /// </summary>
+    public bool IdentServerEnabled { get; set; } = false;
+    
+    /// <summary>
+    /// Port for the ident server (default: 113).
+    /// </summary>
+    public int IdentServerPort { get; set; } = 113;
+    
+    /// <summary>
+    /// Username to return for ident queries. If empty, uses system username.
+    /// </summary>
+    public string IdentUsername { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Operating system identifier for ident responses (UNIX, WIN32, OTHER).
+    /// </summary>
+    public string IdentOperatingSystem { get; set; } = "WIN32";
+    
+    /// <summary>
+    /// Hide username in ident responses (returns HIDDEN-USER error).
+    /// </summary>
+    public bool IdentHideUser { get; set; } = false;
     
     // === SECURITY SETTINGS ===
     

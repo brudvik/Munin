@@ -19,6 +19,7 @@
 - **Client certificates** - Authentication with PFX/P12 certificates
 - **Proxy support** - SOCKS4, SOCKS5, and HTTP proxy
 - **IPv6 support** - Native IPv6 with configurable preference and IPv4 fallback
+- **Built-in Ident server** - RFC 1413 compliant identd for IRC authentication
 
 ### Security & Privacy
 - **AES-256-GCM encryption** - All local data can be encrypted
@@ -147,6 +148,20 @@ Data is stored in: `%APPDATA%\Munin\`
 ### Portable Mode
 1. Create an empty file `portable.txt` next to `Munin.exe`
 2. Data will now be stored in `[exe-folder]\data\`
+
+### Ident Server (RFC 1413)
+
+Munin includes a built-in Ident server, similar to mIRC's identd. Many IRC servers query port 113 to verify your identity before allowing connection.
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| Enable Ident Server | Turn the ident server on/off | Off |
+| Port | TCP port for ident queries | 113 |
+| Username | Custom username (empty = system user) | (empty) |
+| Operating System | Reported OS type (UNIX/WIN32/OTHER) | WIN32 |
+| Hide User | Respond with HIDDEN-USER error | Off |
+
+> **Note:** Port 113 requires administrator privileges on Windows. You can use a higher port and configure port forwarding, or run Munin as administrator.
 
 ## 🔐 Security
 

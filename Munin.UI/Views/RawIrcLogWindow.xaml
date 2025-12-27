@@ -75,10 +75,10 @@
                                    VerticalAlignment="Center"/>
                     </Border>
                     <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="Raw IRC Traffic" 
+                        <TextBlock Text="{loc:Localize Key=RawIrcLog_Title}" 
                                    FontSize="16" 
                                    FontWeight="SemiBold"/>
-                        <TextBlock Text="All incoming and outgoing IRC messages" 
+                        <TextBlock Text="{loc:Localize Key=RawIrcLog_Description}" 
                                    Foreground="{StaticResource TextMutedBrush}"
                                    FontSize="12"
                                    Margin="0,2,0,0"/>
