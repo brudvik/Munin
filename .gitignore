@@ -25,6 +25,9 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
+# Release packages
+releases/
+
 # NuGet
 *.nupkg
 *.snupkg
