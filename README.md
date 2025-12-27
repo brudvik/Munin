@@ -33,7 +33,7 @@
 
 ### User Interface
 - **Modern dark theme** - Professional polished design with Windows 11-style window chrome
-- **Discord-style layout** - Vertical server rail, channel sidebar, and expandable chat area
+- **Modern layout** - Vertical server rail, channel sidebar, and expandable chat area
 - **Custom title bar** - Borderless window with rounded corners and integrated controls
 - **Multi-language** - English and Norwegian (auto-detects system language)
 - **Tab completion** - For nicknames and commands
