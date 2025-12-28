@@ -663,6 +663,20 @@ public class GeneralSettings
     // === SECURITY SETTINGS ===
     
     /// <summary>
+    /// Minimum TLS version for SSL connections. 
+    /// Options: "Tls12", "Tls13", "None" (allows any version).
+    /// Default is "Tls12" for security.
+    /// </summary>
+    public string MinimumTlsVersion { get; set; } = "Tls12";
+    
+    /// <summary>
+    /// Enable certificate revocation checking (OCSP/CRL).
+    /// When enabled, verifies server certificates haven't been revoked.
+    /// Default is true for security.
+    /// </summary>
+    public bool EnableCertificateRevocationCheck { get; set; } = true;
+    
+    /// <summary>
     /// Enable automatic lock after inactivity.
     /// </summary>
     public bool AutoLockEnabled { get; set; } = false;

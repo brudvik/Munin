@@ -20,10 +20,11 @@
 - **Proxy support** - SOCKS4, SOCKS5, and HTTP proxy
 - **IPv6 support** - Native IPv6 with configurable preference and IPv4 fallback
 - **Built-in Ident server** - RFC 1413 compliant identd for IRC authentication
+- **MuninRelay** - Route IRC through VPN on another machine (companion tool)
 
 ### Security & Privacy
 - **AES-256-GCM encryption** - All local data can be encrypted
-- **PBKDF2 key derivation** - 150,000 iterations
+- **PBKDF2 key derivation** - 310,000 iterations (OWASP 2023)
 - **FiSH encryption** - End-to-end message encryption compatible with mIRC/HexChat
 - **DH1080 key exchange** - Automatic secure key negotiation
 - **Anonymous filenames** - Hides server/channel names in log files
@@ -119,6 +120,7 @@ Munin/
 │       ├── EncryptionService.cs  # AES-256-GCM
 │       ├── SecureStorageService.cs
 │       ├── LoggingService.cs
+│       ├── RelayConnector.cs     # MuninRelay client
 │       └── ...
 ├── Munin.UI/                 # WPF interface
 │   ├── Views/                # XAML windows
@@ -126,6 +128,15 @@ Munin/
 │   ├── Controls/             # Custom controls
 │   ├── Themes/               # Styling and themes
 │   └── Converters/           # XAML converters
+├── MuninRelay/               # VPN relay companion tool
+│   ├── Program.cs            # Entry point and CLI
+│   ├── RelayConfiguration.cs # JSON config handling
+│   ├── RelayService.cs       # Background service
+│   ├── RelayConnection.cs    # Connection handling
+│   ├── RelayProtocol.cs      # Binary protocol
+│   ├── TokenProtection.cs    # DPAPI encryption
+│   ├── IpVerificationService.cs  # GeoIP checking
+│   └── CertificateGenerator.cs   # SSL cert generation
 ├── scripts/                  # User scripts
 │   └── examples/             # Example scripts
 └── docs/                     # Documentation
@@ -163,11 +174,255 @@ Munin includes a built-in Ident server, similar to mIRC's identd. Many IRC serve
 
 > **Note:** Port 113 requires administrator privileges on Windows. You can use a higher port and configure port forwarding, or run Munin as administrator.
 
+## 🌐 MuninRelay - VPN Traffic Routing
+
+**MuninRelay** is a companion tool that allows you to route your IRC traffic through a VPN running on a different machine. This is useful when:
+
+- Your VPN is on a dedicated server/VM and you want IRC traffic to appear from that location
+- You want to separate VPN traffic (IRC only) from your main connection
+- You need to bypass restrictive firewalls that block IRC but allow HTTPS
+
+### Architecture
+
+```
+┌─────────────────┐         SSL/TLS          ┌─────────────────┐         TCP/SSL         ┌─────────────────┐
+│                 │ ◄────────────────────────►│                 │◄───────────────────────►│                 │
+│   Munin Client  │    Auth: HMAC-SHA256      │   MuninRelay    │                         │   IRC Server    │
+│   (Your PC)     │                           │   (VPN Server)  │                         │  (e.g. Libera)  │
+│                 │                           │                 │                         │                 │
+└─────────────────┘                           └─────────────────┘                         └─────────────────┘
+      Your IP                                      VPN's IP                                   Server sees
+    192.168.1.x                                  45.67.89.xxx                                VPN's IP
+```
+
+### Security Features
+
+| Feature | Description |
+|---------|-------------|
+| **SSL/TLS Encryption** | All traffic between Munin and relay is encrypted (TLS 1.2+) |
+| **HMAC-SHA256 Auth** | Challenge-response authentication prevents replay attacks |
+| **DPAPI Token Storage** | Auth token encrypted at rest using Windows DPAPI |
+| **Machine-Bound Keys** | Token can only be decrypted on the machine where it was created |
+| **IP Verification** | Verifies VPN is active before accepting connections |
+| **GeoIP Detection** | Confirms traffic exits from expected country |
+| **Server Allowlist** | Restrict which IRC servers can be accessed through relay |
+
+### Setting Up MuninRelay
+
+#### On the VPN Server (Remote Machine)
+
+1. **Copy MuninRelay** to your VPN server:
+   ```
+   MuninRelay.exe
+   ```
+
+2. **Run for first time** to generate configuration:
+   ```cmd
+   MuninRelay.exe
+   ```
+   
+   This creates `config.json` and displays your authentication token:
+   ```
+   ╔═══════════════════════════════════════════════════════════════╗
+   ║  IMPORTANT: Copy this token now - it cannot be retrieved!     ║
+   ╠═══════════════════════════════════════════════════════════════╣
+   ║  Token: abc123...xyz789                                       ║
+   ╚═══════════════════════════════════════════════════════════════╝
+   ```
+   
+   > ⚠️ **Save this token!** It's encrypted in `config.json` and cannot be viewed again.
+
+3. **Edit config.json** to customize settings:
+   ```json
+   {
+     "listenPort": 6900,
+     "authToken": "DPAPI:...",
+     "enableIpVerification": true,
+     "expectedCountryCode": "NL",
+     "allowedServers": [
+       { "hostname": "irc.libera.chat", "port": 6697, "useSsl": true },
+       { "hostname": "irc.efnet.org", "port": 6697, "useSsl": true }
+     ],
+     "maxConnections": 10
+   }
+   ```
+
+4. **Open firewall port** (e.g., 6900):
+   ```cmd
+   netsh advfirewall firewall add rule name="MuninRelay" dir=in action=allow protocol=TCP localport=6900
+   ```
+
+5. **Install as Windows Service** (optional, for auto-start):
+   ```cmd
+   MuninRelay.exe --install
+   net start MuninRelay
+   ```
+
+#### In Munin Client (Your PC)
+
+1. **Add or Edit a Server** (Settings → Server List)
+
+2. **Enable MuninRelay** in the "MuninRelay (VPN Routing)" section:
+   - ☑️ Enable MuninRelay
+   - **Host:** Your VPN server's IP or hostname
+   - **Port:** 6900 (or your configured port)
+   - **Auth Token:** Paste the token from step 2 above
+   - ☑️ Use SSL (recommended)
+
+3. **Connect** - Your IRC traffic now routes through the VPN
+
+### MuninRelay Commands
+
+| Command | Description |
+|---------|-------------|
+| `MuninRelay` | Run in console mode |
+| `--install` | Install as Windows Service (requires Admin) |
+| `--uninstall` | Remove Windows Service (requires Admin) |
+| `--setup-password` | Set up or reset the master password |
+| `--change-password` | Change the master password |
+| `--generate-token` | Generate new authentication token |
+| `--generate-cert` | Generate new SSL certificate |
+| `--verify-ip` | Check current IP and VPN status |
+| `--list-servers` | List allowed IRC servers |
+| `--add-server` | Add an allowed server (see below) |
+| `--remove-server` | Remove an allowed server |
+| `--help` | Display help |
+
+### Master Password
+
+MuninRelay requires a master password to protect sensitive configuration data. On first run, you'll be prompted to create one:
+
+```
+First-time setup: Master Password Required
+══════════════════════════════════════════════════════
+A master password is needed to encrypt sensitive configuration.
+This password will be required each time MuninRelay starts.
+Minimum 8 characters.
+
+Create master password: ********
+Confirm password: ********
+```
+
+**How it works:**
+- Your password hash is stored encrypted with DPAPI (machine-bound)
+- Sensitive data (auth token, server list) is encrypted with AES-256 using your password
+- Double protection: Even on this machine, you need the password to decrypt
+
+**Changing the password:**
+```cmd
+MuninRelay.exe --change-password
+```
+
+This re-encrypts all configuration with the new password.
+
+#### Server Management
+
+To manage the allowed IRC server list:
+
+```cmd
+# List current servers
+MuninRelay.exe --list-servers
+
+# Add a server (with SSL)
+MuninRelay.exe --add-server irc.private.net 6697 ssl
+
+# Add a server (without SSL)
+MuninRelay.exe --add-server irc.private.net 6667
+
+# Remove a server
+MuninRelay.exe --remove-server irc.private.net 6697
+```
+
+### Configuration Reference
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| `listenPort` | Port to listen for Munin connections | 6900 |
+| `authToken` | Master password encrypted auth token | (generated) |
+| `encryptedAllowedServers` | Master password encrypted server list | (generated) |
+| `certificatePath` | Path to SSL certificate (PFX) | (auto-generated) |
+| `certificatePassword` | Password for certificate | (auto-generated) |
+| `enableIpVerification` | Verify VPN is active on startup | true |
+| `ipCheckIntervalMinutes` | How often to re-verify IP | 5 |
+| `expectedCountryCode` | Expected GeoIP country (e.g., "SE", "NL") | (none) |
+| `maxConnections` | Maximum simultaneous connections | 10 |
+| `logFilePath` | Path for log files | `logs/muninrelay-.log` |
+| `verboseLogging` | Enable debug logging | false |
+
+> **Security Note:** Configuration encryption uses a two-layer approach:
+> 1. **Master password** - AES-256 encryption of sensitive data
+> 2. **DPAPI** - Machine-bound encryption of the password hash
+> 
+> This means you need both access to this machine AND the master password to decrypt the configuration.
+
+### IP Verification
+
+MuninRelay can verify that your VPN is active by checking your public IP:
+
+```cmd
+MuninRelay.exe --verify-ip
+```
+
+Output:
+```
+IP Address:   45.67.89.123
+Country:      Netherlands (NL)
+City:         Amsterdam, North Holland
+Organization: NordVPN
+Likely VPN:   Yes
+
+
+Expected country: NL
+Country matches:  Yes ✓
+```
+
+If the IP changes or VPN disconnects, the relay logs a warning.
+
+### VPN Provider Detection
+
+MuninRelay recognizes these VPN providers (for informational purposes):
+- NordVPN, ExpressVPN, Surfshark, ProtonVPN, CyberGhost
+- Private Internet Access, IPVanish, Mullvad, Windscribe
+- TunnelBear, Hotspot Shield, Hide.me, VyprVPN
+- DigitalOcean, AWS, Azure, Google Cloud (for self-hosted VPNs)
+
+### Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| "Cannot decrypt AuthToken" | Token was created on a different machine. Run `--generate-token` |
+| Connection refused | Check firewall rules and that relay is running |
+| Authentication failed | Verify token matches between client and relay |
+| "Server not in allowed list" | Add the IRC server to `allowedServers` in config.json |
+| Certificate errors | Enable "Accept Invalid Certificates" in client, or use `--generate-cert` |
+
+### Security Considerations
+
+1. **Token Security**
+   - The auth token is encrypted with Windows DPAPI
+   - Even if someone copies `config.json`, they cannot decrypt the token on another machine
+   - Generate a new token immediately if you suspect compromise: `--generate-token`
+
+2. **Network Security**
+   - Always use SSL between Munin and MuninRelay
+   - The relay generates a self-signed certificate automatically
+   - For production, consider using a proper SSL certificate
+
+3. **Access Control**
+   - Use `allowedServers` to restrict which IRC servers can be accessed
+   - Keep `maxConnections` low to prevent abuse
+   - Monitor logs for unauthorized access attempts
+
+4. **VPN Verification**
+   - Enable `enableIpVerification` to ensure VPN is active
+   - Set `expectedCountryCode` to your VPN exit country
+   - The relay will warn if IP changes unexpectedly
+
 ## 🔐 Security
 
 ### Local Encryption
 - **Algorithm:** AES-256-GCM (authenticated encryption)
-- **Key derivation:** PBKDF2-SHA256, 150,000 iterations
+- **Key derivation:** PBKDF2-SHA256, 310,000 iterations (OWASP 2023)
 - **Salt:** 32 bytes, unique per installation
 - **Nonce:** 12 bytes, unique per encryption operation
 

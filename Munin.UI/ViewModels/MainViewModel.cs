@@ -573,6 +573,10 @@ public partial class MainViewModel : ObservableObject
         connection.AutoReconnect = _configService.Configuration.Settings.ReconnectOnDisconnect;
         connection.ReconnectDelaySeconds = _configService.Configuration.Settings.ReconnectDelaySeconds;
         
+        // Apply TLS security settings
+        connection.MinimumTlsVersion = _configService.Configuration.Settings.MinimumTlsVersion;
+        connection.EnableCertificateRevocationCheck = _configService.Configuration.Settings.EnableCertificateRevocationCheck;
+        
         // Update notification settings
         NotificationService.Instance.EnableSoundNotifications = _configService.Configuration.Settings.EnableSoundNotifications;
         NotificationService.Instance.EnableToastNotifications = _configService.Configuration.Settings.EnableFlashNotifications;
@@ -992,9 +996,11 @@ public partial class MainViewModel : ObservableObject
 
         _clientManager.RawMessage += (s, e) =>
         {
-            _rawIrcLogWindow?.AddEntry(e.IsOutgoing, e.Message);
+            // Use masked message for display in raw log window to hide sensitive data
+            _rawIrcLogWindow?.AddEntry(e.IsOutgoing, e.MaskedMessage);
             
             // Dispatch to scripts (only incoming messages)
+            // Note: Scripts receive the unmasked message for full protocol access
             if (!e.IsOutgoing)
             {
                 // Parse minimal info from raw message

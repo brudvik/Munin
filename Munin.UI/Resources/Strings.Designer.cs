@@ -225,6 +225,7 @@ namespace Munin.UI.Resources {
         public static string Unlock_WrongPassword => ResourceManager.GetString("Unlock_WrongPassword", resourceCulture) ?? "";
         public static string Unlock_TooManyAttempts => ResourceManager.GetString("Unlock_TooManyAttempts", resourceCulture) ?? "";
         public static string Unlock_AttemptsCount => ResourceManager.GetString("Unlock_AttemptsCount", resourceCulture) ?? "";
+        public static string Unlock_AttemptsRemaining => ResourceManager.GetString("Unlock_AttemptsRemaining", resourceCulture) ?? "";
         public static string Unlock_ResetWarning => ResourceManager.GetString("Unlock_ResetWarning", resourceCulture) ?? "";
         public static string Unlock_ResetConfirmTitle => ResourceManager.GetString("Unlock_ResetConfirmTitle", resourceCulture) ?? "";
         public static string Unlock_ResetFinalConfirm => ResourceManager.GetString("Unlock_ResetFinalConfirm", resourceCulture) ?? "";
@@ -351,5 +352,9 @@ namespace Munin.UI.Resources {
         public static string FiSH_SetKeyPrompt => ResourceManager.GetString("FiSH_SetKeyPrompt", resourceCulture) ?? "Enter encryption key for {0}:";
         public static string FiSH_Encryption => ResourceManager.GetString("FiSH_Encryption", resourceCulture) ?? "Encryption";
         public static string Message_Encrypted => ResourceManager.GetString("Message_Encrypted", resourceCulture) ?? "This message was encrypted with FiSH";
+        
+        // Security Warnings
+        public static string Security_AcceptInvalidCertsWarning => ResourceManager.GetString("Security_AcceptInvalidCertsWarning", resourceCulture) ?? "";
+        public static string Security_AcceptInvalidCertsTitle => ResourceManager.GetString("Security_AcceptInvalidCertsTitle", resourceCulture) ?? "Security Risk";
     }
 }

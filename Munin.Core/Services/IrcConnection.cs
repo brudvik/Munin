@@ -1,5 +1,6 @@
 using System.Net.Security;
 using System.Net.Sockets;
+using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Munin.Core.Events;
@@ -49,13 +50,32 @@ public class IrcConnection : IDisposable
     public int ReconnectDelaySeconds { get; set; } = 5;
     
     /// <summary>
+    /// Minimum TLS version for SSL connections.
+    /// Options: "Tls12", "Tls13", "None" (allows any version).
+    /// </summary>
+    public string MinimumTlsVersion { get; set; } = "Tls12";
+    
+    /// <summary>
+    /// Enable certificate revocation checking (OCSP/CRL).
+    /// When enabled, the system will check if server certificates have been revoked.
+    /// </summary>
+    public bool EnableCertificateRevocationCheck { get; set; } = true;
+    
+    /// <summary>
     /// Event raised when a reconnect attempt starts.
     /// </summary>
     public event EventHandler<IrcReconnectEventArgs>? Reconnecting;
 
     public IrcServer Server { get; }
     public string CurrentNickname { get; private set; } = string.Empty;
-    public bool IsConnected => _tcpClient?.Connected == true && Server.State == ConnectionState.Connected;
+    
+    /// <summary>
+    /// Returns true if connected to the IRC server (directly or via relay).
+    /// </summary>
+    public bool IsConnected => 
+        Server.State == ConnectionState.Connected && 
+        _stream != null && 
+        (_tcpClient?.Connected == true || Server.Relay?.Enabled == true);
 
     /// <summary>
     /// Custom words that trigger highlight in addition to nickname.
@@ -218,27 +238,18 @@ public class IrcConnection : IDisposable
             Server.Capabilities.Reset();
             _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-            _tcpClient = await ConnectWithIPv6FallbackAsync(Server.Hostname, Server.Port, _cts.Token);
-
-            _stream = _tcpClient.GetStream();
-
-            if (Server.UseSsl)
+            // Check if we should connect through MuninRelay
+            if (Server.Relay?.Enabled == true)
             {
-                var sslStream = new SslStream(
-                    _stream,
-                    false,
-                    Server.AcceptInvalidCertificates ? AcceptAllCertificates : null);
-
-                await sslStream.AuthenticateAsClientAsync(new SslClientAuthenticationOptions
-                {
-                    TargetHost = Server.Hostname
-                }, _cts.Token);
-
-                _stream = sslStream;
+                await ConnectViaRelayAsync(_cts.Token);
+            }
+            else
+            {
+                await ConnectDirectAsync(_cts.Token);
             }
 
-            _reader = new StreamReader(_stream, Encoding.UTF8);
-            _writer = new StreamWriter(_stream, new UTF8Encoding(false)) { NewLine = "\r\n", AutoFlush = true };
+            _reader = new StreamReader(_stream!, Encoding.UTF8);
+            _writer = new StreamWriter(_stream!, new UTF8Encoding(false)) { NewLine = "\r\n", AutoFlush = true };
 
             // Start reading messages
             _readTask = ReadMessagesAsync(_cts.Token);
@@ -256,7 +267,8 @@ public class IrcConnection : IDisposable
             await SendRawAsync($"NICK {Server.Nickname}");
             await SendRawAsync($"USER {Server.Username} 0 * :{Server.RealName}");
 
-            _logger.Information("Connecting to {Server}:{Port} (IPv6: {IsIPv6})", Server.Hostname, Server.Port, Server.IsIPv6Connected);
+            var connectionType = Server.Relay?.Enabled == true ? "via MuninRelay" : $"IPv6: {Server.IsIPv6Connected}";
+            _logger.Information("Connecting to {Server}:{Port} ({ConnectionType})", Server.Hostname, Server.Port, connectionType);
         }
         catch (Exception ex)
         {
@@ -272,6 +284,60 @@ public class IrcConnection : IDisposable
     /// Connects to a host with IPv6/IPv4 dual-stack support.
     /// If PreferIPv6 is enabled, tries IPv6 first with fallback to IPv4.
     /// </summary>
+    /// <summary>
+    /// Connects directly to the IRC server (standard connection).
+    /// </summary>
+    private async Task ConnectDirectAsync(CancellationToken ct)
+    {
+        _tcpClient = await ConnectWithIPv6FallbackAsync(Server.Hostname, Server.Port, ct);
+        _stream = _tcpClient.GetStream();
+
+        if (Server.UseSsl)
+        {
+            var sslStream = new SslStream(
+                _stream,
+                false,
+                Server.AcceptInvalidCertificates ? AcceptAllCertificates : null);
+
+            var sslOptions = new SslClientAuthenticationOptions
+            {
+                TargetHost = Server.Hostname,
+                EnabledSslProtocols = GetMinimumSslProtocols(),
+                CertificateRevocationCheckMode = EnableCertificateRevocationCheck
+                    ? X509RevocationMode.Online
+                    : X509RevocationMode.NoCheck
+            };
+
+            await sslStream.AuthenticateAsClientAsync(sslOptions, ct);
+            _stream = sslStream;
+        }
+    }
+
+    /// <summary>
+    /// Connects to the IRC server through MuninRelay.
+    /// The relay handles the actual connection to the IRC server.
+    /// </summary>
+    private async Task ConnectViaRelayAsync(CancellationToken ct)
+    {
+        var relay = Server.Relay!;
+        _logger.Information("Connecting via MuninRelay at {RelayHost}:{RelayPort}", relay.Host, relay.Port);
+
+        var relayConnector = new RelayConnector();
+
+        // Connect through relay - this returns a stream that's already connected to the target
+        // The relay handles SSL to the IRC server if needed
+        _stream = await relayConnector.ConnectAsync(
+            relay,
+            Server.Hostname,
+            Server.Port,
+            Server.UseSsl,
+            ct);
+
+        // Note: We don't set up SSL here because the relay handles the SSL to the IRC server
+        // The stream we get back is the raw data stream after relay has connected to target
+        _logger.Debug("Relay connection established");
+    }
+
     private async Task<TcpClient> ConnectWithIPv6FallbackAsync(string hostname, int port, CancellationToken cancellationToken)
     {
         var addresses = await System.Net.Dns.GetHostAddressesAsync(hostname, cancellationToken);
@@ -374,7 +440,7 @@ public class IrcConnection : IDisposable
         {
             await _writer.WriteLineAsync(message);
             RawMessageReceived?.Invoke(this, new IrcRawMessageEventArgs(Server, message, true));
-            _logger.Debug(">>> {Message}", message);
+            _logger.Debug(">>> {Message}", SensitiveDataFilter.MaskSensitiveData(message));
         }
         catch (Exception ex)
         {
@@ -692,7 +758,7 @@ public class IrcConnection : IDisposable
                 _reconnectAttempts = 0;
                 
                 RawMessageReceived?.Invoke(this, new IrcRawMessageEventArgs(Server, line, false));
-                _logger.Debug("<<< {Message}", line);
+                _logger.Debug("<<< {Message}", SensitiveDataFilter.MaskSensitiveData(line));
 
                 var parsed = _parser.Parse(line);
                 await HandleMessageAsync(parsed);
@@ -1726,11 +1792,13 @@ public class IrcConnection : IDisposable
     {
         if (_dh1080Manager == null || string.IsNullOrEmpty(nick)) return;
 
-        _logger.Debug("HandleDh1080 called: nick={Nick}, message={Message}", nick, message);
+        // Only log that DH1080 was received, NOT the message content (contains public keys)
+        _logger.Debug("HandleDh1080 called: nick={Nick}", nick);
 
         var response = _dh1080Manager.HandleMessage(Server.Id, nick, message);
 
-        _logger.Debug("HandleDh1080 response: {Response}", response ?? "(null)");
+        // Only log whether a response was generated, NOT the response content
+        _logger.Debug("HandleDh1080 response generated: {HasResponse}", response != null);
 
         if (response != null)
         {
@@ -2620,6 +2688,20 @@ public class IrcConnection : IDisposable
         X509Certificate? certificate,
         X509Chain? chain,
         SslPolicyErrors sslPolicyErrors) => true;
+
+    /// <summary>
+    /// Gets the SSL protocols allowed based on the MinimumTlsVersion setting.
+    /// </summary>
+    private SslProtocols GetMinimumSslProtocols()
+    {
+        return MinimumTlsVersion?.ToUpperInvariant() switch
+        {
+            "TLS13" => SslProtocols.Tls13,
+            "TLS12" => SslProtocols.Tls12 | SslProtocols.Tls13,
+            "NONE" => SslProtocols.None, // Let the OS decide (may allow older protocols)
+            _ => SslProtocols.Tls12 | SslProtocols.Tls13 // Default to TLS 1.2+
+        };
+    }
 
     /// <summary>
     /// Checks if a message contains the user's nickname or any highlight words.

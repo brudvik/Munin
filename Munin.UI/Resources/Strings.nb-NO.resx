@@ -195,6 +195,9 @@
   <data name="Unlock_AttemptsCount" xml:space="preserve">
     <value>Forsøk {0} av {1}</value>
   </data>
+  <data name="Unlock_AttemptsRemaining" xml:space="preserve">
+    <value>⚠️ Kun {0} forsøk igjen før utestenging!</value>
+  </data>
   <data name="Unlock_ResetWarning" xml:space="preserve">
     <value>⚠️ ADVARSEL: Dette vil slette ALLE data!
 
@@ -415,6 +418,38 @@ Er du helt sikker?</value>
     <value>Auto-bli med i kanaler (kommaseparert):</value>
   </data>
   
+  <!-- MuninRelay Settings -->
+  <data name="AddServer_RelayHeader" xml:space="preserve">
+    <value>MuninRelay (VPN-ruting)</value>
+  </data>
+  <data name="AddServer_RelayDescription" xml:space="preserve">
+    <value>Rut forbindelsen gjennom MuninRelay-server på en annen maskin (f.eks. VPN-gateway)</value>
+  </data>
+  <data name="AddServer_RelayEnabled" xml:space="preserve">
+    <value>Bruk MuninRelay</value>
+  </data>
+  <data name="AddServer_RelayHost" xml:space="preserve">
+    <value>Relay-vert:</value>
+  </data>
+  <data name="AddServer_RelayPort" xml:space="preserve">
+    <value>Relay-port:</value>
+  </data>
+  <data name="AddServer_RelayAuthToken" xml:space="preserve">
+    <value>Auth-token:</value>
+  </data>
+  <data name="AddServer_RelayUseSsl" xml:space="preserve">
+    <value>Bruk SSL/TLS til relay</value>
+  </data>
+  <data name="AddServer_RelayAcceptInvalidCerts" xml:space="preserve">
+    <value>Godta ugyldige sertifikater</value>
+  </data>
+  <data name="AddServer_RelayHostTooltip" xml:space="preserve">
+    <value>Vertsnavn eller IP-adresse til MuninRelay-serveren</value>
+  </data>
+  <data name="AddServer_RelayAuthTokenTooltip" xml:space="preserve">
+    <value>Autentiseringstoken fra MuninRelay-konfigurasjon (config.json)</value>
+  </data>
+  
   <!-- Settings Dialog -->
   <data name="Settings_Title" xml:space="preserve">
     <value>Innstillinger</value>
@@ -603,6 +638,24 @@ Er du helt sikker?</value>
   </data>
   <data name="AddServer_AcceptInvalidCertsTooltip" xml:space="preserve">
     <value>Aktiver dette for selvsignerte sertifikater</value>
+  </data>
+  <data name="Security_AcceptInvalidCertsWarning" xml:space="preserve">
+    <value>⚠️ SIKKERHETSADVARSEL
+
+Å godta ugyldige sertifikater deaktiverer SSL/TLS-verifisering, som betyr:
+
+• Du kan ikke verifisere serverens identitet
+• Man-in-the-middle-angrep blir mulig
+• Tilkoblingen din kan avlyttes
+
+Aktiver kun dette for:
+• Servere med selvsignerte sertifikater du stoler på
+• Testmiljøer
+
+Er du sikker på at du vil godta ugyldige sertifikater?</value>
+  </data>
+  <data name="Security_AcceptInvalidCertsTitle" xml:space="preserve">
+    <value>Sikkerhetsrisiko</value>
   </data>
   <data name="AddServer_PreferIPv6" xml:space="preserve">
     <value>Foretrekk IPv6</value>
@@ -1169,6 +1222,20 @@ Perfekt for USB-minnepinne.</value>
   <!-- Input Dialog -->
   <data name="InputDialog_EnterValue" xml:space="preserve">
     <value>Skriv inn verdi:</value>
+  </data>
+  
+  <!-- TLS Security -->
+  <data name="Settings_TlsSecurityHeader" xml:space="preserve">
+    <value>TLS-sikkerhet</value>
+  </data>
+  <data name="Settings_MinimumTlsVersion" xml:space="preserve">
+    <value>Minimum TLS-versjon:</value>
+  </data>
+  <data name="Settings_CertificateRevocation" xml:space="preserve">
+    <value>Sjekk sertifikat-tilbakekalling (OCSP/CRL)</value>
+  </data>
+  <data name="Settings_TlsDescription" xml:space="preserve">
+    <value>TLS 1.2 eller høyere anbefales. Eldre protokoller (TLS 1.0/1.1) har kjente sårbarheter. Velg kun "Any" hvis du kobler til eldre servere som ikke støtter moderne TLS.</value>
   </data>
   
   <!-- Ident Server -->

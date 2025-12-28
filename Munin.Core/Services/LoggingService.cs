@@ -300,18 +300,21 @@ public class LoggingService : IDisposable
     {
         if (!EnableLogging) return;
 
+        // Always filter sensitive data before logging to file
+        var maskedMessage = SensitiveDataFilter.MaskSensitiveData(rawMessage);
+
         try
         {
             if (UseStructuredLogging)
             {
                 var rawLogger = GetChannelLogger(serverName, "_raw");
-                rawLogger.Debug("{Direction} {RawMessage}", direction, rawMessage);
+                rawLogger.Debug("{Direction} {RawMessage}", direction, maskedMessage);
             }
             else
             {
                 var writer = GetLegacyWriter(serverName, "_raw");
                 var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                writer.WriteLine($"[{timestamp}] {direction} {rawMessage}");
+                writer.WriteLine($"[{timestamp}] {direction} {maskedMessage}");
                 writer.Flush();
             }
         }

@@ -8,6 +8,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **MuninRelay**: New standalone VPN relay tool for routing IRC traffic
+  - Route IRC connections through VPN on another machine
+  - SSL/TLS encryption between Munin client and relay
+  - Token-based authentication (HMAC-SHA256)
+  - **Master Password Protection** - All sensitive configuration data encrypted with user-defined password
+  - Password hash protected with DPAPI (machine-bound) for double security
+  - `--setup-password` and `--change-password` commands for password management
+  - Server list also encrypted - private IRC server hostnames not exposed
+  - IP verification with GeoIP lookup (country/org detection)
+  - VPN status detection (recognizes major VPN providers)
+  - Automatic IP change detection and alerts
+  - Multiple IRC server allowlist support with `--list-servers`, `--add-server`, `--remove-server`
+  - Runs as Windows Service or console application
+  - Auto-generates self-signed SSL certificates
+  - Configurable connection limits and logging
+- **MuninRelay Client Integration**: Connect to IRC servers via MuninRelay
+  - New "MuninRelay (VPN Routing)" section in Add/Edit Server dialogs
+  - Optional per-server relay configuration
+  - Encrypted auth token storage with existing secure configuration
+  - SSL/TLS toggle for relay connection
 - **Ident Server (RFC 1413)**: Built-in identd server like mIRC
   - Full RFC 1413 compliant implementation
   - Configurable port (default 113)
@@ -16,6 +36,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - HIDDEN-USER privacy option
   - Automatic connection tracking for IRC sessions
   - Settings UI in Settings window
+
+### Security
+- **Security Audit Improvements**: Removed logging of sensitive cryptographic data
+  - DH1080 key exchange messages no longer logged (contained public keys)
+  - LogRaw() now applies SensitiveDataFilter before writing to file
+  - Reduced metadata logging that could reveal crypto parameters
+- **Sensitive Data Filtering**: PASS, AUTHENTICATE, and NickServ commands are now masked in logs
+  - Prevents credential leakage in raw IRC logs
+  - MaskedMessage property on IrcRawMessageEventArgs
+- **TLS 1.2+ Enforcement**: Configurable minimum TLS version (default TLS 1.2)
+  - Settings option for TLS 1.3 only, TLS 1.2+, or Any
+  - Protects against TLS downgrade attacks
+- **Rate Limiting on Unlock**: Exponential backoff after failed password attempts
+  - 5 failed attempts triggers 30-second lockout
+  - Lockout time doubles with continued failures (max 1 hour)
+  - Visual countdown and warning messages
+- **PBKDF2 Iterations Increased**: From 150,000 to 310,000 (OWASP 2023 recommendation)
+  - Stronger protection against brute-force attacks
+- **Invalid Certificate Warning**: Confirmation dialog when enabling "Accept Invalid Certificates"
+  - Explains security risks of disabling certificate validation
+- **Certificate Revocation Checking**: OCSP/CRL checking for SSL certificates
+  - Enabled by default, configurable in settings
+  - Detects revoked server certificates
+
+### Changed
 - **Server Groups/Folders**: Organize servers into collapsible groups for better management
   - Create, rename, and delete server groups
   - Move servers between groups via context menu

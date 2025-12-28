@@ -142,4 +142,52 @@ public partial class UnlockDialog : Window
         ErrorText.Text = message;
         ErrorText.Visibility = Visibility.Visible;
     }
+    
+    /// <summary>
+    /// Shows a rate limit message when too many attempts have been made.
+    /// </summary>
+    /// <param name="waitSeconds">Seconds remaining until unlock attempts are allowed again.</param>
+    public void ShowRateLimitMessage(int waitSeconds)
+    {
+        var message = waitSeconds > 60
+            ? string.Format(Strings.Unlock_TooManyAttempts, $"{waitSeconds / 60} minutter")
+            : string.Format(Strings.Unlock_TooManyAttempts, $"{waitSeconds} sekunder");
+        ShowError(message);
+        UnlockButton.IsEnabled = false;
+        
+        // Re-enable after timeout
+        var timer = new System.Windows.Threading.DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(1)
+        };
+        var remaining = waitSeconds;
+        timer.Tick += (s, e) =>
+        {
+            remaining--;
+            if (remaining <= 0)
+            {
+                timer.Stop();
+                UnlockButton.IsEnabled = true;
+                ErrorText.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                var timeText = remaining > 60
+                    ? $"{remaining / 60} minutter"
+                    : $"{remaining} sekunder";
+                ErrorText.Text = string.Format(Strings.Unlock_TooManyAttempts, timeText);
+            }
+        };
+        timer.Start();
+    }
+    
+    /// <summary>
+    /// Shows a warning about remaining attempts before lockout.
+    /// </summary>
+    /// <param name="remainingAttempts">Number of attempts remaining before lockout.</param>
+    public void ShowAttemptsWarning(int remainingAttempts)
+    {
+        AttemptsText.Text = string.Format(Strings.Unlock_AttemptsRemaining, remainingAttempts);
+        AttemptsText.Visibility = Visibility.Visible;
+    }
 }

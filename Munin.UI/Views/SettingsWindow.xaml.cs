@@ -65,6 +65,16 @@ public partial class SettingsWindow : Window
             case "OTHER": IdentOperatingSystemComboBox.SelectedIndex = 2; break;
             default: IdentOperatingSystemComboBox.SelectedIndex = 1; break;
         }
+        
+        // TLS security settings
+        switch (settings.MinimumTlsVersion?.ToUpperInvariant())
+        {
+            case "TLS13": MinimumTlsVersionComboBox.SelectedIndex = 0; break;
+            case "TLS12": MinimumTlsVersionComboBox.SelectedIndex = 1; break;
+            case "NONE": MinimumTlsVersionComboBox.SelectedIndex = 2; break;
+            default: MinimumTlsVersionComboBox.SelectedIndex = 1; break;
+        }
+        EnableCertificateRevocationCheckBox.IsChecked = settings.EnableCertificateRevocationCheck;
     }
     
     /// <summary>
@@ -318,6 +328,16 @@ public partial class SettingsWindow : Window
             2 => "OTHER",
             _ => "WIN32"
         };
+        
+        // TLS security settings
+        settings.MinimumTlsVersion = MinimumTlsVersionComboBox.SelectedIndex switch
+        {
+            0 => "Tls13",
+            1 => "Tls12",
+            2 => "None",
+            _ => "Tls12"
+        };
+        settings.EnableCertificateRevocationCheck = EnableCertificateRevocationCheckBox.IsChecked == true;
         
         // Update auto-lock configuration
         if (Application.Current is App app)

@@ -135,6 +135,7 @@
                         <CheckBox x:Name="AcceptInvalidCertsCheckBox" 
                                   Content="{loc:Localize Key=AddServer_AcceptInvalidCerts}" 
                                   IsChecked="False"
+                                  Checked="AcceptInvalidCertsCheckBox_Checked"
                                   Foreground="{StaticResource TextSecondaryBrush}"
                                   VerticalAlignment="Center"
                                   ToolTip="{loc:Localize Key=AddServer_AcceptInvalidCertsTooltip}"
@@ -222,6 +223,83 @@
                                    FontSize="12"
                                    Margin="0,0,0,8"/>
                         <PasswordBox x:Name="SaslPasswordBox"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Auto-connect -->
+                <!-- MuninRelay Section -->
+                <Border Background="{StaticResource BackgroundMediumBrush}"
+                        CornerRadius="8"
+                        Padding="16"
+                        Margin="0,0,0,18">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="🔀" FontSize="14" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBlock Text="{loc:Localize Key=AddServer_RelayHeader}" 
+                                       FontWeight="SemiBold"
+                                       FontSize="13"
+                                       Foreground="{StaticResource TextPrimaryBrush}"/>
+                        </StackPanel>
+                        
+                        <TextBlock Text="{loc:Localize Key=AddServer_RelayDescription}" 
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   FontSize="11"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,12"/>
+                        
+                        <CheckBox x:Name="RelayEnabledCheckBox" 
+                                  Content="{loc:Localize Key=AddServer_RelayEnabled}" 
+                                  IsChecked="False"
+                                  Foreground="{StaticResource TextPrimaryBrush}"
+                                  Margin="0,0,0,12"/>
+                        
+                        <StackPanel x:Name="RelaySettingsPanel" 
+                                    Visibility="{Binding IsChecked, ElementName=RelayEnabledCheckBox, Converter={StaticResource BoolToVisibilityConverter}}">
+                            
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                    <TextBlock Text="{loc:Localize Key=AddServer_RelayHost}" 
+                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                               FontSize="12"
+                                               Margin="0,0,0,6"/>
+                                    <TextBox x:Name="RelayHostTextBox" 
+                                             ToolTip="{loc:Localize Key=AddServer_RelayHostTooltip}"/>
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                                    <TextBlock Text="{loc:Localize Key=AddServer_RelayPort}" 
+                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                               FontSize="12"
+                                               Margin="0,0,0,6"/>
+                                    <TextBox x:Name="RelayPortTextBox" Text="6900"/>
+                                </StackPanel>
+                            </Grid>
+                            
+                            <TextBlock Text="{loc:Localize Key=AddServer_RelayAuthToken}" 
+                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                       FontSize="12"
+                                       Margin="0,0,0,6"/>
+                            <PasswordBox x:Name="RelayAuthTokenBox" 
+                                         ToolTip="{loc:Localize Key=AddServer_RelayAuthTokenTooltip}"
+                                         Margin="0,0,0,12"/>
+                            
+                            <CheckBox x:Name="RelayUseSslCheckBox" 
+                                      Content="{loc:Localize Key=AddServer_RelayUseSsl}" 
+                                      IsChecked="True"
+                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                      Margin="0,0,0,6"/>
+                            
+                            <CheckBox x:Name="RelayAcceptInvalidCertsCheckBox" 
+                                      Content="{loc:Localize Key=AddServer_RelayAcceptInvalidCerts}" 
+                                      IsChecked="True"
+                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                      IsEnabled="{Binding IsChecked, ElementName=RelayUseSslCheckBox}"/>
+                        </StackPanel>
                     </StackPanel>
                 </Border>
 

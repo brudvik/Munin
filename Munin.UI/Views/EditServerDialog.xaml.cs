@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Input;
 using Munin.Core.Models;
+using Munin.UI.Resources;
 
 namespace Munin.UI.Views;
 
@@ -19,12 +20,45 @@ public partial class EditServerDialog : Window
     /// Gets a value indicating whether changes were made to the server configuration.
     /// </summary>
     public bool HasChanges { get; private set; }
+    
+    /// <summary>
+    /// Tracks whether the user has already been warned about accepting invalid certificates.
+    /// </summary>
+    private bool _acceptInvalidCertsWarningShown;
+    
+    /// <summary>
+    /// Original value of AcceptInvalidCertificates to detect changes.
+    /// </summary>
+    private bool _originalAcceptInvalidCerts;
 
     public EditServerDialog(IrcServer server)
     {
         InitializeComponent();
         Server = server;
+        _originalAcceptInvalidCerts = server.AcceptInvalidCertificates;
         LoadServerData();
+    }
+    
+    /// <summary>
+    /// Shows a warning dialog when the user enables "Accept Invalid Certificates".
+    /// </summary>
+    private void AcceptInvalidCertsCheckBox_Checked(object sender, RoutedEventArgs e)
+    {
+        // Don't show warning if it was already enabled when dialog opened
+        if (_originalAcceptInvalidCerts) return;
+        if (_acceptInvalidCertsWarningShown) return;
+        _acceptInvalidCertsWarningShown = true;
+        
+        var result = MessageBox.Show(
+            Strings.Security_AcceptInvalidCertsWarning,
+            Strings.Security_AcceptInvalidCertsTitle,
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+        
+        if (result != MessageBoxResult.Yes)
+        {
+            AcceptInvalidCertsCheckBox.IsChecked = false;
+        }
     }
 
     /// <summary>
@@ -44,7 +78,16 @@ public partial class EditServerDialog : Window
         AutoConnectCheckBox.IsChecked = Server.AutoConnect;
         SaslUsernameTextBox.Text = Server.SaslUsername ?? "";
         
-        // Note: Passwords are not loaded for security - user must re-enter if changing
+        // Load relay settings
+        if (Server.Relay != null)
+        {
+            RelayEnabledCheckBox.IsChecked = Server.Relay.Enabled;
+            RelayHostTextBox.Text = Server.Relay.Host;
+            RelayPortTextBox.Text = Server.Relay.Port.ToString();
+            RelayUseSslCheckBox.IsChecked = Server.Relay.UseSsl;
+            RelayAcceptInvalidCertsCheckBox.IsChecked = Server.Relay.AcceptInvalidCertificates;
+            // Note: Auth token is not loaded for security - user must re-enter if changing
+        }
     }
 
     /// <summary>
@@ -68,6 +111,32 @@ public partial class EditServerDialog : Window
             MessageBox.Show("Please enter a valid port number (1-65535).", "Validation Error", 
                 MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
+        }
+
+        // Validate relay settings if enabled
+        if (RelayEnabledCheckBox.IsChecked == true)
+        {
+            if (string.IsNullOrWhiteSpace(RelayHostTextBox.Text))
+            {
+                MessageBox.Show("Please enter the relay host address.", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (!int.TryParse(RelayPortTextBox.Text, out var relayPort) || relayPort < 1 || relayPort > 65535)
+            {
+                MessageBox.Show("Please enter a valid relay port number (1-65535).", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // Auth token is required if relay is newly enabled or token is being changed
+            if (Server.Relay?.Enabled != true && string.IsNullOrEmpty(RelayAuthTokenBox.Password))
+            {
+                MessageBox.Show("Please enter the relay authentication token.", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
         }
 
         // Update server properties
@@ -104,6 +173,31 @@ public partial class EditServerDialog : Window
         if (!string.IsNullOrEmpty(SaslPasswordBox.Password))
         {
             Server.SaslPassword = SaslPasswordBox.Password;
+        }
+
+        // Relay settings
+        if (RelayEnabledCheckBox.IsChecked == true)
+        {
+            Server.Relay ??= new RelaySettings();
+            Server.Relay.Enabled = true;
+            Server.Relay.Host = RelayHostTextBox.Text.Trim();
+            Server.Relay.Port = int.Parse(RelayPortTextBox.Text);
+            Server.Relay.UseSsl = RelayUseSslCheckBox.IsChecked == true;
+            Server.Relay.AcceptInvalidCertificates = RelayAcceptInvalidCertsCheckBox.IsChecked == true;
+            
+            // Only update auth token if user entered a new one
+            if (!string.IsNullOrEmpty(RelayAuthTokenBox.Password))
+            {
+                Server.Relay.AuthToken = RelayAuthTokenBox.Password;
+            }
+        }
+        else
+        {
+            // Disable relay if checkbox is unchecked
+            if (Server.Relay != null)
+            {
+                Server.Relay.Enabled = false;
+            }
         }
 
         HasChanges = true;

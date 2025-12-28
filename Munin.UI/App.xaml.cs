@@ -220,14 +220,46 @@ public partial class App : Application
     {
         if (_storage == null) return;
         
-        var unlockDialog = new UnlockDialog
+        var unlockDialog = new UnlockDialog();
+        
+        // Check rate limiting before showing dialog
+        if (_securityAudit?.IsLockedOut == true)
         {
-            ValidatePassword = password => 
+            unlockDialog.ShowRateLimitMessage(_securityAudit.RemainingLockoutSeconds);
+        }
+        
+        unlockDialog.ValidatePassword = password => 
+        {
+            // Check rate limiting first
+            if (_securityAudit != null)
             {
-                var success = _storage.Unlock(password);
-                _ = _securityAudit?.LogUnlockAttemptAsync(success, success ? null : "Feil passord");
-                return success;
+                var (isAllowed, waitSeconds) = _securityAudit.CheckRateLimit();
+                if (!isAllowed)
+                {
+                    unlockDialog.ShowRateLimitMessage(waitSeconds);
+                    return false;
+                }
             }
+            
+            var success = _storage.Unlock(password);
+            _ = _securityAudit?.LogUnlockAttemptAsync(success, success ? null : "Feil passord");
+            
+            // Show rate limit warning if getting close to lockout
+            if (!success && _securityAudit != null)
+            {
+                var remaining = _securityAudit.ConsecutiveFailedAttempts;
+                var max = _securityAudit.MaxFailedAttempts;
+                if (remaining >= max - 2 && remaining < max)
+                {
+                    unlockDialog.ShowAttemptsWarning(max - remaining);
+                }
+                else if (_securityAudit.IsLockedOut)
+                {
+                    unlockDialog.ShowRateLimitMessage(_securityAudit.RemainingLockoutSeconds);
+                }
+            }
+            
+            return success;
         };
         
         var result = unlockDialog.ShowDialog();

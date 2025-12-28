@@ -10,7 +10,7 @@ namespace Munin.Core.Services;
 /// <para>Security features:</para>
 /// <list type="bullet">
 ///   <item><description>AES-256-GCM authenticated encryption</description></item>
-///   <item><description>PBKDF2 key derivation with 150,000 iterations</description></item>
+///   <item><description>PBKDF2 key derivation with 310,000 iterations (OWASP 2023)</description></item>
 ///   <item><description>Unique salt per installation</description></item>
 ///   <item><description>Unique IV/nonce per encryption operation</description></item>
 /// </list>
@@ -19,9 +19,10 @@ public class EncryptionService
 {
     /// <summary>
     /// Number of PBKDF2 iterations for key derivation.
+    /// 310,000 is the OWASP 2023 recommendation for SHA-256.
     /// Higher values increase security but slow down unlock time.
     /// </summary>
-    private const int Pbkdf2Iterations = 150_000;
+    private const int Pbkdf2Iterations = 310_000;
     
     /// <summary>
     /// AES key size in bytes (256 bits).

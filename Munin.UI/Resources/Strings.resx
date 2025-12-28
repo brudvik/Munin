@@ -195,6 +195,9 @@
   <data name="Unlock_AttemptsCount" xml:space="preserve">
     <value>Attempt {0} of {1}</value>
   </data>
+  <data name="Unlock_AttemptsRemaining" xml:space="preserve">
+    <value>⚠️ Only {0} attempt(s) remaining before lockout!</value>
+  </data>
   <data name="Unlock_ResetWarning" xml:space="preserve">
     <value>⚠️ WARNING: This will delete ALL data!
 
@@ -415,6 +418,38 @@ Are you absolutely sure?</value>
     <value>Auto-join channels (comma-separated):</value>
   </data>
   
+  <!-- MuninRelay Settings -->
+  <data name="AddServer_RelayHeader" xml:space="preserve">
+    <value>MuninRelay (VPN Routing)</value>
+  </data>
+  <data name="AddServer_RelayDescription" xml:space="preserve">
+    <value>Route connection through MuninRelay server on another machine (e.g., VPN gateway)</value>
+  </data>
+  <data name="AddServer_RelayEnabled" xml:space="preserve">
+    <value>Use MuninRelay</value>
+  </data>
+  <data name="AddServer_RelayHost" xml:space="preserve">
+    <value>Relay host:</value>
+  </data>
+  <data name="AddServer_RelayPort" xml:space="preserve">
+    <value>Relay port:</value>
+  </data>
+  <data name="AddServer_RelayAuthToken" xml:space="preserve">
+    <value>Auth token:</value>
+  </data>
+  <data name="AddServer_RelayUseSsl" xml:space="preserve">
+    <value>Use SSL/TLS to relay</value>
+  </data>
+  <data name="AddServer_RelayAcceptInvalidCerts" xml:space="preserve">
+    <value>Accept invalid certificates</value>
+  </data>
+  <data name="AddServer_RelayHostTooltip" xml:space="preserve">
+    <value>Hostname or IP address of the MuninRelay server</value>
+  </data>
+  <data name="AddServer_RelayAuthTokenTooltip" xml:space="preserve">
+    <value>Authentication token from MuninRelay configuration (config.json)</value>
+  </data>
+  
   <!-- Settings Dialog -->
   <data name="Settings_Title" xml:space="preserve">
     <value>Settings</value>
@@ -603,6 +638,24 @@ Are you absolutely sure?</value>
   </data>
   <data name="AddServer_AcceptInvalidCertsTooltip" xml:space="preserve">
     <value>Enable this for self-signed certificates</value>
+  </data>
+  <data name="Security_AcceptInvalidCertsWarning" xml:space="preserve">
+    <value>⚠️ SECURITY WARNING
+
+Accepting invalid certificates disables SSL/TLS verification, which means:
+
+• You cannot verify the server's identity
+• Man-in-the-middle attacks become possible
+• Your connection could be intercepted
+
+Only enable this for:
+• Servers with self-signed certificates you trust
+• Testing environments
+
+Are you sure you want to accept invalid certificates?</value>
+  </data>
+  <data name="Security_AcceptInvalidCertsTitle" xml:space="preserve">
+    <value>Security Risk</value>
   </data>
   <data name="AddServer_PreferIPv6" xml:space="preserve">
     <value>Prefer IPv6</value>
@@ -1169,6 +1222,20 @@ Perfect for USB drives.</value>
   <!-- Input Dialog -->
   <data name="InputDialog_EnterValue" xml:space="preserve">
     <value>Enter value:</value>
+  </data>
+  
+  <!-- TLS Security -->
+  <data name="Settings_TlsSecurityHeader" xml:space="preserve">
+    <value>TLS Security</value>
+  </data>
+  <data name="Settings_MinimumTlsVersion" xml:space="preserve">
+    <value>Minimum TLS Version:</value>
+  </data>
+  <data name="Settings_CertificateRevocation" xml:space="preserve">
+    <value>Check certificate revocation (OCSP/CRL)</value>
+  </data>
+  <data name="Settings_TlsDescription" xml:space="preserve">
+    <value>TLS 1.2 or higher is recommended. Older protocols (TLS 1.0/1.1) have known vulnerabilities. Only select "Any" if connecting to legacy servers that don't support modern TLS.</value>
   </data>
   
   <!-- Ident Server -->

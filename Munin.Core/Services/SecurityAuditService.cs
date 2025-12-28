@@ -23,6 +23,26 @@ public class SecurityAuditService
     private readonly string _auditLogPath = "security_audit.json";
     private SecurityAuditLog _auditLog;
     
+    // Rate limiting for failed unlock attempts
+    private int _consecutiveFailedAttempts;
+    private DateTime _lastFailedAttempt = DateTime.MinValue;
+    private DateTime _lockoutUntil = DateTime.MinValue;
+    
+    /// <summary>
+    /// Maximum number of failed attempts before lockout.
+    /// </summary>
+    public int MaxFailedAttempts { get; set; } = 5;
+    
+    /// <summary>
+    /// Base lockout duration in seconds (doubles with each lockout).
+    /// </summary>
+    public int BaseLockoutSeconds { get; set; } = 30;
+    
+    /// <summary>
+    /// Maximum lockout duration in seconds.
+    /// </summary>
+    public int MaxLockoutSeconds { get; set; } = 3600; // 1 hour
+    
     /// <summary>
     /// Initializes a new instance of the SecurityAuditService.
     /// </summary>
@@ -43,12 +63,82 @@ public class SecurityAuditService
     public IReadOnlyList<SecurityEvent> Events => _auditLog.Events.AsReadOnly();
     
     /// <summary>
+    /// Checks if unlock attempts are currently rate-limited.
+    /// </summary>
+    /// <returns>True if currently locked out, false if attempts are allowed.</returns>
+    public bool IsLockedOut => DateTime.UtcNow < _lockoutUntil;
+    
+    /// <summary>
+    /// Gets the remaining lockout time in seconds.
+    /// </summary>
+    public int RemainingLockoutSeconds => IsLockedOut 
+        ? (int)(_lockoutUntil - DateTime.UtcNow).TotalSeconds 
+        : 0;
+    
+    /// <summary>
+    /// Gets the number of consecutive failed attempts.
+    /// </summary>
+    public int ConsecutiveFailedAttempts => _consecutiveFailedAttempts;
+    
+    /// <summary>
+    /// Checks if an unlock attempt is allowed and returns the wait time if not.
+    /// </summary>
+    /// <returns>Tuple of (isAllowed, waitSeconds). If not allowed, waitSeconds indicates how long to wait.</returns>
+    public (bool IsAllowed, int WaitSeconds) CheckRateLimit()
+    {
+        if (IsLockedOut)
+        {
+            return (false, RemainingLockoutSeconds);
+        }
+        return (true, 0);
+    }
+    
+    /// <summary>
+    /// Records a failed unlock attempt and applies rate limiting if needed.
+    /// </summary>
+    private void RecordFailedAttempt()
+    {
+        _consecutiveFailedAttempts++;
+        _lastFailedAttempt = DateTime.UtcNow;
+        
+        if (_consecutiveFailedAttempts >= MaxFailedAttempts)
+        {
+            // Calculate exponential backoff lockout time
+            int lockoutMultiplier = (_consecutiveFailedAttempts - MaxFailedAttempts) / MaxFailedAttempts + 1;
+            int lockoutSeconds = Math.Min(BaseLockoutSeconds * (int)Math.Pow(2, lockoutMultiplier - 1), MaxLockoutSeconds);
+            _lockoutUntil = DateTime.UtcNow.AddSeconds(lockoutSeconds);
+            
+            _logger.Warning("Rate limit triggered: {Attempts} failed attempts. Locked out for {Seconds} seconds",
+                _consecutiveFailedAttempts, lockoutSeconds);
+        }
+    }
+    
+    /// <summary>
+    /// Resets the failed attempt counter after a successful unlock.
+    /// </summary>
+    private void ResetFailedAttempts()
+    {
+        _consecutiveFailedAttempts = 0;
+        _lockoutUntil = DateTime.MinValue;
+    }
+    
+    /// <summary>
     /// Logs an unlock attempt.
     /// </summary>
     /// <param name="success">Whether the unlock was successful.</param>
     /// <param name="failureReason">Reason for failure if unsuccessful.</param>
     public async Task LogUnlockAttemptAsync(bool success, string? failureReason = null)
     {
+        // Update rate limiting counters
+        if (success)
+        {
+            ResetFailedAttempts();
+        }
+        else
+        {
+            RecordFailedAttempt();
+        }
+        
         var evt = new SecurityEvent
         {
             EventType = SecurityEventType.UnlockAttempt,
@@ -56,7 +146,7 @@ public class SecurityAuditService
             Success = success,
             MachineName = Environment.MachineName,
             UserName = Environment.UserName,
-            Details = failureReason
+            Details = success ? null : $"{failureReason} (Attempt {_consecutiveFailedAttempts})"
         };
         
         _auditLog.Events.Add(evt);

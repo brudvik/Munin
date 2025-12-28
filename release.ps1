@@ -20,8 +20,8 @@ function Get-ProjectVersion {
 function Set-ProjectVersion {
     param([string]$NewVersion)
     
-    # Update both project files
-    $projects = @("Munin.UI\Munin.UI.csproj", "Munin.Core\Munin.Core.csproj")
+    # Update all project files
+    $projects = @("Munin.UI\Munin.UI.csproj", "Munin.Core\Munin.Core.csproj", "MuninRelay\MuninRelay.csproj")
     
     foreach ($proj in $projects) {
         $content = Get-Content $proj -Raw
@@ -72,6 +72,7 @@ if ([string]::IsNullOrEmpty($Version)) {
 $Date = Get-Date -Format "yyyy-MM-dd"
 $ZipName = "munin-windows-$Date-v$Version.zip"
 $PublishDir = "Munin.UI\bin\Release\net8.0-windows\win-x64\publish"
+$RelayPublishDir = "MuninRelay\bin\Release\net8.0\win-x64\publish"
 $OutputDir = "releases"
 
 Write-Host "`nBuilding Munin IRC Client v$Version (Release)..." -ForegroundColor Cyan
@@ -80,12 +81,25 @@ Write-Host "`nBuilding Munin IRC Client v$Version (Release)..." -ForegroundColor
 if (Test-Path $PublishDir) {
     Remove-Item $PublishDir -Recurse -Force
 }
+if (Test-Path $RelayPublishDir) {
+    Remove-Item $RelayPublishDir -Recurse -Force
+}
 
-# Build
+# Build Munin.UI
+Write-Host "  Publishing Munin.UI..." -ForegroundColor Gray
 dotnet publish Munin.UI -c Release -r win-x64 --self-contained
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "`nBuild failed!" -ForegroundColor Red
+    Write-Host "`nMunin.UI build failed!" -ForegroundColor Red
+    exit $LASTEXITCODE
+}
+
+# Build MuninRelay
+Write-Host "  Publishing MuninRelay..." -ForegroundColor Gray
+dotnet publish MuninRelay -c Release -r win-x64 --self-contained
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "`nMuninRelay build failed!" -ForegroundColor Red
     exit $LASTEXITCODE
 }
 
@@ -99,6 +113,12 @@ New-Item -ItemType Directory -Path $ExamplesDir -Force | Out-Null
 # Copy example scripts
 Write-Host "Copying example scripts..." -ForegroundColor Cyan
 Copy-Item "scripts\examples\*" -Destination $ExamplesDir -Recurse
+
+# Copy MuninRelay to its own folder in publish directory
+Write-Host "Copying MuninRelay..." -ForegroundColor Cyan
+$RelayDestDir = Join-Path $PublishDir "MuninRelay"
+New-Item -ItemType Directory -Path $RelayDestDir -Force | Out-Null
+Copy-Item "$RelayPublishDir\*" -Destination $RelayDestDir -Recurse
 
 # Copy documentation
 Write-Host "Copying documentation..." -ForegroundColor Cyan

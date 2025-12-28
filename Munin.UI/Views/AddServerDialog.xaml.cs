@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Input;
 using Munin.Core.Models;
+using Munin.UI.Resources;
 
 namespace Munin.UI.Views;
 
@@ -14,6 +15,11 @@ public partial class AddServerDialog : Window
     /// Gets the configured server if the dialog was confirmed, or null if cancelled.
     /// </summary>
     public IrcServer? Server { get; private set; }
+    
+    /// <summary>
+    /// Tracks whether the user has already been warned about accepting invalid certificates.
+    /// </summary>
+    private bool _acceptInvalidCertsWarningShown;
 
     public AddServerDialog()
     {
@@ -21,6 +27,26 @@ public partial class AddServerDialog : Window
         
         // Generate random nickname
         NicknameTextBox.Text = $"User{Random.Shared.Next(1000, 9999)}";
+    }
+    
+    /// <summary>
+    /// Shows a warning dialog when the user enables "Accept Invalid Certificates".
+    /// </summary>
+    private void AcceptInvalidCertsCheckBox_Checked(object sender, RoutedEventArgs e)
+    {
+        if (_acceptInvalidCertsWarningShown) return;
+        _acceptInvalidCertsWarningShown = true;
+        
+        var result = MessageBox.Show(
+            Strings.Security_AcceptInvalidCertsWarning,
+            Strings.Security_AcceptInvalidCertsTitle,
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+        
+        if (result != MessageBoxResult.Yes)
+        {
+            AcceptInvalidCertsCheckBox.IsChecked = false;
+        }
     }
 
     /// <summary>
@@ -46,6 +72,31 @@ public partial class AddServerDialog : Window
             return;
         }
 
+        // Validate relay settings if enabled
+        if (RelayEnabledCheckBox.IsChecked == true)
+        {
+            if (string.IsNullOrWhiteSpace(RelayHostTextBox.Text))
+            {
+                MessageBox.Show("Please enter the relay host address.", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (!int.TryParse(RelayPortTextBox.Text, out var relayPort) || relayPort < 1 || relayPort > 65535)
+            {
+                MessageBox.Show("Please enter a valid relay port number (1-65535).", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(RelayAuthTokenBox.Password))
+            {
+                MessageBox.Show("Please enter the relay authentication token.", "Validation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+        }
+
         Server = new IrcServer
         {
             Name = ServerNameTextBox.Text.Trim(),
@@ -68,7 +119,16 @@ public partial class AddServerDialog : Window
                 .Where(c => c.StartsWith('#') || c.StartsWith('&'))
                 .ToList(),
             AutoConnect = AutoConnectCheckBox.IsChecked == true,
-            PreferIPv6 = PreferIPv6CheckBox.IsChecked == true
+            PreferIPv6 = PreferIPv6CheckBox.IsChecked == true,
+            Relay = RelayEnabledCheckBox.IsChecked == true ? new RelaySettings
+            {
+                Enabled = true,
+                Host = RelayHostTextBox.Text.Trim(),
+                Port = int.Parse(RelayPortTextBox.Text),
+                AuthToken = RelayAuthTokenBox.Password,
+                UseSsl = RelayUseSslCheckBox.IsChecked == true,
+                AcceptInvalidCertificates = RelayAcceptInvalidCertsCheckBox.IsChecked == true
+            } : null
         };
 
         DialogResult = true;

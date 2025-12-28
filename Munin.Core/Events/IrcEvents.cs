@@ -1,4 +1,5 @@
 using Munin.Core.Models;
+using Munin.Core.Services;
 
 namespace Munin.Core.Events;
 
@@ -180,6 +181,9 @@ public class IrcRawMessageEventArgs : EventArgs
     /// <summary>The raw message text.</summary>
     public string Message { get; }
     
+    /// <summary>The message with sensitive data masked for safe display/logging.</summary>
+    public string MaskedMessage { get; }
+    
     /// <summary>True if we sent this message, false if received.</summary>
     public bool IsOutgoing { get; }
 
@@ -187,6 +191,7 @@ public class IrcRawMessageEventArgs : EventArgs
     {
         Server = server;
         Message = message;
+        MaskedMessage = Services.SensitiveDataFilter.MaskSensitiveData(message);
         IsOutgoing = isOutgoing;
     }
 }

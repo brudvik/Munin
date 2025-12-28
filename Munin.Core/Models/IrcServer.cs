@@ -185,6 +185,55 @@ public class IrcServer
     public bool IsReceivingPlayback { get; set; } = false;
 
     #endregion
+
+    #region MuninRelay Support
+
+    /// <summary>
+    /// Relay settings for routing connection through MuninRelay.
+    /// When configured, traffic is routed through a relay server (e.g., for VPN routing).
+    /// </summary>
+    public RelaySettings? Relay { get; set; }
+
+    #endregion
+}
+
+/// <summary>
+/// Relay configuration for routing IRC connections through MuninRelay.
+/// Allows routing traffic through a VPN server on another machine.
+/// </summary>
+public class RelaySettings
+{
+    /// <summary>
+    /// Whether to use the relay for this server connection.
+    /// </summary>
+    public bool Enabled { get; set; } = false;
+
+    /// <summary>
+    /// Hostname or IP address of the MuninRelay server.
+    /// </summary>
+    public string Host { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Port number of the MuninRelay server (default 6900).
+    /// </summary>
+    public int Port { get; set; } = 6900;
+
+    /// <summary>
+    /// Authentication token for the relay server.
+    /// Must match the token configured in MuninRelay.
+    /// </summary>
+    public string? AuthToken { get; set; }
+
+    /// <summary>
+    /// Whether to use SSL/TLS to connect to the relay.
+    /// Recommended for security.
+    /// </summary>
+    public bool UseSsl { get; set; } = true;
+
+    /// <summary>
+    /// Whether to accept invalid/self-signed certificates from the relay.
+    /// </summary>
+    public bool AcceptInvalidCertificates { get; set; } = true;
 }
 
 /// <summary>

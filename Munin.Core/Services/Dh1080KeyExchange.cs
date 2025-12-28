@@ -471,15 +471,17 @@ public class Dh1080Manager
         var parsed = Dh1080KeyExchange.ParseMessage(ctcpMessage);
         if (parsed == null)
         {
-            _logger.Warning("HandleMessage: ParseMessage returned null for: {Message}", ctcpMessage);
+            // Don't log the actual message content as it may contain key material
+            _logger.Warning("HandleMessage: ParseMessage returned null");
             return null;
         }
 
         var (command, theirPublicKey, isCbc, useMircFormat) = parsed.Value;
         var key = GetKey(serverId, fromNick);
         
-        _logger.Debug("HandleMessage: parsed command={Command}, keyLen={KeyLen}, isCbc={IsCbc}, useMircFormat={UseMircFormat}",
-            command, theirPublicKey.Length, isCbc, useMircFormat);
+        // Only log non-sensitive metadata, NOT the public key length which could reveal crypto info
+        _logger.Debug("HandleMessage: parsed command={Command}, isCbc={IsCbc}, useMircFormat={UseMircFormat}",
+            command, isCbc, useMircFormat);
 
         if (command == Dh1080KeyExchange.InitCommand)
         {
@@ -529,8 +531,9 @@ public class Dh1080Manager
             // Use the CBC mode we initiated with, or what the response indicates
             var useCbcMode = initiatedWithCbc || isCbc;
             
-            _logger.Debug("HandleMessage: Computing shared secret with their public key (length={Len}), initiatedWithCbc={InitCbc}, responseCbc={RespCbc}", 
-                theirPublicKey.Length, initiatedWithCbc, isCbc);
+            // Don't log key length or other crypto-revealing metadata
+            _logger.Debug("HandleMessage: Computing shared secret, initiatedWithCbc={InitCbc}, responseCbc={RespCbc}", 
+                initiatedWithCbc, isCbc);
             var sharedKey = exchange.ComputeSharedSecret(theirPublicKey);
             if (sharedKey != null)
             {
