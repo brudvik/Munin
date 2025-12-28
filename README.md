@@ -185,7 +185,7 @@ Munin includes a built-in Ident server, similar to mIRC's identd. Many IRC serve
 ### Architecture
 
 ```
-┌─────────────────┐         SSL/TLS          ┌─────────────────┐         TCP/SSL         ┌─────────────────┐
+┌─────────────────┐         SSL/TLS           ┌─────────────────┐         TCP/SSL         ┌─────────────────┐
 │                 │ ◄────────────────────────►│                 │◄───────────────────────►│                 │
 │   Munin Client  │    Auth: HMAC-SHA256      │   MuninRelay    │                         │   IRC Server    │
 │   (Your PC)     │                           │   (VPN Server)  │                         │  (e.g. Libera)  │
@@ -232,27 +232,45 @@ Munin includes a built-in Ident server, similar to mIRC's identd. Many IRC serve
    
    > ⚠️ **Save this token!** It's encrypted in `config.json` and cannot be viewed again.
 
-3. **Edit config.json** to customize settings:
-   ```json
-   {
-     "listenPort": 6900,
-     "authToken": "DPAPI:...",
-     "enableIpVerification": true,
-     "expectedCountryCode": "NL",
-     "allowedServers": [
-       { "hostname": "irc.libera.chat", "port": 6697, "useSsl": true },
-       { "hostname": "irc.efnet.org", "port": 6697, "useSsl": true }
-     ],
-     "maxConnections": 10
-   }
+3. **Set a master password** when prompted:
+   ```
+   === MuninRelay Configuration Setup ===
+   Enter a master password to protect the configuration.
+   
+   Enter master password: ********
+   Confirm password: ********
+   Master password set successfully!
+   ```
+   
+   > 🔐 **Master password protection:** The entire `config.json` is encrypted with your master password using AES-256. You'll need this password whenever you start MuninRelay or modify settings.
+
+4. **Configure allowed servers** using the `--config` command:
+   ```cmd
+   MuninRelay.exe --config
+   ```
+   
+   This opens an interactive menu where you can:
+   - Change listen port (default: 6900)
+   - Enable/disable IP verification
+   - Set expected country code for VPN verification
+   - Add/remove allowed IRC servers
+   - Set maximum connections
+
+   Example allowed servers configuration:
+   ```
+   Allowed servers:
+   1. irc.libera.chat:6697 (SSL)
+   2. irc.efnet.org:6697 (SSL)
+   
+   [A]dd server, [R]emove server, [B]ack
    ```
 
-4. **Open firewall port** (e.g., 6900):
+5. **Open firewall port** (e.g., 6900):
    ```cmd
    netsh advfirewall firewall add rule name="MuninRelay" dir=in action=allow protocol=TCP localport=6900
    ```
 
-5. **Install as Windows Service** (optional, for auto-start):
+6. **Install as Windows Service** (optional, for auto-start):
    ```cmd
    MuninRelay.exe --install
    net start MuninRelay
@@ -266,7 +284,7 @@ Munin includes a built-in Ident server, similar to mIRC's identd. Many IRC serve
    - ☑️ Enable MuninRelay
    - **Host:** Your VPN server's IP or hostname
    - **Port:** 6900 (or your configured port)
-   - **Auth Token:** Paste the token from step 2 above
+   - **Auth Token:** Paste the token displayed during first run
    - ☑️ Use SSL (recommended)
 
 3. **Connect** - Your IRC traffic now routes through the VPN
@@ -278,6 +296,7 @@ Munin includes a built-in Ident server, similar to mIRC's identd. Many IRC serve
 | `MuninRelay` | Run in console mode |
 | `--install` | Install as Windows Service (requires Admin) |
 | `--uninstall` | Remove Windows Service (requires Admin) |
+| `--config` | Interactive configuration menu |
 | `--setup-password` | Set up or reset the master password |
 | `--change-password` | Change the master password |
 | `--generate-token` | Generate new authentication token |
