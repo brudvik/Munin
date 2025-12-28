@@ -10,7 +10,8 @@
         Background="Transparent"
         FontFamily="{StaticResource UIFont}"
         FontSize="13"
-        ResizeMode="NoResize">
+        ResizeMode="NoResize"
+        Icon="/Resources/munin-icon.ico">
     <Window.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>

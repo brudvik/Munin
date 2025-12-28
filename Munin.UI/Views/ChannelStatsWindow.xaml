@@ -10,7 +10,8 @@
         Background="Transparent"
         FontFamily="{StaticResource UIFont}"
         FontSize="13"
-        ResizeMode="NoResize">
+        ResizeMode="NoResize"
+        Icon="/Resources/munin-icon.ico">
     
     <Border Background="{DynamicResource BackgroundDarkBrush}"
             CornerRadius="8"

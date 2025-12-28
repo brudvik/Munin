@@ -12,7 +12,8 @@
         Background="Transparent"
         Foreground="{StaticResource TextPrimaryBrush}"
         FontFamily="{StaticResource UIFont}"
-        FontSize="13">
+        FontSize="13"
+        Icon="/Resources/munin-icon.ico">
 
     <Border Background="{StaticResource BackgroundDarkBrush}"
             CornerRadius="8"

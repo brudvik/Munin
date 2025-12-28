@@ -20,7 +20,8 @@
         Background="Transparent"
         Foreground="{StaticResource TextPrimaryBrush}"
         FontFamily="{StaticResource UIFont}"
-        FontSize="13">
+        FontSize="13"
+        Icon="/Resources/munin-icon.ico">
 
     <Window.DataContext>
         <vm:MainViewModel/>
@@ -74,7 +75,7 @@
                     
                     <!-- App Icon and Title -->
                     <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="12,0,0,0" VerticalAlignment="Center">
-                        <TextBlock Text="💬" FontSize="14" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <Image Source="/Resources/munin-logo.png" Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality"/>
                         <TextBlock Text="Munin" 
                                    FontSize="13" 
                                    FontWeight="SemiBold"

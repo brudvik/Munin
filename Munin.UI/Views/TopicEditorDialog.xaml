@@ -8,7 +8,8 @@
         ResizeMode="NoResize"
         WindowStyle="None"
         AllowsTransparency="True"
-        Background="Transparent">
+        Background="Transparent"
+        Icon="/Resources/munin-icon.ico">
     
     <Border Background="{StaticResource BackgroundDarkBrush}" 
             BorderBrush="{StaticResource BorderBrush}" 

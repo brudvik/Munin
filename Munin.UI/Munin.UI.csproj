@@ -13,11 +13,14 @@
     <RootNamespace>Munin.UI</RootNamespace>
     <Description>Modern WPF IRC Client with IRCv3 support</Description>
     <Authors>Your Name</Authors>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     
     <!-- Generate XML documentation for IntelliSense -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
+    
+    <!-- Application icon -->
+    <ApplicationIcon>..\resources\munin-irc-client.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -51,6 +54,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\LuaSyntax.xshd" />
     <EmbeddedResource Include="Resources\JsonSyntax.xshd" />
+  </ItemGroup>
+  
+  <!-- Application icon resource -->
+  <ItemGroup>
+    <Resource Include="Resources\munin-icon.ico" />
+    <Resource Include="Resources\munin-logo.png" />
   </ItemGroup>
 
 </Project>

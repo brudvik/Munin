@@ -10,7 +10,8 @@
         AllowsTransparency="True"
         ResizeMode="CanResizeWithGrip"
         Background="Transparent"
-        WindowStartupLocation="CenterOwner">
+        WindowStartupLocation="CenterOwner"
+        Icon="/Resources/munin-icon.ico">
     
     <Border Background="{StaticResource BackgroundDarkBrush}"
             CornerRadius="8"

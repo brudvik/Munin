@@ -72,7 +72,7 @@ if ([string]::IsNullOrEmpty($Version)) {
 $Date = Get-Date -Format "yyyy-MM-dd"
 $ZipName = "munin-windows-$Date-v$Version.zip"
 $PublishDir = "Munin.UI\bin\Release\net8.0-windows\win-x64\publish"
-$RelayPublishDir = "MuninRelay\bin\Release\net8.0\win-x64\publish"
+$RelayPublishDir = "MuninRelay\bin\Release\net8.0-windows\win-x64\publish"
 $OutputDir = "releases"
 
 Write-Host "`nBuilding Munin IRC Client v$Version (Release)..." -ForegroundColor Cyan

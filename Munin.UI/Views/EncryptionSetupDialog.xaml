@@ -10,7 +10,8 @@
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
-        FontFamily="{StaticResource UIFont}">
+        FontFamily="{StaticResource UIFont}"
+        Icon="/Resources/munin-icon.ico">
     
     <Border Background="{DynamicResource BackgroundDarkBrush}"
             CornerRadius="8"
@@ -36,7 +37,7 @@
                     </Grid.ColumnDefinitions>
                     
                     <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="12,0,0,0" VerticalAlignment="Center">
-                        <TextBlock Text="🔐" FontSize="14" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <Image Source="/Resources/munin-logo.png" Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality"/>
                         <TextBlock Text="{x:Static res:Strings.EncryptionSetup_Title}" 
                                    FontSize="13" 
                                    FontWeight="SemiBold"
@@ -63,13 +64,15 @@
                     Background="{DynamicResource BackgroundMediumBrush}"
                     Padding="30,24">
                 <StackPanel HorizontalAlignment="Center">
-                    <Border Width="64" Height="64" 
-                            CornerRadius="32"
+                    <Border Width="72" Height="72" 
+                            CornerRadius="36"
                             Background="{DynamicResource AccentSubtleBrush}"
                             Margin="0,0,0,16">
-                        <TextBlock Text="🔐" FontSize="28" 
-                                   HorizontalAlignment="Center" 
-                                   VerticalAlignment="Center"/>
+                        <Image Source="/Resources/munin-logo.png" 
+                               Width="48" Height="48" 
+                               HorizontalAlignment="Center" 
+                               VerticalAlignment="Center"
+                               RenderOptions.BitmapScalingMode="HighQuality"/>
                     </Border>
                     <TextBlock Text="{x:Static res:Strings.EncryptionSetup_Header}" 
                                FontSize="18" 
