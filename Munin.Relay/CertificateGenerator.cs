@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using Serilog;
 
-namespace MuninRelay;
+namespace Munin.Relay;
 
 /// <summary>
 /// Utility for generating self-signed SSL certificates for the relay.

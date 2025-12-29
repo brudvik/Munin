@@ -1,0 +1,319 @@
+<Window x:Class="Munin.UI.Views.AgentManagerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Munin.UI.Views"
+        xmlns:vm="clr-namespace:Munin.UI.ViewModels"
+        xmlns:loc="clr-namespace:Munin.UI.Localization"
+        mc:Ignorable="d"
+        Title="Agent Manager" 
+        Height="600" 
+        Width="900"
+        WindowStartupLocation="CenterOwner"
+        Style="{StaticResource ChromelessWindowStyle}">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Agent List Panel -->
+        <Border Grid.Column="0" 
+                Background="{DynamicResource SidebarBackgroundBrush}"
+                BorderThickness="0,0,1,0"
+                BorderBrush="{DynamicResource BorderBrush}">
+            <DockPanel>
+                <!-- Header -->
+                <Border DockPanel.Dock="Top" 
+                        Padding="12" 
+                        BorderThickness="0,0,0,1"
+                        BorderBrush="{DynamicResource BorderBrush}">
+                    <DockPanel>
+                        <TextBlock Text="Agents" 
+                                   FontSize="16" 
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource ForegroundBrush}"/>
+                        <Button DockPanel.Dock="Right" 
+                                Content="+" 
+                                Width="28" 
+                                Height="28"
+                                Command="{Binding AddAgentCommand}"
+                                ToolTip="Add Agent"
+                                Style="{StaticResource IconButtonStyle}"/>
+                    </DockPanel>
+                </Border>
+
+                <!-- Agent List -->
+                <ListBox x:Name="AgentListBox"
+                         ItemsSource="{Binding Agents}"
+                         SelectedItem="{Binding SelectedAgent}"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         Padding="4">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border Padding="8" 
+                                    CornerRadius="4"
+                                    Background="{DynamicResource ItemBackgroundBrush}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Connection Status Indicator -->
+                                    <Ellipse Grid.Column="0" 
+                                             Width="10" 
+                                             Height="10" 
+                                             Margin="0,0,8,0"
+                                             VerticalAlignment="Center">
+                                        <Ellipse.Style>
+                                            <Style TargetType="Ellipse">
+                                                <Setter Property="Fill" Value="#888"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                                                        <Setter Property="Fill" Value="#4CAF50"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>
+                                    </Ellipse>
+
+                                    <!-- Agent Info -->
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Name}" 
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource ForegroundBrush}"/>
+                                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                                   FontSize="11">
+                                            <Run Text="{Binding Host, Mode=OneWay}"/>
+                                            <Run Text=":"/>
+                                            <Run Text="{Binding Port, Mode=OneWay}"/>
+                                        </TextBlock>
+                                    </StackPanel>
+
+                                    <!-- Connect/Disconnect Button -->
+                                    <Button Grid.Column="2" 
+                                            Width="70"
+                                            Padding="8,4"
+                                            Command="{Binding DataContext.ConnectAgentCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                                                <Setter Property="Content" Value="Connect"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                                                        <Setter Property="Content" Value="Disconnect"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </Grid>
+                                
+                                <!-- Context Menu for agent actions -->
+                                <Border.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="{loc:Localize Key=AgentManager_Connect}"
+                                                  Command="{Binding DataContext.ConnectAgentCommand, Source={x:Reference AgentListBox}}"
+                                                  CommandParameter="{Binding}">
+                                            <MenuItem.Style>
+                                                <Style TargetType="MenuItem">
+                                                    <Setter Property="Header" Value="{loc:Localize Key=AgentManager_Connect}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                                                            <Setter Property="Header" Value="{loc:Localize Key=AgentManager_Disconnect}"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </MenuItem.Style>
+                                        </MenuItem>
+                                        <Separator/>
+                                        <MenuItem Header="{loc:Localize Key=AgentManager_Edit}"
+                                                  Command="{Binding DataContext.EditAgentCommand, Source={x:Reference AgentListBox}}"
+                                                  CommandParameter="{Binding}"/>
+                                        <MenuItem Header="{loc:Localize Key=AgentManager_Remove}"
+                                                  Command="{Binding DataContext.RemoveAgentCommand, Source={x:Reference AgentListBox}}"
+                                                  CommandParameter="{Binding}"/>
+                                    </ContextMenu>
+                                </Border.ContextMenu>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </Border>
+
+        <!-- Main Content Area -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Tabs -->
+            <TabControl Grid.Row="1" 
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="8">
+                
+                <!-- Overview Tab -->
+                <TabItem Header="Overview">
+                    <ScrollViewer Padding="16">
+                        <StackPanel>
+                            <TextBlock Text="Agent Status" 
+                                       FontSize="18" 
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,0,16"
+                                       Foreground="{DynamicResource ForegroundBrush}"/>
+
+                            <Grid Visibility="{Binding SelectedAgent, Converter={StaticResource NullToVisibilityConverter}}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Server Count -->
+                                <Border Grid.Row="0" Grid.Column="0" 
+                                        Margin="0,0,8,8" 
+                                        Padding="16"
+                                        CornerRadius="8"
+                                        Background="{DynamicResource CardBackgroundBrush}">
+                                    <StackPanel>
+                                        <TextBlock Text="IRC Servers" 
+                                                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                                   FontSize="12"/>
+                                        <TextBlock Text="{Binding SelectedAgent.ServerCount}" 
+                                                   FontSize="36" 
+                                                   FontWeight="Bold"
+                                                   Foreground="{DynamicResource AccentBrush}"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Uptime -->
+                                <Border Grid.Row="0" Grid.Column="1" 
+                                        Margin="8,0,0,8" 
+                                        Padding="16"
+                                        CornerRadius="8"
+                                        Background="{DynamicResource CardBackgroundBrush}">
+                                    <StackPanel>
+                                        <TextBlock Text="Uptime" 
+                                                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                                   FontSize="12"/>
+                                        <TextBlock Text="{Binding SelectedAgent.Uptime}" 
+                                                   FontSize="24" 
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource ForegroundBrush}"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <!-- No agent selected message -->
+                            <TextBlock Text="Select an agent from the list to view details"
+                                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,40,0,0"
+                                       Visibility="{Binding SelectedAgent, Converter={StaticResource NullToVisibilityInverseConverter}}"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- Channels Tab -->
+                <TabItem Header="Channels">
+                    <DataGrid ItemsSource="{Binding SelectedAgentChannels}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              HeadersVisibility="Column"
+                              GridLinesVisibility="Horizontal"
+                              Background="Transparent"
+                              BorderThickness="0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Channel" Binding="{Binding Name}" Width="150"/>
+                            <DataGridTextColumn Header="Users" Binding="{Binding UserCount}" Width="80"/>
+                            <DataGridTextColumn Header="Topic" Binding="{Binding Topic}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+
+                <!-- Scripts Tab -->
+                <TabItem Header="Scripts">
+                    <Grid Margin="16">
+                        <TextBlock Text="Script management coming soon..."
+                                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                    </Grid>
+                </TabItem>
+
+                <!-- Users Tab -->
+                <TabItem Header="Users">
+                    <Grid Margin="16">
+                        <TextBlock Text="User database management coming soon..."
+                                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                    </Grid>
+                </TabItem>
+
+                <!-- Logs Tab -->
+                <TabItem Header="Logs">
+                    <ListBox ItemsSource="{Binding SelectedAgentLogs}"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             FontFamily="Cascadia Code, Consolas, monospace"
+                             FontSize="12">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Timestamp, StringFormat='HH:mm:ss'}" 
+                                               Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                               Width="70"/>
+                                    <TextBlock Text="{Binding Level}" 
+                                               Width="60">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Level}" Value="Error">
+                                                        <Setter Property="Foreground" Value="#F44336"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Level}" Value="Warning">
+                                                        <Setter Property="Foreground" Value="#FFC107"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Level}" Value="Info">
+                                                        <Setter Property="Foreground" Value="#2196F3"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <TextBlock Text="{Binding Message}" 
+                                               Foreground="{DynamicResource ForegroundBrush}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </TabItem>
+            </TabControl>
+
+            <!-- Status Bar -->
+            <Border Grid.Row="2" 
+                    Padding="12,8"
+                    Background="{DynamicResource StatusBarBackgroundBrush}"
+                    BorderThickness="0,1,0,0"
+                    BorderBrush="{DynamicResource BorderBrush}">
+                <TextBlock Text="{Binding StatusText}"
+                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                           FontSize="12"/>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

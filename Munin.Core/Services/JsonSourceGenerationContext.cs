@@ -16,6 +16,8 @@ namespace Munin.Core.Services;
 [JsonSerializable(typeof(List<SecurityEvent>))]
 [JsonSerializable(typeof(ClientConfiguration))]
 [JsonSerializable(typeof(ServerConfiguration))]
+[JsonSerializable(typeof(SavedAgentConfiguration))]
+[JsonSerializable(typeof(List<SavedAgentConfiguration>))]
 [JsonSerializable(typeof(ProxyConfiguration))]
 [JsonSerializable(typeof(GeneralSettings))]
 [JsonSerializable(typeof(List<ServerConfiguration>))]

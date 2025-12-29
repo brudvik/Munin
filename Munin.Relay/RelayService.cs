@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 
-namespace MuninRelay;
+namespace Munin.Relay;
 
 /// <summary>
 /// Background service that listens for incoming relay connections

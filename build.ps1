@@ -17,11 +17,11 @@ switch ($Project) {
         dotnet build "$PSScriptRoot\Munin.UI\Munin.UI.csproj" -c $Configuration
     }
     "Relay" {
-        Write-Host "  Building MuninRelay..." -ForegroundColor Gray
-        dotnet build "$PSScriptRoot\MuninRelay\MuninRelay.csproj" -c $Configuration
+        Write-Host "  Building Munin.Relay..." -ForegroundColor Gray
+        dotnet build "$PSScriptRoot\Munin.Relay\Munin.Relay.csproj" -c $Configuration
     }
     default {
-        Write-Host "  Building entire solution (Munin.UI + MuninRelay)..." -ForegroundColor Gray
+        Write-Host "  Building entire solution (Munin.UI + Munin.Relay)..." -ForegroundColor Gray
         dotnet build "$PSScriptRoot\Munin.sln" -c $Configuration
     }
 }
@@ -30,7 +30,7 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "`nBuild successful!" -ForegroundColor Green
     
     if ($Project -eq "All" -or $Project -eq "Relay") {
-        Write-Host "  MuninRelay: $PSScriptRoot\MuninRelay\bin\$Configuration\net8.0\MuninRelay.exe" -ForegroundColor Yellow
+        Write-Host "  Munin.Relay: $PSScriptRoot\Munin.Relay\bin\$Configuration\net8.0\MuninRelay.exe" -ForegroundColor Yellow
     }
     if ($Project -eq "All" -or $Project -eq "Munin") {
         Write-Host "  Munin.UI: $PSScriptRoot\Munin.UI\bin\$Configuration\net8.0-windows\Munin.exe" -ForegroundColor Yellow

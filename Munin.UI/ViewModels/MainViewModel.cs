@@ -2417,6 +2417,27 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    private AgentManagerWindow? _agentManagerWindow;
+
+    /// <summary>
+    /// Opens the Agent Manager window for managing remote Munin agents.
+    /// </summary>
+    [RelayCommand]
+    private void ShowAgentManager()
+    {
+        if (_agentManagerWindow == null || !_agentManagerWindow.IsLoaded)
+        {
+            _agentManagerWindow = new AgentManagerWindow(_configService, 
+                new Munin.Core.Services.EncryptionService());
+            _agentManagerWindow.Owner = App.Current.MainWindow;
+            _agentManagerWindow.Show();
+        }
+        else
+        {
+            _agentManagerWindow.Activate();
+        }
+    }
+
     /// <summary>
     /// Toggles the user list visibility.
     /// </summary>

@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace MuninRelay;
+namespace Munin.Relay;
 
 /// <summary>
 /// Configuration for the MuninRelay service.

@@ -1260,4 +1260,122 @@ Perfekt for USB-minnepinne.</value>
   <data name="Settings_IdentDescription" xml:space="preserve">
     <value>Ident-serveren svarer på identitetsforespørsler fra IRC-servere. Port 113 kan kreve administratorrettigheter. La brukernavnet stå tomt for å bruke systembrukernavnet.</value>
   </data>
+  
+  <!-- Agent Manager -->
+  <data name="MainWindow_AgentManager" xml:space="preserve">
+    <value>Agent-håndtering</value>
+  </data>
+  <data name="AgentManager_Title" xml:space="preserve">
+    <value>Agent-håndtering</value>
+  </data>
+  <data name="AgentManager_Agents" xml:space="preserve">
+    <value>Agenter</value>
+  </data>
+  <data name="AgentManager_AddAgent" xml:space="preserve">
+    <value>Legg til agent</value>
+  </data>
+  <data name="AgentManager_Connect" xml:space="preserve">
+    <value>Koble til</value>
+  </data>
+  <data name="AgentManager_Disconnect" xml:space="preserve">
+    <value>Koble fra</value>
+  </data>
+  <data name="AgentManager_Remove" xml:space="preserve">
+    <value>Fjern</value>
+  </data>
+  <data name="AgentManager_Overview" xml:space="preserve">
+    <value>Oversikt</value>
+  </data>
+  <data name="AgentManager_Channels" xml:space="preserve">
+    <value>Kanaler</value>
+  </data>
+  <data name="AgentManager_Scripts" xml:space="preserve">
+    <value>Skript</value>
+  </data>
+  <data name="AgentManager_Users" xml:space="preserve">
+    <value>Brukere</value>
+  </data>
+  <data name="AgentManager_Logs" xml:space="preserve">
+    <value>Logger</value>
+  </data>
+  <data name="AgentManager_Status" xml:space="preserve">
+    <value>Agent-status</value>
+  </data>
+  <data name="AgentManager_IrcServers" xml:space="preserve">
+    <value>IRC-servere</value>
+  </data>
+  <data name="AgentManager_Uptime" xml:space="preserve">
+    <value>Oppetid</value>
+  </data>
+  <data name="AgentManager_SelectAgent" xml:space="preserve">
+    <value>Velg en agent fra listen for å se detaljer</value>
+  </data>
+  <data name="AgentManager_NotConnected" xml:space="preserve">
+    <value>Ikke koblet til noen agenter</value>
+  </data>
+  <data name="AgentManager_Connecting" xml:space="preserve">
+    <value>Kobler til {0}...</value>
+  </data>
+  <data name="AgentManager_Connected" xml:space="preserve">
+    <value>Koblet til {0}</value>
+  </data>
+  <data name="AgentManager_Disconnected" xml:space="preserve">
+    <value>Koblet fra {0}</value>
+  </data>
+  <data name="AgentManager_ConnectionFailed" xml:space="preserve">
+    <value>Kunne ikke koble til: {0}</value>
+  </data>
+  
+  <!-- Add Agent Dialog -->
+  <data name="AddAgentDialog_Title" xml:space="preserve">
+    <value>Legg til agent</value>
+  </data>
+  <data name="AddAgentDialog_Description" xml:space="preserve">
+    <value>Skriv inn tilkoblingsdetaljene for en ekstern Munin-agent. Du finner disse i agentens konfigurasjonsfil.</value>
+  </data>
+  <data name="AddAgentDialog_Name" xml:space="preserve">
+    <value>Agentnavn</value>
+  </data>
+  <data name="AddAgentDialog_Host" xml:space="preserve">
+    <value>Vert</value>
+  </data>
+  <data name="AddAgentDialog_HostHint" xml:space="preserve">
+    <value>Vertsnavn eller IP-adresse til agenten</value>
+  </data>
+  <data name="AddAgentDialog_Port" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="AddAgentDialog_UseTls" xml:space="preserve">
+    <value>Bruk TLS-kryptering</value>
+  </data>
+  <data name="AddAgentDialog_AuthToken" xml:space="preserve">
+    <value>Autentiseringstoken</value>
+  </data>
+  <data name="AddAgentDialog_PasteToken" xml:space="preserve">
+    <value>Lim inn fra utklippstavlen</value>
+  </data>
+  <data name="AddAgentDialog_AuthTokenHint" xml:space="preserve">
+    <value>Token generert av agenten for autentisering. Sjekk agentens konsollutdata eller konfigurasjon.</value>
+  </data>
+  <data name="AddAgentDialog_TestConnection" xml:space="preserve">
+    <value>Test tilkobling</value>
+  </data>
+  <data name="AddAgentDialog_SaveCredentials" xml:space="preserve">
+    <value>Lagre agent i konfigurasjonen</value>
+  </data>
+  <data name="AddAgentDialog_SaveCredentialsHint" xml:space="preserve">
+    <value>Legitimasjon lagres sikkert med kryptering</value>
+  </data>
+  <data name="AddAgentDialog_Cancel" xml:space="preserve">
+    <value>Avbryt</value>
+  </data>
+  <data name="AddAgentDialog_Add" xml:space="preserve">
+    <value>Legg til agent</value>
+  </data>
+  <data name="AgentManager_Edit" xml:space="preserve">
+    <value>Rediger</value>
+  </data>
+  <data name="EditAgentDialog_Title" xml:space="preserve">
+    <value>Rediger agent</value>
+  </data>
 </root>

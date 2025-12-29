@@ -1,0 +1,158 @@
+{
+    // ==============================================================
+    // Munin Agent Configuration
+    // ==============================================================
+    // IMPORTANT: Run 'muninagent encrypt' after editing to encrypt
+    // all sensitive values marked with [ENCRYPT].
+    // ==============================================================
+
+    // Unique identifier for this agent
+    "id": "agent-001",
+
+    // Agent display name
+    "name": "MyMuninAgent",
+
+    // Master password verification token (set during 'muninagent setup')
+    "verificationToken": {
+        "isEncrypted": false,
+        "value": ""
+    },
+
+    // ==============================================================
+    // Control Server Settings (for remote control from Munin UI)
+    // ==============================================================
+    "controlServer": {
+        "enabled": true,
+        "bindAddress": "0.0.0.0",
+        "port": 9443,
+        
+        // Path to TLS certificate (PFX format)
+        // Generate with: muninagent gencert
+        "certificatePath": "agent.pfx",
+        
+        // Certificate password [ENCRYPT]
+        "certificatePassword": {
+            "isEncrypted": false,
+            "value": "changeme"
+        },
+        
+        // Authentication token for remote control [ENCRYPT]
+        // Generate with: muninagent gentoken
+        "authToken": {
+            "isEncrypted": false,
+            "value": "GENERATE_NEW_TOKEN"
+        },
+        
+        // IP addresses allowed to connect (* = all)
+        "allowedIps": ["127.0.0.1", "192.168.1.*"]
+    },
+
+    // ==============================================================
+    // IRC Servers
+    // ==============================================================
+    "servers": [
+        {
+            "id": "libera",
+            "enabled": true,
+            "host": "irc.libera.chat",
+            "port": 6697,
+            "useTls": true,
+            "verifyTlsCertificate": true,
+            
+            // Nicknames to try (in order)
+            "nicknames": ["MuninBot", "MuninBot_", "MuninBot__"],
+            
+            // Ident/username
+            "username": "munin",
+            
+            // Real name
+            "realname": "Munin IRC Agent",
+            
+            // Server password [ENCRYPT] (leave empty if not needed)
+            "serverPassword": {
+                "isEncrypted": false,
+                "value": ""
+            },
+            
+            // SASL authentication
+            "saslUsername": "",
+            "saslPassword": {
+                "isEncrypted": false,
+                "value": ""
+            },
+            
+            // NickServ password [ENCRYPT] (legacy auth)
+            "nickservPassword": {
+                "isEncrypted": false,
+                "value": ""
+            },
+            
+            // Connection settings
+            "autoConnect": true,
+            "autoReconnect": true,
+            "reconnectDelaySeconds": 30,
+            "reconnectMaxRetries": 0,
+            
+            // Channels to join
+            "channels": [
+                {
+                    "name": "#munin",
+                    "autoJoin": true,
+                    "key": {
+                        "isEncrypted": false,
+                        "value": ""
+                    },
+                    "encryptionKey": {
+                        "isEncrypted": false,
+                        "value": ""
+                    }
+                }
+            ],
+            
+            // Perform commands on connect (executed in order)
+            "performCommands": [
+                // "PRIVMSG NickServ :IDENTIFY mypassword"
+            ]
+        }
+    ],
+
+    // ==============================================================
+    // Scripts Configuration
+    // ==============================================================
+    "scripts": {
+        "enabled": true,
+        "scriptsDirectory": "scripts",
+        "autoloadScripts": [
+            // "autoload.lua"
+        ]
+    },
+
+    // ==============================================================
+    // User Database Configuration
+    // ==============================================================
+    "userDatabase": {
+        "path": "users.db",
+        "encrypted": true
+    },
+
+    // ==============================================================
+    // Logging Configuration
+    // ==============================================================
+    "logging": {
+        "level": "Information",
+        "logDirectory": "logs",
+        "maxFileSizeMb": 10,
+        "retainedFileCount": 7,
+        "logIrcMessages": true,
+        "logToConsole": true
+    },
+
+    // ==============================================================
+    // Flood Protection
+    // ==============================================================
+    "floodProtection": {
+        "enabled": true,
+        "messagesPerSecond": 2.0,
+        "burstLimit": 5
+    }
+}

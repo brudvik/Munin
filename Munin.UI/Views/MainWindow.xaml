@@ -172,6 +172,12 @@
                             Style="{StaticResource IconButtonStyle}"
                             FontSize="16"
                             Margin="0,0,4,0"/>
+                    <Button Content="🤖" 
+                            ToolTip="{loc:Localize Key=MainWindow_AgentManager}"
+                            Command="{Binding ShowAgentManagerCommand}"
+                            Style="{StaticResource IconButtonStyle}"
+                            FontSize="16"
+                            Margin="0,0,4,0"/>
                     <Button Content="⚙" 
                             ToolTip="{loc:Localize Key=MainWindow_Settings}"
                             Command="{Binding ShowSettingsCommand}"

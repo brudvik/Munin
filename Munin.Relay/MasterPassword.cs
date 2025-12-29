@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace MuninRelay;
+namespace Munin.Relay;
 
 /// <summary>
 /// Provides master password protection for sensitive configuration data.

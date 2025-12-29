@@ -73,6 +73,15 @@
 - **Portable mode** - Run from USB drive
 - **Encrypted logs** - Secure log storage
 
+### Munin.Agent (Autonomous IRC Bot)
+- **Eggdrop-inspired** - Familiar user flags and management concepts
+- **24/7 operation** - Runs as Windows Service or Linux systemd
+- **Remote control** - TLS-secured control from Munin UI
+- **Encrypted config** - All sensitive data encrypted (AES-256-GCM)
+- **User database** - Eggdrop-style flags (n/m/o/v/f/a/g/j/k/b/d)
+- **Auto-reconnect** - Exponential backoff on disconnect
+- **Multi-server** - Connect to multiple IRC networks
+
 ### Scripting & Automation
 - **Lua scripting** - Powerful Lua scripts with full IRC API (MoonSharp engine)
 - **JSON triggers** - Simple pattern-based automation without coding
@@ -128,7 +137,7 @@ Munin/
 │   ├── Controls/             # Custom controls
 │   ├── Themes/               # Styling and themes
 │   └── Converters/           # XAML converters
-├── MuninRelay/               # VPN relay companion tool
+├── Munin.Relay/              # VPN relay companion tool
 │   ├── Program.cs            # Entry point and CLI
 │   ├── RelayConfiguration.cs # JSON config handling
 │   ├── RelayService.cs       # Background service

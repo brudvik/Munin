@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace MuninRelay;
+namespace Munin.Relay;
 
 /// <summary>
 /// Protocol for communication between Munin client and MuninRelay.

@@ -1,0 +1,77 @@
+{
+  "description": "Example agent triggers for channel automation",
+  "triggers": [
+    {
+      "name": "GreetNewUsers",
+      "on": "Join",
+      "channel": "#mychannel",
+      "action": "say",
+      "response": "Welcome to the channel, {nick}!"
+    },
+    {
+      "name": "PingPong",
+      "on": "ChannelMessage",
+      "match": "!ping",
+      "action": "say",
+      "response": "Pong! 🏓"
+    },
+    {
+      "name": "BotInfo",
+      "on": "ChannelMessage",
+      "match": "!bot",
+      "action": "say",
+      "response": "I'm MuninAgent, an IRC bot powered by Munin."
+    },
+    {
+      "name": "UptimeCommand",
+      "on": "ChannelMessage",
+      "match": "!uptime",
+      "action": "lua",
+      "luaCode": "local uptime = os.time() - agent.starttime; return string.format('Uptime: %d hours, %d minutes', uptime // 3600, (uptime % 3600) // 60)"
+    },
+    {
+      "name": "HelpCommand",
+      "on": "ChannelMessage",
+      "match": "!help",
+      "action": "say",
+      "response": "Available commands: !ping, !bot, !uptime, !help"
+    },
+    {
+      "name": "BadWordKick",
+      "on": "ChannelMessage",
+      "match": "badword",
+      "isRegex": false,
+      "action": "kick",
+      "response": "Watch your language!",
+      "cancel": true
+    },
+    {
+      "name": "URLLogger",
+      "on": "ChannelMessage",
+      "match": "https?://[\\S]+",
+      "isRegex": true,
+      "action": "log",
+      "logLevel": "info",
+      "logMessage": "URL shared by {nick} in {channel}: {text}"
+    },
+    {
+      "name": "OpRequest",
+      "on": "PrivateMessage",
+      "match": "^!op (#\\S+)$",
+      "isRegex": true,
+      "action": "mode",
+      "response": "{match1} +o {nick}",
+      "requireFlags": "o"
+    },
+    {
+      "name": "AntiFlood",
+      "on": "ChannelMessage",
+      "rateLimit": {
+        "count": 5,
+        "seconds": 10
+      },
+      "action": "kick",
+      "response": "Flooding detected"
+    }
+  ]
+}

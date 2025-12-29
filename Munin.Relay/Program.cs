@@ -7,7 +7,7 @@ using System.Security.Principal;
 using System.ServiceProcess;
 using System.Runtime.InteropServices;
 
-namespace MuninRelay;
+namespace Munin.Relay;
 
 /// <summary>
 /// MuninRelay - IRC Traffic Relay for VPN routing

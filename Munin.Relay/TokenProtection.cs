@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace MuninRelay;
+namespace Munin.Relay;
 
 /// <summary>
 /// Provides DPAPI-based protection for authentication tokens.

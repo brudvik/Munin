@@ -5,7 +5,7 @@ using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using Serilog;
 
-namespace MuninRelay;
+namespace Munin.Relay;
 
 /// <summary>
 /// Handles individual client connections and relays data to target IRC servers.

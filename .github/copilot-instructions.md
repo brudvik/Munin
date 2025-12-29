@@ -75,5 +75,7 @@ Munin/
 │   ├── Themes/           # XAML styles and themes
 │   ├── ViewModels/       # MVVM ViewModels
 │   └── Views/            # XAML views and windows
+├── Munin.Relay/          # VPN relay companion tool
+├── Munin.Agent/          # Standalone IRC bot/agent
 └── docs/                 # Additional documentation
 ```

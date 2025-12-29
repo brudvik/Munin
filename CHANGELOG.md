@@ -8,6 +8,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Munin.Agent**: New autonomous IRC bot agent inspired by Eggdrop
+  - Runs independently 24/7 as Windows Service or Linux systemd service
+  - TLS control server for remote management from Munin UI
+  - Eggdrop-style user flags (n=owner, m=master, o=op, v=voice, f=friend, etc.)
+  - Fully encrypted configuration - all passwords, tokens, and keys stored encrypted
+  - AES-256-GCM encryption with PBKDF2 key derivation (310k iterations)
+  - Challenge-response authentication with HMAC-SHA256
+  - Auto-reconnect with exponential backoff
+  - Multiple IRC server support with per-server configuration
+  - User database with hostmask matching
+  - CLI tools: `setup`, `encrypt`, `decrypt`, `gentoken`, `gencert`
+  - Binary protocol for efficient communication (MAGT v1)
+  - IP allowlist for control server access
+- **Agent Scripting System**:
+  - Lua scripting with MoonSharp engine and Eggdrop-compatible API
+  - Eggdrop-style binds: `bind("pub", "o", "!cmd", callback)` for pub/msg/join/part/kick/nick/mode/ctcp/raw events
+  - User flag checking in binds (e.g., "o" for ops only, "-" for anyone)
+  - IRC functions: `putserv`, `puthelp`, `putquick`, `putkick`, `putmsg`, `putnotice`
+  - User database API: `users.get()`, `users.match()`, `users.hasflags()`, `users.addflags()`
+  - JSON triggers for pattern-based automation without coding
+  - C# plugin system with hot-reload support
+  - Timer API inherited from ScriptContext
+- **Agent Botnet Linking**:
+  - Connect multiple agents together with encrypted P2P protocol
+  - Partyline chat between agents and admins (Eggdrop-style)
+  - User database synchronization across linked bots
+  - Distributed ops: coordinated op/kick/ban requests across agents
+  - Ban list synchronization
+  - Challenge-response authentication with shared secrets
+- **Agent Channel Protection**:
+  - Flood protection with configurable thresholds and actions
+  - Clone detection (multiple users from same host)
+  - Bad word filter with regex support and configurable actions (kick/ban/warn)
+  - Invite-only guard: auto-invite +f users to +i channels
+  - Mass-kick protection: detect and counter channel takeover attempts
+- **Agent Channel Statistics**:
+  - Track messages, joins, parts, kicks, topic changes
+  - Per-user stats: message count, words, URLs, questions, actions
+  - Hourly and daily activity tracking
+  - Top talkers list
+  - Stats persistence to JSON files
+- **Agent Manager UI**: New window in Munin UI to manage remote agents
+  - Connect to multiple agents simultaneously
+  - View agent status, channels, and logs
+  - Real-time log streaming
+  - Tabbed interface for Overview/Channels/Scripts/Users/Logs
 - **MuninRelay**: New standalone VPN relay tool for routing IRC traffic
   - Route IRC connections through VPN on another machine
   - SSL/TLS encryption between Munin client and relay

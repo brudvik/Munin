@@ -2,7 +2,7 @@ using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Serilog;
 
-namespace MuninRelay;
+namespace Munin.Relay;
 
 /// <summary>
 /// Service for verifying the public IP address and ensuring VPN is active.

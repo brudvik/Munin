@@ -325,6 +325,76 @@ public class ConfigurationService
     }
 
     #endregion
+
+    #region Agent Management
+
+    /// <summary>
+    /// Gets all saved agent configurations.
+    /// </summary>
+    /// <returns>List of saved agent configurations converted to AgentConnection objects.</returns>
+    public IEnumerable<object> GetSavedAgents()
+    {
+        // Returns SavedAgentConfiguration objects that can be converted by the caller
+        return _configuration.SavedAgents.ToList();
+    }
+
+    /// <summary>
+    /// Saves an agent connection to the configuration.
+    /// </summary>
+    /// <param name="agent">The agent to save (expects an object with Name, Host, Port, UseTls, AuthToken properties).</param>
+    public void SaveAgent(object agent)
+    {
+        // Use reflection to get properties since AgentConnection is in UI project
+        var type = agent.GetType();
+        var name = type.GetProperty("Name")?.GetValue(agent) as string ?? "";
+        var host = type.GetProperty("Host")?.GetValue(agent) as string ?? "";
+        var port = (int)(type.GetProperty("Port")?.GetValue(agent) ?? 5550);
+        var useTls = (bool)(type.GetProperty("UseTls")?.GetValue(agent) ?? true);
+        var authToken = type.GetProperty("AuthToken")?.GetValue(agent) as string;
+
+        // Check if agent already exists
+        var existing = _configuration.SavedAgents.FirstOrDefault(a => 
+            a.Host.Equals(host, StringComparison.OrdinalIgnoreCase) && a.Port == port);
+
+        if (existing != null)
+        {
+            existing.Name = name;
+            existing.UseTls = useTls;
+            existing.AuthToken = authToken;
+        }
+        else
+        {
+            _configuration.SavedAgents.Add(new SavedAgentConfiguration
+            {
+                Name = name,
+                Host = host,
+                Port = port,
+                UseTls = useTls,
+                AuthToken = authToken
+            });
+        }
+
+        _logger.Information("Saved agent: {Name} at {Host}:{Port}", name, host, port);
+    }
+
+    /// <summary>
+    /// Removes a saved agent from the configuration.
+    /// </summary>
+    /// <param name="host">The agent host.</param>
+    /// <param name="port">The agent port.</param>
+    public void RemoveAgent(string host, int port)
+    {
+        var agent = _configuration.SavedAgents.FirstOrDefault(a => 
+            a.Host.Equals(host, StringComparison.OrdinalIgnoreCase) && a.Port == port);
+
+        if (agent != null)
+        {
+            _configuration.SavedAgents.Remove(agent);
+            _logger.Information("Removed agent: {Host}:{Port}", host, port);
+        }
+    }
+
+    #endregion
 }
 
 /// <summary>
@@ -351,6 +421,32 @@ public class ClientConfiguration
     /// Gets or sets the FiSH encryption keys (serverId:target -> key).
     /// </summary>
     public Dictionary<string, string>? FishKeys { get; set; }
+
+    /// <summary>
+    /// Gets or sets the saved remote agent connections.
+    /// </summary>
+    public List<SavedAgentConfiguration> SavedAgents { get; set; } = new();
+}
+
+/// <summary>
+/// Configuration for a saved remote agent connection.
+/// </summary>
+public class SavedAgentConfiguration
+{
+    /// <summary>Display name for the agent.</summary>
+    public string Name { get; set; } = string.Empty;
+
+    /// <summary>Agent hostname or IP address.</summary>
+    public string Host { get; set; } = string.Empty;
+
+    /// <summary>Agent control port.</summary>
+    public int Port { get; set; } = 5550;
+
+    /// <summary>Whether to use TLS.</summary>
+    public bool UseTls { get; set; } = true;
+
+    /// <summary>Authentication token (encrypted).</summary>
+    public string? AuthToken { get; set; }
 }
 
 /// <summary>
