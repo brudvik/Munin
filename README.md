@@ -93,6 +93,10 @@
 - **Script console** - Test and debug scripts with live output
 - **Auto-load** - Scripts in `%APPDATA%\Munin\scripts\` load automatically on startup
 
+## 📚 Related Projects
+
+- **[Hugin](https://github.com/brudvik/hugin)**: IRC server companion project
+
 ## 🚀 Getting Started
 
 ### Prerequisites
