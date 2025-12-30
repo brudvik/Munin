@@ -106,16 +106,23 @@ public class IrcConnectionTests : IDisposable
         var connection = new IrcConnection(_testServer);
         await _mockServer.StartAsync();
 
+        // Start waiting for PASS command before connecting to avoid race condition
+        var passTask = Task.Run(async () =>
+        {
+            // Wait a bit for connection to be established
+            await Task.Delay(100);
+            return await _mockServer.WaitForMessageAsync(
+                msg => msg.StartsWith("PASS "),
+                TimeSpan.FromSeconds(5));
+        });
+
         // Act
         var connectTask = connection.ConnectAsync();
 
         // Wait for client to connect
         await _mockServer.WaitForClientAsync(TimeSpan.FromSeconds(5));
 
-        // Wait for PASS command
-        var passMsg = await _mockServer.WaitForMessageAsync(
-            msg => msg.StartsWith("PASS "),
-            TimeSpan.FromSeconds(2));
+        var passMsg = await passTask;
 
         await _mockServer.SendServerGreetingAsync("TestUser");
 

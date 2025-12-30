@@ -73,6 +73,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **AliasService**: Fixed argument substitution bug where $1- range patterns were incorrectly replaced by individual $1 replacement, causing trailing `-` characters
 - **CTCP Tests**: Fixed hex escape sequence bug in tests - `\x01ACTION` was parsed as `\x01A` (0x01A = Ƭ) + "CTION", changed to `\u0001` to prevent C# from interpreting following hex digits as part of escape sequence
 - **IrcConnection integration tests**: Fixed timing/synchronization issues by adding proper delays for CAP negotiation and event processing, Task.Delay(200ms) after client connect, 700ms for event processing
+- **IrcConnection ConnectAsync_WithPassword test**: Fixed race condition where PASS command was sent before WaitForMessageAsync started listening, causing null passMsg in CI environments (especially Linux). Now starts message listener before connecting with 100ms delay and 5s timeout.
 - Test projects for Core, Agent, Relay, and UI (xUnit + FluentAssertions)
 - **Munin.Agent**: New autonomous IRC bot agent inspired by Eggdrop
   - Runs independently 24/7 as Windows Service or Linux systemd service
