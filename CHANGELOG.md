@@ -76,6 +76,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **IrcConnection ConnectAsync_WithPassword test**: Fixed race condition where PASS command was sent before WaitForMessageAsync started listening, causing null passMsg in CI environments (especially Linux). Now starts message listener before connecting with 100ms delay and 5s timeout.
 - **DH1080 ECB mode test**: Fixed false positive in `CreateInitMessage_WithEcb_DoesNotContainCbc` test where Base64-encoded public key randomly contained "cbc" substring (e.g., `TcbcHTj1Lt`). Changed assertion from `.NotContain("cbc")` to `.NotStartWith("DH1080_INIT_cbc")` and `.NotEndWith(" CBC")` to only check for CBC mode indicators, not random Base64 content.
 - **IrcConnection ReceiveMessage_PrivateMessage test**: Fixed race condition with insufficient delay (200ms → 700ms) for message processing, added 200ms delay for CAP negotiation before server greeting.
+- **IrcConnection message sending/receiving tests**: Fixed buffer parsing race conditions in `SendRawAsync`, `SendMessageAsync`, `JoinChannelAsync`, and `DisconnectAsync` tests by replacing `ClearReceivedMessages()` + `ReceivedMessages.Should().Contain()` pattern with `WaitForMessageAsync()` which properly handles IRC message buffering and avoids message concatenation issues (e.g., `"PING :tesPING :test"`).
 - Test projects for Core, Agent, Relay, and UI (xUnit + FluentAssertions)
 - **Munin.Agent**: New autonomous IRC bot agent inspired by Eggdrop
   - Runs independently 24/7 as Windows Service or Linux systemd service

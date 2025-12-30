@@ -183,14 +183,16 @@ public class IrcConnectionTests : IDisposable
         await _mockServer.SendServerGreetingAsync("TestUser");
         await connectTask.WaitAsync(TimeSpan.FromSeconds(5));
 
-        // Act
+        // Act - use WaitForMessageAsync to avoid race conditions with message buffering
+        var quitTask = _mockServer.WaitForMessageAsync(
+            msg => msg.StartsWith("QUIT"),
+            TimeSpan.FromSeconds(5));
+            
         await connection.DisconnectAsync("Goodbye!");
 
-        // Wait for QUIT command
-        await Task.Delay(200);
+        var quitMsg = await quitTask;
 
         // Assert
-        var quitMsg = _mockServer.ReceivedMessages.FirstOrDefault(m => m.StartsWith("QUIT"));
         quitMsg.Should().Contain("Goodbye!");
         connection.IsConnected.Should().BeFalse();
     }
@@ -230,19 +232,24 @@ public class IrcConnectionTests : IDisposable
 
         var connectTask = connection.ConnectAsync();
         await _mockServer.WaitForClientAsync(TimeSpan.FromSeconds(5));
+        
+        // Give time for CAP negotiation
+        await Task.Delay(200);
+        
         await _mockServer.SendServerGreetingAsync("TestUser");
         await connectTask.WaitAsync(TimeSpan.FromSeconds(5));
 
-        _mockServer.ClearReceivedMessages();
-
-        // Act
+        // Act - use WaitForMessageAsync to avoid race conditions with message buffering
+        var messageTask = _mockServer.WaitForMessageAsync(
+            msg => msg == "PING :test",
+            TimeSpan.FromSeconds(5));
+            
         await connection.SendRawAsync("PING :test");
 
-        // Wait for message
-        await Task.Delay(100);
+        var receivedMsg = await messageTask;
 
         // Assert
-        _mockServer.ReceivedMessages.Should().Contain("PING :test");
+        receivedMsg.Should().Be("PING :test");
     }
 
     [Fact]
@@ -254,18 +261,24 @@ public class IrcConnectionTests : IDisposable
 
         var connectTask = connection.ConnectAsync();
         await _mockServer.WaitForClientAsync(TimeSpan.FromSeconds(5));
+        
+        // Give time for CAP negotiation
+        await Task.Delay(200);
+        
         await _mockServer.SendServerGreetingAsync("TestUser");
         await connectTask.WaitAsync(TimeSpan.FromSeconds(5));
 
-        _mockServer.ClearReceivedMessages();
-
-        // Act
+        // Act - use WaitForMessageAsync to avoid race conditions with message buffering
+        var messageTask = _mockServer.WaitForMessageAsync(
+            msg => msg == "PRIVMSG #test :Hello, world!",
+            TimeSpan.FromSeconds(5));
+            
         await connection.SendMessageAsync("#test", "Hello, world!");
 
-        await Task.Delay(100);
+        var receivedMsg = await messageTask;
 
         // Assert
-        _mockServer.ReceivedMessages.Should().Contain("PRIVMSG #test :Hello, world!");
+        receivedMsg.Should().Be("PRIVMSG #test :Hello, world!");
     }
 
     [Fact]
@@ -277,18 +290,24 @@ public class IrcConnectionTests : IDisposable
 
         var connectTask = connection.ConnectAsync();
         await _mockServer.WaitForClientAsync(TimeSpan.FromSeconds(5));
+        
+        // Give time for CAP negotiation
+        await Task.Delay(200);
+        
         await _mockServer.SendServerGreetingAsync("TestUser");
         await connectTask.WaitAsync(TimeSpan.FromSeconds(5));
 
-        _mockServer.ClearReceivedMessages();
-
-        // Act
+        // Act - use WaitForMessageAsync to avoid race conditions with message buffering
+        var messageTask = _mockServer.WaitForMessageAsync(
+            msg => msg == "JOIN #testchannel",
+            TimeSpan.FromSeconds(5));
+            
         await connection.JoinChannelAsync("#testchannel");
 
-        await Task.Delay(100);
+        var receivedMsg = await messageTask;
 
         // Assert
-        _mockServer.ReceivedMessages.Should().Contain("JOIN #testchannel");
+        receivedMsg.Should().Be("JOIN #testchannel");
     }
 
     [Fact]
@@ -300,18 +319,24 @@ public class IrcConnectionTests : IDisposable
 
         var connectTask = connection.ConnectAsync();
         await _mockServer.WaitForClientAsync(TimeSpan.FromSeconds(5));
+        
+        // Give time for CAP negotiation
+        await Task.Delay(200);
+        
         await _mockServer.SendServerGreetingAsync("TestUser");
         await connectTask.WaitAsync(TimeSpan.FromSeconds(5));
 
-        _mockServer.ClearReceivedMessages();
-
-        // Act
+        // Act - use WaitForMessageAsync to avoid race conditions with message buffering
+        var messageTask = _mockServer.WaitForMessageAsync(
+            msg => msg == "JOIN #secret password123",
+            TimeSpan.FromSeconds(5));
+            
         await connection.JoinChannelAsync("#secret", "password123");
 
-        await Task.Delay(100);
+        var receivedMsg = await messageTask;
 
         // Assert
-        _mockServer.ReceivedMessages.Should().Contain("JOIN #secret password123");
+        receivedMsg.Should().Be("JOIN #secret password123");
     }
 
     #endregion
