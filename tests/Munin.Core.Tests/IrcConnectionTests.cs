@@ -373,12 +373,16 @@ public class IrcConnectionTests : IDisposable
         await _mockServer.StartAsync();
         var connectTask = connection.ConnectAsync();
         await _mockServer.WaitForClientAsync(TimeSpan.FromSeconds(5));
+        
+        // Give time for CAP negotiation
+        await Task.Delay(200);
+        
         await _mockServer.SendServerGreetingAsync("TestUser");
         await connectTask.WaitAsync(TimeSpan.FromSeconds(5));
 
         // Act
         await _mockServer.SendAsync(":bob!user@host PRIVMSG TestUser :Private message");
-        await Task.Delay(200);
+        await Task.Delay(700); // Give time for message processing
 
         // Assert
         receivedMessage.Should().Be("Private message");

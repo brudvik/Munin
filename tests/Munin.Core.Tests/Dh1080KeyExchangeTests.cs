@@ -99,9 +99,11 @@ public class Dh1080KeyExchangeTests
         
         var message = dh.CreateInitMessage(useCbc: false);
         
+        // Should start with DH1080_INIT (not DH1080_INIT_cbc)
         message.Should().StartWith("DH1080_INIT ");
-        message.Should().NotContain("cbc");
-        message.Should().NotContain("CBC");
+        message.Should().NotStartWith("DH1080_INIT_cbc");
+        // Should not end with CBC suffix (FiSH-irssi format)
+        message.Should().NotEndWith(" CBC");
     }
 
     [Fact]

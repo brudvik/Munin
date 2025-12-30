@@ -74,6 +74,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CTCP Tests**: Fixed hex escape sequence bug in tests - `\x01ACTION` was parsed as `\x01A` (0x01A = Ƭ) + "CTION", changed to `\u0001` to prevent C# from interpreting following hex digits as part of escape sequence
 - **IrcConnection integration tests**: Fixed timing/synchronization issues by adding proper delays for CAP negotiation and event processing, Task.Delay(200ms) after client connect, 700ms for event processing
 - **IrcConnection ConnectAsync_WithPassword test**: Fixed race condition where PASS command was sent before WaitForMessageAsync started listening, causing null passMsg in CI environments (especially Linux). Now starts message listener before connecting with 100ms delay and 5s timeout.
+- **DH1080 ECB mode test**: Fixed false positive in `CreateInitMessage_WithEcb_DoesNotContainCbc` test where Base64-encoded public key randomly contained "cbc" substring (e.g., `TcbcHTj1Lt`). Changed assertion from `.NotContain("cbc")` to `.NotStartWith("DH1080_INIT_cbc")` and `.NotEndWith(" CBC")` to only check for CBC mode indicators, not random Base64 content.
+- **IrcConnection ReceiveMessage_PrivateMessage test**: Fixed race condition with insufficient delay (200ms → 700ms) for message processing, added 200ms delay for CAP negotiation before server greeting.
 - Test projects for Core, Agent, Relay, and UI (xUnit + FluentAssertions)
 - **Munin.Agent**: New autonomous IRC bot agent inspired by Eggdrop
   - Runs independently 24/7 as Windows Service or Linux systemd service
