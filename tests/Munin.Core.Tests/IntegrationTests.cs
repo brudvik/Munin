@@ -36,7 +36,7 @@ public class IntegrationTests : IDisposable
     #region End-to-End Encryption Tests
 
     [Fact]
-    public void EndToEndEncryption_FullWorkflow_WithPasswordChange()
+    public async Task EndToEndEncryption_PasswordChange_MigratesAllFiles()
     {
         // Setup: Create storage and enable encryption
         var storage = new SecureStorageService(_testBasePath);
@@ -44,7 +44,7 @@ public class IntegrationTests : IDisposable
         var newPassword = "NewPass456";
 
         // Step 1: Enable encryption and save data
-        storage.EnableEncryptionAsync(initialPassword).Wait();
+        await storage.EnableEncryptionAsync(initialPassword);
         storage.WriteTextSync("test.txt", "Secret data");
         storage.WriteTextSync("nested/file.txt", "More secrets");
 
@@ -58,7 +58,7 @@ public class IntegrationTests : IDisposable
         storage.Unlock(initialPassword).Should().BeTrue();
 
         // Step 3: Change password
-        storage.ChangePasswordAsync(initialPassword, newPassword).Wait();
+        await storage.ChangePasswordAsync(initialPassword, newPassword);
 
         // Step 4: Verify old password no longer works
         storage.Lock();
@@ -71,13 +71,13 @@ public class IntegrationTests : IDisposable
     }
 
     [Fact]
-    public void EndToEndEncryption_MultipleFiles_PersistsAcrossInstances()
+    public async Task EndToEndEncryption_MultipleStorageInstances_ShareSameMasterKey()
     {
         var password = "TestPass123";
 
         // Instance 1: Create and encrypt
         var storage1 = new SecureStorageService(_testBasePath);
-        storage1.EnableEncryptionAsync(password).Wait();
+        await storage1.EnableEncryptionAsync(password);
         storage1.WriteTextSync("file1.txt", "Data 1");
         storage1.WriteTextSync("file2.txt", "Data 2");
         storage1.WriteTextSync("dir/file3.txt", "Data 3");
@@ -93,13 +93,13 @@ public class IntegrationTests : IDisposable
     }
 
     [Fact]
-    public void EndToEndEncryption_DisableEncryption_DecryptsAllFiles()
+    public async Task EndToEndEncryption_DisableEncryption_DecryptsAllFiles()
     {
         var password = "TestPass123";
         var storage = new SecureStorageService(_testBasePath);
 
         // Enable encryption and write files
-        storage.EnableEncryptionAsync(password).Wait();
+        await storage.EnableEncryptionAsync(password);
         storage.WriteTextSync("file1.txt", "Content 1");
         storage.WriteTextSync("file2.txt", "Content 2");
 
@@ -108,7 +108,7 @@ public class IntegrationTests : IDisposable
         EncryptionService.IsEncrypted(bytes1).Should().BeTrue();
 
         // Disable encryption
-        storage.DisableEncryptionAsync(password).Wait();
+        await storage.DisableEncryptionAsync(password);
 
         // Verify files are now plaintext
         var bytes2 = File.ReadAllBytes(storage.GetFullPath("file1.txt"));
@@ -413,13 +413,13 @@ public class IntegrationTests : IDisposable
     #region Configuration Persistence Tests
 
     [Fact]
-    public void ConfigurationPersistence_SaveLoadWithEncryption()
+    public async Task ConfigurationPersistence_SaveLoadWithEncryption()
     {
         var storage = new SecureStorageService(_testBasePath);
         var password = "ConfigPass123";
         
         // Enable encryption
-        storage.EnableEncryptionAsync(password).Wait();
+        await storage.EnableEncryptionAsync(password);
         
         // Create configuration
         var config = new ClientConfiguration
@@ -449,12 +449,12 @@ public class IntegrationTests : IDisposable
     }
 
     [Fact]
-    public void ConfigurationPersistence_MultipleConfigs_IndependentFiles()
+    public async Task ConfigurationPersistence_MultipleConfigs_IndependentFiles()
     {
         var storage = new SecureStorageService(_testBasePath);
         var password = "Pass123";
         
-        storage.EnableEncryptionAsync(password).Wait();
+        await storage.EnableEncryptionAsync(password);
         
         // Save multiple configurations
         storage.WriteTextSync("servers.json", JsonSerializer.Serialize(new { Server = "irc.example.com" }));

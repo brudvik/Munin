@@ -10,9 +10,34 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-
+  build-linux:
+    name: Build and Test (Linux - Core/Agent/Relay)
     runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build Core
+      run: dotnet build Munin.Core/Munin.Core.csproj --no-restore
+    - name: Build Agent
+      run: dotnet build Munin.Agent/Munin.Agent.csproj --no-restore
+    - name: Build Relay
+      run: dotnet build Munin.Relay/Munin.Relay.csproj --no-restore
+    - name: Test Core
+      run: dotnet test tests/Munin.Core.Tests/Munin.Core.Tests.csproj --no-build --verbosity normal
+    - name: Test Agent
+      run: dotnet test tests/Munin.Agent.Tests/Munin.Agent.Tests.csproj --no-build --verbosity normal
+    - name: Test Relay
+      run: dotnet test tests/Munin.Relay.Tests/Munin.Relay.Tests.csproj --no-build --verbosity normal
+
+  build-windows:
+    name: Build and Test (Windows - Full Suite)
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v4

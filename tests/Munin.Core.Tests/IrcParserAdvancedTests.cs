@@ -525,7 +525,7 @@ public class IrcParserAdvancedTests
     [Fact]
     public void IsCTCP_RecognizesCTCPMessage()
     {
-        var message = "\x01VERSION\x01";
+        var message = "\u0001VERSION\u0001";
 
         IrcMessageParser.IsCTCP(message).Should().BeTrue();
     }
@@ -541,7 +541,7 @@ public class IrcParserAdvancedTests
     [Fact]
     public void ParseCTCP_ParsesVersionRequest()
     {
-        var message = "\x01VERSION\x01";
+        var message = "\u0001VERSION\u0001";
 
         var (command, parameter) = IrcMessageParser.ParseCTCP(message);
 
@@ -552,7 +552,7 @@ public class IrcParserAdvancedTests
     [Fact]
     public void ParseCTCP_ParsesPingWithParameter()
     {
-        var message = "\x01PING 1234567890\x01";
+        var message = "\u0001PING 1234567890\u0001";
 
         var (command, parameter) = IrcMessageParser.ParseCTCP(message);
 
@@ -563,7 +563,7 @@ public class IrcParserAdvancedTests
     [Fact]
     public void ParseCTCP_ParsesAction()
     {
-        var message = "\x01ACTION does something\x01";
+        var message = "\u0001ACTION does something\u0001";
 
         var (command, parameter) = IrcMessageParser.ParseCTCP(message);
 
@@ -574,7 +574,7 @@ public class IrcParserAdvancedTests
     [Fact]
     public void ParseCTCP_HandlesMultipleSpaces()
     {
-        var message = "\x01COMMAND   multiple   spaces\x01";
+        var message = "\u0001COMMAND   multiple   spaces\u0001";
 
         var (command, parameter) = IrcMessageParser.ParseCTCP(message);
 

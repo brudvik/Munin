@@ -134,13 +134,7 @@ public class AliasService
     {
         var result = expansion;
 
-        // Replace $1, $2, etc. with arguments
-        for (int i = 0; i < args.Length; i++)
-        {
-            result = result.Replace($"${i + 1}", args[i]);
-        }
-
-        // Replace $n- with argument n and all following
+        // First, replace $n- range patterns (must be done before single argument replacement)
         for (int i = 1; i <= 9; i++)
         {
             var rangePattern = $"${i}-";
@@ -151,6 +145,12 @@ public class AliasService
                     : "";
                 result = result.Replace(rangePattern, remaining);
             }
+        }
+
+        // Then replace $1, $2, etc. with individual arguments
+        for (int i = 0; i < args.Length; i++)
+        {
+            result = result.Replace($"${i + 1}", args[i]);
         }
 
         // Replace special variables

@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- **Comprehensive test suite for Munin.Core & Munin.UI** (709 tests, ~701 passing)
+- **Comprehensive test suite for Munin.Core & Munin.UI** (802 tests, 100% passing)
   - **Phase 1 - Security & Core Logic** (144 tests)
     - EncryptionService tests (35 tests): AES-256-GCM encryption, password verification, key derivation
     - FishCryptService tests (38 tests): FiSH encryption/decryption, mIRC/HexChat compatibility, Base64 encoding
@@ -51,6 +51,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - ISupportTests (34 tests): ISUPPORT (005) token parsing, server limits (NICKLEN/CHANNELLEN/TOPICLEN), PREFIX/CHANMODES parsing, CHANLIMIT/TARGMAX/MAXLIST, EXCEPTS/INVEX/STATUSMSG, case mapping (rfc1459/strict-rfc1459/ascii), channel/prefix validation
     - ParsedIrcMessageTests (25 tests): IRC message structure, prefix/nick/user/host extraction, IRCv3 tags (@time/@account/@msgid), GetTimestamp() with ISO 8601, GetParameter() indexing, server vs user prefixes
     - ChannelListModeEntryTests (17 tests): Ban/exception/invite list entries, SetBy/SetAt timestamp tracking, mask formatting, ChannelListModeType enum
+  - **Phase 11 - Services Testing** (67 tests)
+    - IdentServerTests (25 tests): RFC 1413 ident server implementation, Start/Stop, RegisterConnection/UnregisterConnection, port configuration, OS types (WIN32/UNIX/OTHER), hide user mode, timeout handling, QueryReceived event
+    - AliasServiceTests (32 tests): Command alias management, default aliases (ns/cs/j/kb), argument substitution ($1/$2/$1-), special variables ($channel/$me), multiple commands with semicolons, case insensitivity, built-in command detection
+    - CertificatePinningServiceTests (18 tests): SSL certificate pinning, ValidateCertificate (new/valid/changed), UpdatePin/RemovePin/GetPin, CertificateChanged/NewCertificateSeen events, SHA-256 fingerprints, metadata storage
+
+### Fixed
+- **AliasService**: Fixed argument substitution bug where $1- range patterns were incorrectly replaced by individual $1 replacement, causing trailing `-` characters
+- **CTCP Tests**: Fixed hex escape sequence bug in tests - `\x01ACTION` was parsed as `\x01A` (0x01A = Ƭ) + "CTION", changed to `\u0001` to prevent C# from interpreting following hex digits as part of escape sequence
 - Test projects for Core, Agent, Relay, and UI (xUnit + FluentAssertions)
 - **Munin.Agent**: New autonomous IRC bot agent inspired by Eggdrop
   - Runs independently 24/7 as Windows Service or Linux systemd service
