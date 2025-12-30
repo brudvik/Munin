@@ -1,21 +1,18 @@
 <div align="center">
-
-<img src="resources/munin-irc-client.png" alt="Munin IRC Client" width="128" height="128">
-
-# Munin
-
-**Munin** is a modern, secure IRC client for Windows, built with .NET 8 and WPF.
-
-*Named after Odin's raven who flies across the world to bring back news and information.*
-
+  <img src="resources/munin-irc-client.png" alt="Munin IRC Client" width="128" height="128">
+  <h1>Munin IRC Client</h1>
+  <p>
+    <a href="https://github.com/brudvik/munin/actions"><img src="https://img.shields.io/github/actions/workflow/status/brudvik/munin/dotnet.yml?branch=main" alt="Build Status"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
+    <a href="https://dotnet.microsoft.com/"><img src="https://img.shields.io/badge/.NET-8.0-purple.svg" alt=".NET"></a>
+  </p>
+  <p>A modern, secure IRC client for Windows, built with .NET 8 and WPF.</p>
 </div>
 
-![Munin IRC Client](https://raw.githubusercontent.com/brudvik/Munin/refs/heads/main/munin.png)
+*Named after Muninn, Odin’s raven who flies across the world to bring back news and information.*
+---
 
-<a href="https://github.com/brudvik/munin/actions"><img src="https://img.shields.io/github/actions/workflow/status/brudvik/munin/dotnet.yml?branch=main" alt="Build Status"></a>
-![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4)
-![Windows](https://img.shields.io/badge/Platform-Windows-0078D6)
-![License](https://img.shields.io/badge/License-MIT-green)
+![Munin IRC Client](https://raw.githubusercontent.com/brudvik/Munin/refs/heads/main/munin.png)
 
 ## ✨ Features
 
