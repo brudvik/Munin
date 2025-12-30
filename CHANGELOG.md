@@ -8,6 +8,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Comprehensive test suite for Munin.Core & Munin.UI** (709 tests, ~701 passing)
+  - **Phase 1 - Security & Core Logic** (144 tests)
+    - EncryptionService tests (35 tests): AES-256-GCM encryption, password verification, key derivation
+    - FishCryptService tests (38 tests): FiSH encryption/decryption, mIRC/HexChat compatibility, Base64 encoding
+    - SecureStorageService tests (33 tests): Encrypted file storage, password changes, lock/unlock functionality
+    - IrcMessageParser tests (37 tests): IRC protocol parsing, IRCv3 tags, CTCP messages, malformed input handling
+  - **Phase 2 - Protocol & Network** (50 tests)
+    - ScramAuthenticator tests (23 tests): SASL SCRAM-SHA-256 authentication, nonce generation, server message handling
+    - Dh1080KeyExchange tests (28 tests): DH1080 key exchange, public key generation, shared secret computation
+  - **Phase 3 - Integration Testing** (13 tests)
+    - End-to-end encryption workflows across multiple files and sessions
+    - FiSH + DH1080 key exchange integration with CBC/ECB modes
+    - Complete SCRAM authentication handshake simulation
+    - IRC message flow with encryption/decryption
+    - Configuration persistence with encrypted storage
+  - **Phase 4 - Critical Infrastructure** (96 tests)
+    - CapabilityManagerTests (30 tests): IRCv3 CAP negotiation, multi-line responses, CAP NEW/DEL, SASL methods
+    - IrcChannelTests (20 tests): Channel state, topic handling, user tracking, mode management
+    - IrcUserTests (27 tests): User identity, modes, prefix ordering, away tracking, sort order
+    - FloodProtectorTests (19 tests): Token bucket algorithm, rate limiting, queue management, burst handling
+  - **Phase 5 - Security & Privacy Services** (78 tests)
+    - PrivacyServiceTests (30 tests): Filename anonymization with HMAC-SHA256, hash consistency, mapping persistence
+    - SecurityAuditServiceTests (27 tests): Audit logging, rate limiting (5 max attempts), exponential backoff lockout
+    - SecureDeleteServiceTests (21 tests): Secure file deletion with cryptographic overwriting, directory recursion
+  - **Phase 6 - User Experience & Configuration** (40 tests)
+    - ConfigurationServiceTests (20 tests): Server/channel management, persistence, encryption state handling
+    - NotificationServiceTests (20 tests): Toast notifications, sound alerts, do-not-disturb mode
+  - **Phase 7 - Advanced Features** (79 tests)
+    - ScriptManagerTests (25 tests): Lua script loading/unloading, execution, event dispatching, error handling, hot-reload
+    - NotifyListServiceTests (29 tests): Friend list tracking, online/offline events, ISON polling, per-server lists
+    - AutoPerformServiceTests (25 tests): Global/server/channel commands, connection automation, persistence
+  - **Phase 8 - Core Models** (68 tests)
+    - IrcServerTests (27 tests): Server configuration, connection state, SSL/SASL/proxy settings, bouncer support, relay routing
+    - IrcBatchTests (23 tests): IRCv3 batch processing, chathistory/netjoin/netsplit batches, nested batches, message ordering
+    - WhoisInfoTests (18 tests): WHOIS data storage, idle time formatting, channel lists, account/operator status
+  - **Phase 9 - Data Models** (65 tests)
+    - ChannelListAndModeTests (30 tests): Channel LIST entries, mode state management, simple/parameter modes, mode string formatting
+    - WhoInfoTests (25 tests): WHO reply parsing, user flags (away/oper/op/voice), account info, hop count tracking
+    - ServerGroupTests (10 tests): Server grouping/organization, sort order, collapse state, icon management
+  - **Phase 10 - Protocol Models & Configuration** (76 tests)
+    - ISupportTests (34 tests): ISUPPORT (005) token parsing, server limits (NICKLEN/CHANNELLEN/TOPICLEN), PREFIX/CHANMODES parsing, CHANLIMIT/TARGMAX/MAXLIST, EXCEPTS/INVEX/STATUSMSG, case mapping (rfc1459/strict-rfc1459/ascii), channel/prefix validation
+    - ParsedIrcMessageTests (25 tests): IRC message structure, prefix/nick/user/host extraction, IRCv3 tags (@time/@account/@msgid), GetTimestamp() with ISO 8601, GetParameter() indexing, server vs user prefixes
+    - ChannelListModeEntryTests (17 tests): Ban/exception/invite list entries, SetBy/SetAt timestamp tracking, mask formatting, ChannelListModeType enum
+- Test projects for Core, Agent, Relay, and UI (xUnit + FluentAssertions)
 - **Munin.Agent**: New autonomous IRC bot agent inspired by Eggdrop
   - Runs independently 24/7 as Windows Service or Linux systemd service
   - TLS control server for remote management from Munin UI

@@ -28,6 +28,7 @@
 - Document new configuration options
 - Update screenshots if UI changes significantly
 - Maintain accurate build/run instructions
+- **Update the Testing section** when test coverage changes significantly
 
 ## Architecture Guidelines
 
@@ -52,6 +53,49 @@
 - For Content/Text: `Content="{loc:Localize Key=ButtonText}"`
 - String keys should follow pattern: `ViewName_ElementDescription` (e.g., `MainWindow_LeaveChannel`)
 - Always add both English and Norwegian translations when adding new strings
+
+## Testing Requirements
+
+### All New Functionality Must Have Tests
+- **This is critical** - every new feature, service, model, or significant logic change MUST include corresponding unit tests
+- Tests are not optional - they are a required part of the implementation
+- Pull requests without tests for new functionality will not be accepted
+
+### Test Coverage Guidelines
+- **Services**: Test all public methods, error handling, and edge cases
+- **Models**: Test property setters/getters, validation, and business logic
+- **Protocol Parsing**: Test valid input, malformed input, edge cases, and error conditions
+- **Encryption/Security**: Test correctness, key handling, and failure scenarios
+- **UI ViewModels**: Test commands, property changes, and state management
+
+### Test Organization
+- Place tests in corresponding test projects:
+  - `Munin.Core.Tests` for Core logic
+  - `Munin.UI.Tests` for UI components
+  - `Munin.Agent.Tests` for Agent functionality
+  - `Munin.Relay.Tests` for Relay functionality
+- Name test classes with `Tests` suffix (e.g., `EncryptionServiceTests`)
+- Group related tests using descriptive test method names
+- Use `[Fact]` for simple tests, `[Theory]` for parameterized tests
+
+### Test Quality Standards
+- Use **FluentAssertions** for readable assertions
+- Follow Arrange-Act-Assert pattern
+- Test one concept per test method
+- Use descriptive test names that explain what is being tested
+- Include XML documentation comments explaining complex test scenarios
+- Mock external dependencies appropriately
+
+### Running Tests
+- Run all tests before committing: `dotnet test`
+- Run specific test file: `dotnet test --filter "FullyQualifiedName~ClassName"`
+- All tests must pass before merging
+- Maintain test pass rate above 98%
+
+### Test Documentation
+- Update CHANGELOG.md when adding significant test coverage
+- Update README.md Testing section when test count or structure changes significantly
+- Document known test failures or flaky tests in ISSUES.md
 
 ## Testing Checklist
 Before committing changes:

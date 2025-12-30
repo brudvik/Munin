@@ -1,8 +1,14 @@
+<div align="center">
+
+<img src="munin-irc-client.png" alt="Munin IRC Client" />
+
 # Munin
 
 **Munin** is a modern, secure IRC client for Windows, built with .NET 8 and WPF.
 
 *Named after Odin's raven who flies across the world to bring back news and information.*
+
+</div>
 
 ![Munin IRC Client](https://raw.githubusercontent.com/brudvik/Munin/refs/heads/main/munin.png)
 
@@ -608,6 +614,104 @@ public class MyPlugin : IPlugin
 - **Serilog** - Logging
 - **CommunityToolkit.Mvvm** - MVVM framework
 
+## 🧪 Testing
+
+Munin has a comprehensive test suite to ensure reliability and correctness. All new features and bug fixes must include corresponding tests.
+
+### Test Coverage
+
+The project currently has **709 tests** (~701 passing, 98.9% pass rate) covering:
+
+- **Phase 1 - Security & Core Logic** (144 tests)
+  - EncryptionService, FishCryptService, SecureStorageService
+  - IrcMessageParser with IRCv3 tags and CTCP
+  
+- **Phase 2 - Protocol & Network** (50 tests)
+  - SASL SCRAM-SHA-256 authentication
+  - DH1080 key exchange for FiSH encryption
+
+- **Phase 3 - Integration Testing** (13 tests)
+  - End-to-end encryption workflows
+  - Complete authentication handshakes
+
+- **Phase 4 - Critical Infrastructure** (96 tests)
+  - IRCv3 capability negotiation
+  - Channel and user state management
+  - Flood protection (token bucket algorithm)
+
+- **Phase 5 - Security & Privacy** (78 tests)
+  - Filename anonymization (HMAC-SHA256)
+  - Security audit logging with rate limiting
+  - Secure file deletion with cryptographic overwriting
+
+- **Phase 6 - Configuration & UX** (40 tests)
+  - Server/channel configuration persistence
+  - Toast notifications and sound alerts
+
+- **Phase 7 - Advanced Features** (79 tests)
+  - Lua script engine (MoonSharp)
+  - Friend list tracking (ISON polling)
+  - Auto-perform command automation
+
+- **Phase 8 - Core Models** (68 tests)
+  - Server configuration with SSL/SASL/proxy
+  - IRCv3 batch processing
+  - WHOIS data management
+
+- **Phase 9 - Data Models** (65 tests)
+  - Channel LIST entries and mode state
+  - WHO reply parsing
+  - Server grouping/organization
+
+- **Phase 10 - Protocol Models** (76 tests)
+  - ISUPPORT (005) token parsing
+  - IRC message structure with IRCv3 tags
+  - Ban/exception/invite list entries
+
+### Running Tests
+
+Run all tests:
+```bash
+dotnet test
+```
+
+Run tests for a specific project:
+```bash
+dotnet test tests/Munin.Core.Tests
+dotnet test tests/Munin.UI.Tests
+dotnet test tests/Munin.Agent.Tests
+dotnet test tests/Munin.Relay.Tests
+```
+
+Run specific test class:
+```bash
+dotnet test --filter "FullyQualifiedName~EncryptionServiceTests"
+```
+
+### Test Framework
+
+- **xUnit 2.6.6** - Test runner
+- **FluentAssertions 6.12.0** - Expressive assertions
+- **Moq** - Mocking framework (where needed)
+
+### Known Issues
+
+See [ISSUES.md](ISSUES.md) for documented test failures and known bugs.
+
+- **DH1080KeyExchange**: ~27% flaky failure rate in key exchange tests (under investigation)
+
+### Contributing Tests
+
+When contributing new features:
+
+1. **Write tests first** - Follow TDD when possible
+2. **Test all paths** - Cover success, failure, and edge cases
+3. **Use descriptive names** - Test names should explain what is being tested
+4. **Follow Arrange-Act-Assert** - Structure tests clearly
+5. **Update documentation** - Document test coverage in CHANGELOG.md
+
+See [.github/copilot-instructions.md](.github/copilot-instructions.md) for detailed testing guidelines.
+
 ## ⌨️ Keyboard Shortcuts
 
 | Shortcut | Action |
@@ -637,3 +741,9 @@ Contributions are welcome!
 ## 📧 Contact
 
 Create an issue for questions or bug reports.
+
+---
+
+## 📚 Additional Documentation
+
+- [ISSUES.md](ISSUES.md) - Known issues and bugs requiring investigation

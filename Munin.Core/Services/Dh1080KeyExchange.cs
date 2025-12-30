@@ -74,12 +74,22 @@ public class Dh1080KeyExchange
         lock (_lock)
         {
             // Generate random private key (1080 bits)
-            var privateBytes = new byte[135]; // 1080 bits
-            RandomNumberGenerator.Fill(privateBytes);
-            _privateKey = new BigInteger(privateBytes, isUnsigned: true);
+            // Ensure it's in valid range [2, p-2]
+            do
+            {
+                var privateBytes = new byte[135]; // 1080 bits
+                RandomNumberGenerator.Fill(privateBytes);
+                _privateKey = new BigInteger(privateBytes, isUnsigned: true);
+            } while (_privateKey >= DhPrime || _privateKey <= 1);
 
             // Compute public key: g^private mod p
             _publicKey = BigInteger.ModPow(Generator, _privateKey.Value, DhPrime);
+
+            // Validate public key is in valid range
+            if (_publicKey <= 1 || _publicKey >= DhPrime)
+            {
+                throw new InvalidOperationException($"Generated invalid public key: {_publicKey}");
+            }
 
             return EncodePublicKey(_publicKey.Value);
         }
@@ -103,18 +113,41 @@ public class Dh1080KeyExchange
             {
                 var theirPublicKey = DecodePublicKey(theirPublicKeyBase64);
                 
+                // Validate public key (must be in range [2, p-1])
+                if (theirPublicKey <= 1 || theirPublicKey >= DhPrime)
+                {
+                    Log.Warning("Received invalid DH1080 public key (out of range): {Key}", theirPublicKeyBase64);
+                    return null;
+                }
+                
                 // Compute shared secret: their_public^our_private mod p
                 var sharedSecret = BigInteger.ModPow(theirPublicKey, _privateKey.Value, DhPrime);
 
-                // Convert to bytes (big-endian, unsigned) - pad to 135 bytes
+                // Validate shared secret is not zero or one
+                if (sharedSecret <= 1)
+                {
+                    Log.Warning("Computed invalid DH1080 shared secret (too small)");
+                    return null;
+                }
+
+                // Convert to bytes (big-endian, unsigned) - pad/trim to 135 bytes
                 var secretBytes = sharedSecret.ToByteArray(isUnsigned: true, isBigEndian: true);
                 
-                // Pad to 135 bytes if shorter (DH_size)
-                if (secretBytes.Length < 135)
+                // Ensure exactly 135 bytes (pad if shorter, trim if longer)
+                if (secretBytes.Length != 135)
                 {
-                    var padded = new byte[135];
-                    Array.Copy(secretBytes, 0, padded, 135 - secretBytes.Length, secretBytes.Length);
-                    secretBytes = padded;
+                    var normalized = new byte[135];
+                    if (secretBytes.Length < 135)
+                    {
+                        // Pad with leading zeros
+                        Array.Copy(secretBytes, 0, normalized, 135 - secretBytes.Length, secretBytes.Length);
+                    }
+                    else
+                    {
+                        // Trim extra bytes (should not happen with mod p, but be safe)
+                        Array.Copy(secretBytes, secretBytes.Length - 135, normalized, 0, 135);
+                    }
+                    secretBytes = normalized;
                 }
                 
                 // FiSH uses SHA256 hash of the raw bytes
@@ -134,8 +167,9 @@ public class Dh1080KeyExchange
                     return b64.Replace("=", "");
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                Log.Warning(ex, "Failed to compute DH1080 shared secret from key: {Key}", theirPublicKeyBase64);
                 return null;
             }
         }
@@ -258,12 +292,21 @@ public class Dh1080KeyExchange
     {
         var bytes = key.ToByteArray(isUnsigned: true, isBigEndian: true);
         
-        // Pad to 135 bytes if shorter (1080 bits)
-        if (bytes.Length < 135)
+        // Ensure exactly 135 bytes (1080 bits) - pad if shorter, trim if longer
+        if (bytes.Length != 135)
         {
-            var padded = new byte[135];
-            Array.Copy(bytes, 0, padded, 135 - bytes.Length, bytes.Length);
-            bytes = padded;
+            var normalized = new byte[135];
+            if (bytes.Length < 135)
+            {
+                // Pad with leading zeros
+                Array.Copy(bytes, 0, normalized, 135 - bytes.Length, bytes.Length);
+            }
+            else
+            {
+                // Trim to 135 bytes (take rightmost bytes)
+                Array.Copy(bytes, bytes.Length - 135, normalized, 0, 135);
+            }
+            bytes = normalized;
         }
         
         // Use standard Base64
