@@ -20,20 +20,22 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
-    - name: Restore dependencies
-      run: dotnet restore
+    - name: Restore Core
+      run: dotnet restore Munin.Core/Munin.Core.csproj
+    - name: Restore Agent
+      run: dotnet restore Munin.Agent/Munin.Agent.csproj
+    - name: Restore Core Tests
+      run: dotnet restore tests/Munin.Core.Tests/Munin.Core.Tests.csproj
+    - name: Restore Agent Tests
+      run: dotnet restore tests/Munin.Agent.Tests/Munin.Agent.Tests.csproj
     - name: Build Core
       run: dotnet build Munin.Core/Munin.Core.csproj --no-restore
     - name: Build Agent
       run: dotnet build Munin.Agent/Munin.Agent.csproj --no-restore
-    - name: Build Relay
-      run: dotnet build Munin.Relay/Munin.Relay.csproj --no-restore
     - name: Test Core
-      run: dotnet test tests/Munin.Core.Tests/Munin.Core.Tests.csproj --no-build --verbosity normal
+      run: dotnet test tests/Munin.Core.Tests/Munin.Core.Tests.csproj --no-restore --verbosity normal
     - name: Test Agent
-      run: dotnet test tests/Munin.Agent.Tests/Munin.Agent.Tests.csproj --no-build --verbosity normal
-    - name: Test Relay
-      run: dotnet test tests/Munin.Relay.Tests/Munin.Relay.Tests.csproj --no-build --verbosity normal
+      run: dotnet test tests/Munin.Agent.Tests/Munin.Agent.Tests.csproj --no-restore --verbosity normal
 
   build-windows:
     name: Build and Test (Windows - Full Suite)
