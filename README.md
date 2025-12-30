@@ -10,7 +10,7 @@
 </div>
 
 *Named after Muninn, Odin’s raven who flies across the world to bring back news and information.*
-
+---
 ![Munin IRC Client](https://raw.githubusercontent.com/brudvik/Munin/refs/heads/main/munin.png)
 
 ## ✨ Features
