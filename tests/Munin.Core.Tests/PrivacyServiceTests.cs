@@ -121,11 +121,17 @@ public class PrivacyServiceTests
     {
         var service = new PrivacyService { IsEnabled = false };
         
-        var result = service.AnonymizeChannelName("#test<>|");
+        // Use characters that are invalid on all platforms
+        var channelWithInvalidChars = "#test" + new string(Path.GetInvalidFileNameChars().Take(3).ToArray());
+        var result = service.AnonymizeChannelName(channelWithInvalidChars);
         
-        result.Should().NotContain("<");
-        result.Should().NotContain(">");
-        result.Should().NotContain("|");
+        // Verify invalid chars are replaced with underscores
+        var invalidChars = Path.GetInvalidFileNameChars();
+        foreach (var invalidChar in invalidChars.Take(3))
+        {
+            result.Should().NotContain(invalidChar.ToString());
+        }
+        result.Should().Contain("_"); // Should have underscores as replacements
     }
 
     [Fact]
