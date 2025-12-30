@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- **Comprehensive test suite for Munin.Core & Munin.UI** (802 tests, 100% passing)
+- **Comprehensive test suite for Munin.Core & Munin.UI** (904 tests, 100% passing)
   - **Phase 1 - Security & Core Logic** (144 tests)
     - EncryptionService tests (35 tests): AES-256-GCM encryption, password verification, key derivation
     - FishCryptService tests (38 tests): FiSH encryption/decryption, mIRC/HexChat compatibility, Base64 encoding
@@ -55,10 +55,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - IdentServerTests (25 tests): RFC 1413 ident server implementation, Start/Stop, RegisterConnection/UnregisterConnection, port configuration, OS types (WIN32/UNIX/OTHER), hide user mode, timeout handling, QueryReceived event
     - AliasServiceTests (32 tests): Command alias management, default aliases (ns/cs/j/kb), argument substitution ($1/$2/$1-), special variables ($channel/$me), multiple commands with semicolons, case insensitivity, built-in command detection
     - CertificatePinningServiceTests (18 tests): SSL certificate pinning, ValidateCertificate (new/valid/changed), UpdatePin/RemovePin/GetPin, CertificateChanged/NewCertificateSeen events, SHA-256 fingerprints, metadata storage
+  - **Phase 12 - IrcConnection Integration Testing** (18 tests, 100% passing)
+    - MockIrcServer helper: TCP mock server with auto CAP negotiation, TaskCompletionSource synchronization, IRC protocol simulation
+    - MockIrcServerTests (4 tests): Mock server functionality verification - connection handling, message receiving, WaitForMessageAsync
+    - IrcConnectionTests (14 tests): Full integration testing of IrcConnection TCP/IRC protocol
+      - Connection tests (5): SuccessfulConnection (raises event), SendsNickAndUser commands, WithPassword (PASS command), ServerNotListening (throws), IsConnected property
+      - Disconnection tests (2): SendsQuitCommand, RaisesDisconnectedEvent
+      - Message sending tests (4): SendRawAsync, SendMessageAsync (PRIVMSG), JoinChannelAsync, JoinChannelAsync with key
+      - Message receiving tests (3): PrivmsgFromUser (channel message event), PrivateMessage event, JoinMessage (user joined event)
+  - **Phase 13 - UI ViewModels Testing** (61 tests, 100% passing)
+    - UserViewModelTests (17 tests): Constructor initialization, DisplayName with mode prefixes (@/+/%/~), Mode property, IsAway status, GroupName classification (Owners/Admins/Operators/Half-Operators/Voiced/Users), Initials generation, StatusTooltip, AwayOpacity dimming, SortOrder
+    - MessageViewModelTests (16 tests): Constructor initialization, Timestamp formatting ([HH:mm:ss]), IsHighlight/IsEncrypted flags, FormattedMessage for Normal/Action/Notice/System types, ShowNickname display logic, IsOwnMessage detection, PaddedNickname alignment, Type property
+    - ServerViewModelTests (21 tests): Constructor initialization, DisplayName, SortOrder, StatusIcon (⚫/🔄/🟢 for disconnected/connecting/connected), LatencyDisplay formatting, IsSelected/IsExpanded/IsAway properties, AwayMessage, Initials generation, IsGroup flag, Channels collection
+    - ChannelViewModelTests (15 tests): Constructor with IrcChannel+ServerViewModel, HasNoMessages flag, IsServerConsole/IsPrivateMessage flags, UnreadCount/HasMention tracking, Topic property, Users/Messages collections, SortOrder, PrivateMessageTarget, IsLoadingHistory flag
 
 ### Fixed
 - **AliasService**: Fixed argument substitution bug where $1- range patterns were incorrectly replaced by individual $1 replacement, causing trailing `-` characters
 - **CTCP Tests**: Fixed hex escape sequence bug in tests - `\x01ACTION` was parsed as `\x01A` (0x01A = Ƭ) + "CTION", changed to `\u0001` to prevent C# from interpreting following hex digits as part of escape sequence
+- **IrcConnection integration tests**: Fixed timing/synchronization issues by adding proper delays for CAP negotiation and event processing, Task.Delay(200ms) after client connect, 700ms for event processing
 - Test projects for Core, Agent, Relay, and UI (xUnit + FluentAssertions)
 - **Munin.Agent**: New autonomous IRC bot agent inspired by Eggdrop
   - Runs independently 24/7 as Windows Service or Linux systemd service

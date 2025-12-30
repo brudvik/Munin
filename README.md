@@ -617,7 +617,7 @@ Munin has a comprehensive test suite to ensure reliability and correctness. All 
 
 ### Test Coverage
 
-The project currently has **802 tests** (100% passing) covering:
+The project currently has **904 tests** (100% passing) covering:
 
 - **Phase 1 - Security & Core Logic** (144 tests)
   - EncryptionService, FishCryptService, SecureStorageService
@@ -669,6 +669,17 @@ The project currently has **802 tests** (100% passing) covering:
   - RFC 1413 ident server implementation
   - Command alias management and expansion
   - SSL certificate pinning and MITM detection
+
+- **Phase 12 - IrcConnection Integration** (18 tests)
+  - MockIrcServer helper with auto CAP negotiation
+  - Full TCP/IRC protocol integration testing
+  - Connection, disconnection, and message flow verification
+
+- **Phase 13 - UI ViewModels** (61 tests)
+  - UserViewModel: Mode prefixes, away status, group classification
+  - MessageViewModel: Timestamp formatting, message types, nickname coloring
+  - ServerViewModel: Connection state, status icons, latency display
+  - ChannelViewModel: Message/user management, unread tracking
 
 ### Running Tests
 
