@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="munin-irc-client.png" alt="Munin IRC Client" />
+<img src="https://github.com/brudvik/Munin/blob/main/resources/munin-irc-client.png" alt="Munin IRC Client" />
 
 # Munin
 
