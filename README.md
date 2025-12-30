@@ -12,6 +12,7 @@
 
 ![Munin IRC Client](https://raw.githubusercontent.com/brudvik/Munin/refs/heads/main/munin.png)
 
+<a href="https://github.com/brudvik/munin/actions"><img src="https://img.shields.io/github/actions/workflow/status/brudvik/munin/dotnet.yml?branch=main" alt="Build Status"></a>
 ![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4)
 ![Windows](https://img.shields.io/badge/Platform-Windows-0078D6)
 ![License](https://img.shields.io/badge/License-MIT-green)
